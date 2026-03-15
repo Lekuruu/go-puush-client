@@ -20,3 +20,8 @@ func (at AccountType) String() string {
 		return "Unknown"
 	}
 }
+
+const (
+	UploadLimitRegular = 200 * 1024 * 1024       // 200 MB
+	UploadLimitPro     = 15 * 1000 * 1024 * 1024 // 15 GB
+)

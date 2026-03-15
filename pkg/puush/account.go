@@ -10,19 +10,19 @@ import (
 )
 
 // Credentials represents the authentication credentials for a puush account.
-// It can either contain an API key or a combination of email and password for login.
+// It can either contain an API key or a combination of username/email & password for login.
 type Credentials struct {
-	Email    *string
-	Password *string
-	Key      *string
+	Identifier *string
+	Password   *string
+	Key        *string
 }
 
 func (c *Credentials) HasApiKey() bool {
-	return c.Key != nil
+	return c.Identifier != nil && c.Key != nil
 }
 
 func (c *Credentials) HasLoginCredentials() bool {
-	return c.Email != nil && c.Password != nil
+	return c.Identifier != nil && c.Password != nil
 }
 
 func (c *Credentials) IsValid() bool {
@@ -31,12 +31,11 @@ func (c *Credentials) IsValid() bool {
 
 func (c *Credentials) toFormData() url.Values {
 	params := url.Values{}
-
 	if c.HasApiKey() {
+		params.Add("e", *c.Identifier)
 		params.Add("k", *c.Key)
-	}
-	if c.HasLoginCredentials() {
-		params.Add("e", *c.Email)
+	} else if c.HasLoginCredentials() {
+		params.Add("e", *c.Identifier)
 		params.Add("p", *c.Password)
 	}
 	return params

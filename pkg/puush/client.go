@@ -27,14 +27,14 @@ func NewClientFromCredentials(creds Credentials) (*Client, error) {
 	}, nil
 }
 
-func NewClientFromApiKey(apiKey string) *Client {
-	creds := Credentials{Key: &apiKey}
+func NewClientFromApiKey(username, apiKey string) *Client {
+	creds := Credentials{Identifier: &username, Key: &apiKey}
 	client, _ := NewClientFromCredentials(creds)
 	return client
 }
 
 func NewClientFromLogin(email, password string) *Client {
-	creds := Credentials{Email: &email, Password: &password}
+	creds := Credentials{Identifier: &email, Password: &password}
 	client, _ := NewClientFromCredentials(creds)
 	return client
 }

@@ -3,6 +3,7 @@ package puush
 import (
 	"errors"
 	"net/http"
+	"strings"
 )
 
 // Authenticate performs the authentication process using the client's credentials.
@@ -13,12 +14,13 @@ func (c *Client) Authenticate() error {
 		return errors.New("invalid credentials: either API key or login must be provided")
 	}
 	params := c.Account.Credentials.toFormData()
+	params.Add("z", "poop")
+	body := strings.NewReader(params.Encode())
 
-	req, err := http.NewRequest("POST", c.FormatURL("/api/auth"), nil)
+	req, err := http.NewRequest("POST", c.FormatURL("/api/auth"), body)
 	if err != nil {
 		return err
 	}
-	req.PostForm = params
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := c.httpClient.Do(req)

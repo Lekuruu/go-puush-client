@@ -12,8 +12,8 @@ func TestThumbnail(t *testing.T) {
 
 	client := NewClientFromLogin(*authEmail, *authPassword)
 	client.SetBaseURL(*authServerURL)
-	err := client.Authenticate()
-	if err != nil {
+
+	if err := client.Authenticate(); err != nil {
 		t.Fatalf("Authenticate() returned error: %v", err)
 	}
 

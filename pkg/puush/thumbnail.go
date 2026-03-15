@@ -17,14 +17,14 @@ func (c *Client) Thumbnail(id int) (io.ReadCloser, error) {
 	params.Add("k", *c.Account.Credentials.Key)
 	params.Add("i", strconv.Itoa(id))
 
-	resp, err := http.NewRequest("POST", c.FormatURL("/api/thumb"), strings.NewReader(params.Encode()))
+	request, err := http.NewRequest("POST", c.FormatURL("/api/thumb"), strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, err
 	}
-	resp.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp.Header.Set("User-Agent", "puush")
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("User-Agent", "puush")
 
-	response, err := c.httpClient.Do(resp)
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}

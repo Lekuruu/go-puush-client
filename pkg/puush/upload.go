@@ -37,20 +37,20 @@ func (c *Client) Upload(file io.Reader, filename string) (string, error) {
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", c.FormatURL("/api/up"), body)
+	request, err := http.NewRequest("POST", c.FormatURL("/api/up"), body)
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("User-Agent", "puush")
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	request.Header.Set("User-Agent", "puush")
 
-	resp, err := c.httpClient.Do(req)
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	scanner, err := c.EvaluateResponse(resp)
+	scanner, err := c.EvaluateResponse(response)
 	if err != nil {
 		return "", err
 	}

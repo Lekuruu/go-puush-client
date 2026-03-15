@@ -17,20 +17,20 @@ func (c *Client) Authenticate() error {
 	params.Add("z", "poop")
 	body := strings.NewReader(params.Encode())
 
-	req, err := http.NewRequest("POST", c.FormatURL("/api/auth"), body)
+	request, err := http.NewRequest("POST", c.FormatURL("/api/auth"), body)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", "puush")
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("User-Agent", "puush")
 
-	resp, err := c.httpClient.Do(req)
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer response.Body.Close()
 
-	scanner, err := c.EvaluateResponse(resp)
+	scanner, err := c.EvaluateResponse(response)
 	if err != nil {
 		return err
 	}

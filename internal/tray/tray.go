@@ -3,10 +3,12 @@ package tray
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/Lekuruu/go-puush-client/internal/config"
 )
 
 type TrayManager struct {
-	app desktop.App
+	app  desktop.App
+	menu *fyne.Menu
 }
 
 func NewTrayManager(app fyne.App) *TrayManager {
@@ -17,7 +19,7 @@ func NewTrayManager(app fyne.App) *TrayManager {
 }
 
 func (m *TrayManager) Initialize(applicationName string) error {
-	puushVersion := fyne.NewMenuItem("puush", func() {})
+	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
 	puushVersion.Disabled = true
 	accountSettings := fyne.NewMenuItem("My Account", func() {})
 
@@ -34,10 +36,15 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	uploadFile.Icon = uploadIcon
 	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", func() {})
 
-	disablePuushing := fyne.NewMenuItem("Disable puushing", func() {})
+	var disablePuushing *fyne.MenuItem
+
+	disablePuushing = fyne.NewMenuItem("Disable puushing", func() {
+		disablePuushing.Checked = !disablePuushing.Checked
+		m.menu.Refresh()
+	})
 	settings := fyne.NewMenuItem("Settings...", func() {})
 
-	menu := fyne.NewMenu(applicationName,
+	m.menu = fyne.NewMenu(applicationName,
 		puushVersion,
 		accountSettings,
 		fyne.NewMenuItemSeparator(),
@@ -52,7 +59,7 @@ func (m *TrayManager) Initialize(applicationName string) error {
 		disablePuushing,
 		settings,
 	)
-	m.app.SetSystemTrayMenu(menu)
+	m.app.SetSystemTrayMenu(m.menu)
 	m.app.SetSystemTrayIcon(puushIcon)
 	return nil
 }

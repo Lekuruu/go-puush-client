@@ -3,6 +3,7 @@ package puush
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -50,6 +51,26 @@ type Account struct {
 	SubscriptionEnd *time.Time
 }
 
+func (a *Account) DiskUsageHumanReadable() string {
+	return formatBytes(a.DiskUsage)
+}
+
+func (a *Account) CanUpload() bool {
+	limit := a.UploadLimit()
+	return limit == -1 || a.DiskUsage < limit
+}
+
+func (a *Account) UploadLimit() int64 {
+	switch a.Type {
+	case AccountTypeRegular:
+		return UploadLimitRegular
+	case AccountTypePro:
+		return UploadLimitPro
+	default:
+		return -1
+	}
+}
+
 func NewAccountFromCredentials(creds Credentials) (*Account, error) {
 	if !creds.IsValid() {
 		return nil, errors.New("invalid credentials: either API key or login must be provided")
@@ -63,9 +84,6 @@ func NewAccountFromCredentials(creds Credentials) (*Account, error) {
 }
 
 func NewAccountFromResponse(scanner *bufio.Scanner) (*Account, error) {
-	if !scanner.Scan() {
-		return nil, errors.New("failed to read account type from response")
-	}
 	authenticationResponse := strings.Split(scanner.Text(), ",")
 
 	accountTypeInt, err := strconv.Atoi(authenticationResponse[0])
@@ -98,4 +116,20 @@ func NewAccountFromResponse(scanner *bufio.Scanner) (*Account, error) {
 		SubscriptionEnd: subscriptionEnd,
 		Credentials:     &Credentials{Key: &apiKey},
 	}, nil
+}
+
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%dB", bytes)
+	}
+
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+
+	units := []string{"KB", "MB", "GB", "TB", "PB", "EB"}
+	return fmt.Sprintf("%.2f%s", float64(bytes)/float64(div), units[exp])
 }

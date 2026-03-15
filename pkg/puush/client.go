@@ -73,7 +73,8 @@ func (c *Client) EvaluateResponse(response *http.Response) (*bufio.Scanner, Puus
 	responseLine := scanner.Text()
 	statusCode, err := strconv.Atoi(responseLine)
 	if err != nil {
-		return nil, PuushErrorRequestFailure
+		// Assuming we have a successful response here too
+		return scanner, nil
 	}
 
 	if statusCode >= 0 {

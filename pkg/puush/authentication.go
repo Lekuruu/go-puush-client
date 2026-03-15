@@ -34,10 +34,13 @@ func (c *Client) Authenticate() error {
 		return err
 	}
 
+	accountIdentifer := c.Account.Credentials.Identifier
 	account, err := NewAccountFromResponse(scanner)
 	if err != nil {
 		return errors.New("response error: " + err.Error())
 	}
+
 	c.Account = account
+	c.Account.Credentials.Identifier = accountIdentifer
 	return nil
 }

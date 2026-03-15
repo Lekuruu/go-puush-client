@@ -9,7 +9,8 @@ var (
 	PuushErrorInsufficientStorage PuushError = NewPuushError("Insufficient storage", -4, false)
 
 	/* Custom internal errors */
-	PuushErrorUnknown PuushError = NewPuushError("Unknown error", -999, false)
+	PuushErrorNotFound PuushError = NewPuushError("Not found", -998, false)
+	PuushErrorUnknown  PuushError = NewPuushError("Unknown error", -999, false)
 )
 
 type PuushError interface {

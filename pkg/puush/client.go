@@ -95,3 +95,21 @@ func (c *Client) EvaluateResponse(response *http.Response) (*bufio.Scanner, Puus
 		return nil, PuushErrorUnknown
 	}
 }
+
+// EvaluateHttpResponse returns a puush error based on the http status code of the response
+func (c *Client) EvaluateHttpResponse(response *http.Response) PuushError {
+	if response.StatusCode >= http.StatusInternalServerError {
+		return PuushErrorRequestFailure
+	}
+
+	switch response.StatusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusNotFound:
+		return PuushErrorNotFound
+	case http.StatusUnauthorized, http.StatusForbidden:
+		return PuushErrorInvalidCredentials
+	default:
+		return PuushErrorUnknown
+	}
+}

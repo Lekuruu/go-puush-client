@@ -27,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	file, err := os.Open(*uploadFileName)
+	file, err := os.Open("example.png")
 	if err != nil {
 		panic(err)
 	}

@@ -1,6 +1,7 @@
 package puush
 
 import (
+	"bufio"
 	"errors"
 	"net/http"
 	"net/url"
@@ -43,6 +44,29 @@ func NewHistoryItemFromResponse(line string) (*HistoryItem, error) {
 	}, nil
 }
 
+func NewHistoryItemsFromResponse(scanner *bufio.Scanner) ([]*HistoryItem, error) {
+	amountUploads, err := strconv.Atoi(scanner.Text())
+	if err != nil {
+		return nil, errors.New("response error: expected number of uploads")
+	}
+
+	history := make([]*HistoryItem, 0, amountUploads)
+	for range amountUploads {
+		if !scanner.Scan() {
+			return nil, errors.New("response error: expected more history items")
+		}
+
+		line := scanner.Text()
+		item, err := NewHistoryItemFromResponse(line)
+		if err != nil {
+			return nil, errors.New("response error: " + err.Error())
+		}
+		history = append(history, item)
+	}
+
+	return history, nil
+}
+
 func (c *Client) History() ([]*HistoryItem, error) {
 	if !c.Account.Credentials.HasApiKey() {
 		return nil, PuushErrorInvalidCredentials
@@ -69,23 +93,9 @@ func (c *Client) History() ([]*HistoryItem, error) {
 		return nil, err
 	}
 
-	amountUploads, err := strconv.Atoi(scanner.Text())
+	history, err := NewHistoryItemsFromResponse(scanner)
 	if err != nil {
-		return nil, errors.New("response error: expected number of uploads")
-	}
-
-	history := make([]*HistoryItem, 0, amountUploads)
-	for range amountUploads {
-		if !scanner.Scan() {
-			return nil, errors.New("response error: expected more history items")
-		}
-
-		line := scanner.Text()
-		item, err := NewHistoryItemFromResponse(line)
-		if err != nil {
-			return nil, errors.New("response error: " + err.Error())
-		}
-		history = append(history, item)
+		return nil, err
 	}
 
 	return history, nil

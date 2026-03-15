@@ -1,7 +1,6 @@
 package puush
 
 import (
-	"bytes"
 	"errors"
 	"io"
 	"mime/multipart"
@@ -17,29 +16,34 @@ func (c *Client) Upload(file io.Reader, filename string) (string, error) {
 		return "", PuushErrorInvalidCredentials
 	}
 
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("f", filename)
-	if err != nil {
-		return "", err
-	}
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	_, err = io.Copy(part, file)
-	if err != nil {
-		return "", err
-	}
+	go func() {
+		var err error
+		defer func() {
+			pw.CloseWithError(err)
+		}()
 
-	err = writer.WriteField("k", *c.Account.Credentials.Key)
-	if err != nil {
-		return "", err
-	}
+		part, err := writer.CreateFormFile("f", filename)
+		if err != nil {
+			return
+		}
 
-	err = writer.Close()
-	if err != nil {
-		return "", err
-	}
+		_, err = io.Copy(part, file)
+		if err != nil {
+			return
+		}
 
-	request, err := http.NewRequest("POST", c.FormatURL("/api/up"), body)
+		err = writer.WriteField("k", *c.Account.Credentials.Key)
+		if err != nil {
+			return
+		}
+
+		err = writer.Close()
+	}()
+
+	request, err := http.NewRequest("POST", c.FormatURL("/api/up"), pr)
 	if err != nil {
 		return "", err
 	}

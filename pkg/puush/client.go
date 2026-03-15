@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Client is the main struct for interacting with the puush API.
@@ -71,7 +72,8 @@ func (c *Client) EvaluateResponse(response *http.Response) (*bufio.Scanner, Puus
 	}
 
 	responseLine := scanner.Text()
-	statusCode, err := strconv.Atoi(responseLine)
+	responseStatus := strings.SplitN(responseLine, ",", 1)[0]
+	statusCode, err := strconv.Atoi(responseStatus)
 	if err != nil {
 		// Assuming we have a successful response here too
 		return scanner, nil

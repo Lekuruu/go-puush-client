@@ -67,6 +67,7 @@ func NewHistoryItemsFromResponse(scanner *bufio.Scanner) ([]*HistoryItem, error)
 	return history, nil
 }
 
+// History retrieves the 5 most recent uploads of the authenticated user.
 func (c *Client) History() ([]*HistoryItem, error) {
 	if !c.Account.Credentials.HasApiKey() {
 		return nil, PuushErrorInvalidCredentials

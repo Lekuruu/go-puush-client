@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// Delete removes a file from puush by its ID.
+// It returns the most recent history items after deletion.
 func (c *Client) Delete(id int) ([]*HistoryItem, error) {
 	if !c.Account.Credentials.HasApiKey() {
 		return nil, PuushErrorInvalidCredentials

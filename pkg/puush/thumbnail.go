@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Thumbnail retrieves the thumbnail of an uploaded file by its ID.
 func (c *Client) Thumbnail(id int) (io.ReadCloser, error) {
 	if !c.Account.Credentials.HasApiKey() {
 		return nil, PuushErrorInvalidCredentials

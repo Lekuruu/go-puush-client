@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// Upload sends a file to puush and returns the URL of the uploaded file.
+// It will also update the disk usage of the account based on the response from the server.
 func (c *Client) Upload(file io.Reader, filename string) (string, error) {
 	if !c.Account.Credentials.HasApiKey() {
 		return "", PuushErrorInvalidCredentials

@@ -1,6 +1,6 @@
 # go-puush-client
 
-This repository contains a go implementation of the puush api. My plan for the future is to add a cross-platform desktop client, which will aim to recreate the original client as closely as possible. Right now, the repository only contains the barebones api implementation.
+This repository contains a go implementation of the puush api. My plan for the future is to add a cross-platform desktop application, which will aim to recreate the original client as closely as possible. Right now, the repository only contains the barebones api implementation.
 
 ## Usage example
 

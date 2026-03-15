@@ -22,6 +22,7 @@ func (c *Client) Authenticate() error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("User-Agent", "puush")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

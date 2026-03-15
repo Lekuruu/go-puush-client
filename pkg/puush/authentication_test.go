@@ -12,14 +12,14 @@ import (
 //     -auth-server-url "https://puush.me"
 
 var (
-	authEmail     = flag.String("auth-email", "", "Email used for integration auth test")
-	authPassword  = flag.String("auth-password", "", "Password used for integration auth test")
-	authServerURL = flag.String("auth-server-url", "https://puush.me", "Base server URL used for integration auth test")
+	authEmail     = flag.String("auth-email", "", "Email used for testing")
+	authPassword  = flag.String("auth-password", "", "Password used for testing")
+	authServerURL = flag.String("auth-server-url", "https://puush.me", "Base server URL used for testing")
 )
 
 func TestAuthentication(t *testing.T) {
 	if *authEmail == "" || *authPassword == "" || *authServerURL == "" {
-		t.Skip("skipping integration auth test; provide -auth-email, -auth-password, and -auth-server-url")
+		t.Skip("skipping integration auth test; provide -auth-email and -auth-password")
 	}
 
 	client := NewClientFromLogin(*authEmail, *authPassword)

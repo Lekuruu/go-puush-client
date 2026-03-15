@@ -29,5 +29,10 @@ func (c *Client) Thumbnail(id int) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	return response.Body, c.EvaluateHttpResponse(response)
+	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
+		return nil, c.EvaluateHttpResponse(response)
+	}
+
+	return response.Body, nil
 }

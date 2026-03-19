@@ -1,16 +1,19 @@
 package desktop
 
 import (
+	"errors"
 	"image/color"
 	"net/url"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/Lekuruu/go-puush-client/assets"
+	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 // puush uses a pre-made background asset for the quick start window.
@@ -63,11 +66,42 @@ func (ui *UI) ShowStartupWindow() {
 	coverRectangle.Move(fyne.NewPos(125, 200))
 	coverRectangle.Resize(fyne.NewSize(400, 75))
 
-	loginBtn := NewBorderedButton("Login", func() {
-		// TODO: Implement login logic
-		// When a login is successful, the username, password & cover rect should be hidden
-		// When a login failed, an error message box should pop up with the appropriate error message
-	})
+	var loginBtn *BorderedButton
+	var okayBtn *BorderedButton
+
+	// TODO: Find a way to wrap fyne calls in `fyne.Do` without it making
+	// 		the code more shit than it already is
+	performLogin := func() {
+		// Disable input & enable it back afterwards
+		emailEntry.Disable()
+		passwordEntry.Disable()
+		loginBtn.Instance.Disable()
+		defer emailEntry.Enable()
+		defer passwordEntry.Enable()
+		defer loginBtn.Instance.Enable()
+
+		ui.api = puush.NewClientFromLogin(emailEntry.Text, passwordEntry.Text)
+		ui.api.SetBaseURL(serverUrl.String())
+		err := ui.api.Authenticate()
+		if err != nil {
+			showError(err, w)
+			return
+		}
+
+		// Hide login elements
+		loginBtn.Hide()
+		emailEntry.Hide()
+		passwordEntry.Hide()
+		coverRectangle.Hide()
+		emailLabel.Hide()
+		passwordLabel.Hide()
+		forgotLink.Hide()
+
+		// Enable "okay" button
+		okayBtn.Instance.Enable()
+	}
+
+	loginBtn = NewBorderedButton("Login", func() { go performLogin() })
 	loginBtn.Move(fyne.NewPos(370, 200))
 	loginBtn.Resize(fyne.NewSize(160, 55))
 	loginBtn.Instance.Disable()
@@ -102,7 +136,7 @@ func (ui *UI) ShowStartupWindow() {
 	})
 	startupCheckbox.SetChecked(true)
 
-	okayBtn := NewBorderedButton("Okay, I've got it!", func() {
+	okayBtn = NewBorderedButton("Okay, I've got it!", func() {
 		w.Close()
 	})
 	okayBtn.Instance.Disable()
@@ -132,4 +166,27 @@ func (ui *UI) ShowStartupWindow() {
 	// TODO: Disable `SetMaster` once we have the tray system running
 	w.SetMaster()
 	w.Show()
+}
+
+// TODO: Make error dialogs look better
+
+func showError(err error, window fyne.Window) {
+	puushErr, ok := err.(puush.PuushError)
+	if !ok {
+		dialog.ShowError(errors.New("An unexpected error occured. Please try again!"), window)
+		return
+	}
+
+	switch puushErr {
+	case puush.PuushErrorInvalidCredentials:
+		dialog.ShowError(errors.New("The username or password you entered is incorrect."), window)
+	case puush.PuushErrorRequestFailure:
+		dialog.ShowError(errors.New("Connection with server went wrong.  Please check your connection and try again."), window)
+	case puush.PuushErrorChecksumFailure:
+		dialog.ShowError(errors.New("Server responded with an unexpected checksum error."), window)
+	case puush.PuushErrorInsufficientStorage:
+		dialog.ShowError(errors.New("Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!"), window)
+	default:
+		dialog.ShowError(errors.New("An unexpected error occured. Please try again!"), window)
+	}
 }

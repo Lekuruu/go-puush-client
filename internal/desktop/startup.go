@@ -20,6 +20,10 @@ func (ui *UI) ShowStartupWindow() {
 	w := ui.app.NewWindow("puush quick start")
 	w.SetFixedSize(true)
 
+	serverUrl := ui.config.Misc.ParseServerURL()
+	registerUrl := serverUrl.String() + "/register"
+	resetUrl := serverUrl.String() + "/reset_password"
+
 	// Create the background image from our embedded asset
 	bgResource := fyne.NewStaticResource("quickstart_bg", assets.QuickstartData)
 	bgImage := canvas.NewImageFromResource(bgResource)
@@ -28,7 +32,7 @@ func (ui *UI) ShowStartupWindow() {
 
 	// Create button to link to account page
 	registerBtn := NewBorderedButton("Take me to the account creation page!", func() {
-		OpenBrowser("https://puush.me/register") // TODO: Custom server url
+		OpenBrowser(registerUrl)
 	})
 	registerBtn.Move(fyne.NewPos(200, 138))
 	registerBtn.Resize(fyne.NewSize(250, 28))
@@ -49,7 +53,7 @@ func (ui *UI) ShowStartupWindow() {
 	passwordEntry.Resize(fyne.NewSize(150, 25))
 
 	// Forgot password hyperlink
-	forgotURL, _ := url.Parse("https://puush.me/reset_password") // TODO: Custom server url
+	forgotURL, _ := url.Parse(resetUrl)
 	forgotLink := NewUnderlinedLink("Forgotten Password?", forgotURL)
 	forgotLink.Move(fyne.NewPos(201, 256))
 	forgotLink.Resize(forgotLink.MinSize())

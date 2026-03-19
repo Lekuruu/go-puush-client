@@ -1,6 +1,7 @@
 package config
 
 import (
+	"net/url"
 	"time"
 )
 
@@ -58,6 +59,20 @@ type HotkeyConfig struct {
 
 type MiscConfig struct {
 	LastUpdate time.Time
+	ServerURL  string
+}
+
+func (misc *MiscConfig) ParseServerURL() *url.URL {
+	obj, err := url.Parse(misc.ServerURL)
+	if err != nil {
+		// Url seems to be invalid, revert back to default
+		misc.ServerURL = "https://puush.me"
+		obj, _ = url.Parse(misc.ServerURL)
+	}
+
+	// Ensure path is cleared
+	obj.Path = ""
+	return obj
 }
 
 // DefaultConfig returns a Config populated with default values.
@@ -87,6 +102,9 @@ func DefaultConfig() *Config {
 			UploadFile:              "Ctrl+Shift+U",
 			UploadClipboard:         "Ctrl+Shift+5",
 			Toggle:                  "Ctrl+Alt+P",
+		},
+		Misc: MiscConfig{
+			ServerURL: "https://puush.me",
 		},
 	}
 }

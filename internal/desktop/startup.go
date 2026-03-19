@@ -80,7 +80,7 @@ func (ui *UI) ShowStartupWindow() {
 		defer passwordEntry.Enable()
 		defer loginBtn.Instance.Enable()
 
-		ui.api = puush.NewClientFromLogin(emailEntry.Text, passwordEntry.Text)
+		ui.api.Account.Credentials = &puush.Credentials{Identifier: &emailEntry.Text, Password: &passwordEntry.Text}
 		ui.api.SetBaseURL(serverUrl.String())
 		err := ui.api.Authenticate()
 		if err != nil {

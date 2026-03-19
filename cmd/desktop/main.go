@@ -13,8 +13,12 @@ func main() {
 	store := config.NewStore()
 	cfg, err := store.Load()
 	if err != nil {
+		// Use default config if none was found
 		cfg = config.DefaultConfig()
 	}
+
+	// Save config once app shuts down
+	defer store.Save(cfg)
 
 	ui := desktop.NewUI(app, cfg)
 	ui.Run()

@@ -28,7 +28,7 @@ func (u *UI) ShowStartupWindow() {
 
 	// Create button to link to account page
 	registerBtn := NewBorderedButton("Take me to the account creation page!", func() {
-		// TODO: Open browser to /register
+		OpenBrowser("https://puush.me/register") // TODO: Custom server url
 	})
 	registerBtn.Move(fyne.NewPos(200, 138))
 	registerBtn.Resize(fyne.NewSize(250, 28))

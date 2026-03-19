@@ -10,6 +10,7 @@ type UI struct {
 }
 
 func NewUI(a fyne.App) *UI {
+	a.Settings().SetTheme(NewWindowsTheme())
 	return &UI{app: a}
 }
 

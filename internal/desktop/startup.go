@@ -27,11 +27,11 @@ func (u *UI) ShowStartupWindow() {
 	bgImage.SetMinSize(fyne.NewSize(640, 540))
 
 	// Create button to link to account page
-	registerBtn := widget.NewButton("Take me to the account creation page!", func() {
+	registerBtn := newBorderedButton("Take me to the account creation page!", func() {
 		// TODO: Open browser to /register
 	})
 	registerBtn.Move(fyne.NewPos(200, 138))
-	registerBtn.Resize(fyne.NewSize(280, 30))
+	registerBtn.Resize(fyne.NewSize(250, 28))
 
 	emailLabel := canvas.NewText("Email:", color.Black)
 	emailLabel.TextSize = 12
@@ -53,19 +53,19 @@ func (u *UI) ShowStartupWindow() {
 	// Forgot password hyperlink
 	forgotURL, _ := url.Parse("https://puush.me/reset_password") // TODO: Custom server url
 	forgotLink := widget.NewHyperlink("Forgotten Password?", forgotURL)
-	forgotLink.Move(fyne.NewPos(192, 246))
+	forgotLink.Move(fyne.NewPos(197, 252))
 
 	// Create a rectangle to cover the "Login successful" text
 	coverRectangle := canvas.NewRectangle(color.White)
 	coverRectangle.Move(fyne.NewPos(125, 200))
 	coverRectangle.Resize(fyne.NewSize(400, 75))
 
-	loginBtn := widget.NewButton("Login", func() {
+	loginBtn := newBorderedButton("Login", func() {
 		// TODO: Implement login logic
 		// When a login is successful, the username, password & cover rect should be hidden
 		// When a login failed, an error message box should pop up with the appropriate error message
 	})
-	loginBtn.Move(fyne.NewPos(380, 200))
+	loginBtn.Move(fyne.NewPos(370, 200))
 	loginBtn.Resize(fyne.NewSize(160, 55))
 
 	// Container for the background and absolutely positioned overlays
@@ -87,17 +87,20 @@ func (u *UI) ShowStartupWindow() {
 	})
 	startupCheckbox.SetChecked(true)
 
-	okayBtn := widget.NewButton("Okay, I've got it!", func() {
+	okayBtn := newBorderedButton("Okay, I've got it!", func() {
 		w.Close()
 	})
+
 	// Force-resize this button inside a new container, since the HBox will not allow that
-	sizedOkayBtn := container.NewGridWrap(fyne.NewSize(331, 32), okayBtn)
+	sizedOkayBtn := container.NewGridWrap(fyne.NewSize(325, 32), okayBtn)
 
 	// Layout the bottom bar
 	bottomBar := container.NewHBox(
+		layout.NewSpacer(),
 		startupCheckbox,
 		layout.NewSpacer(),
 		sizedOkayBtn,
+		layout.NewSpacer(),
 	)
 
 	// Combine the background area and the bottom bar

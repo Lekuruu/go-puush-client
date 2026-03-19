@@ -27,7 +27,7 @@ func (u *UI) ShowStartupWindow() {
 	bgImage.SetMinSize(fyne.NewSize(640, 540))
 
 	// Create button to link to account page
-	registerBtn := newBorderedButton("Take me to the account creation page!", func() {
+	registerBtn := NewBorderedButton("Take me to the account creation page!", func() {
 		// TODO: Open browser to /register
 	})
 	registerBtn.Move(fyne.NewPos(200, 138))
@@ -60,13 +60,14 @@ func (u *UI) ShowStartupWindow() {
 	coverRectangle.Move(fyne.NewPos(125, 200))
 	coverRectangle.Resize(fyne.NewSize(400, 75))
 
-	loginBtn := newBorderedButton("Login", func() {
+	loginBtn := NewBorderedButton("Login", func() {
 		// TODO: Implement login logic
 		// When a login is successful, the username, password & cover rect should be hidden
 		// When a login failed, an error message box should pop up with the appropriate error message
 	})
 	loginBtn.Move(fyne.NewPos(370, 200))
 	loginBtn.Resize(fyne.NewSize(160, 55))
+	loginBtn.Instance.Disable()
 
 	// Container for the background and absolutely positioned overlays
 	overlayContainer := container.NewWithoutLayout(
@@ -87,9 +88,10 @@ func (u *UI) ShowStartupWindow() {
 	})
 	startupCheckbox.SetChecked(true)
 
-	okayBtn := newBorderedButton("Okay, I've got it!", func() {
+	okayBtn := NewBorderedButton("Okay, I've got it!", func() {
 		w.Close()
 	})
+	okayBtn.Instance.Disable()
 
 	// Force-resize this button inside a new container, since the HBox will not allow that
 	sizedOkayBtn := container.NewGridWrap(fyne.NewSize(325, 32), okayBtn)

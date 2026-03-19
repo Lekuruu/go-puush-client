@@ -32,7 +32,9 @@ func (w *classicTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant
 	case theme.ColorNameButton:
 		return color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	case theme.ColorNameDisabledButton:
-		return color.NRGBA{R: 204, G: 204, B: 204, A: 255}
+		return color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+	case theme.ColorNameDisabled:
+		return color.NRGBA{R: 160, G: 160, B: 160, A: 255}
 	case theme.ColorNameHover:
 		return color.NRGBA{R: 216, G: 230, B: 242, A: 255}
 	case theme.ColorNameInputBackground:

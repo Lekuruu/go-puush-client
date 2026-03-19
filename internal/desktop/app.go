@@ -9,12 +9,12 @@ type UI struct {
 	app fyne.App
 }
 
-func NewUI(a fyne.App) *UI {
-	a.Settings().SetTheme(NewWindowsTheme())
-	return &UI{app: a}
+func NewUI(app fyne.App) *UI {
+	app.Settings().SetTheme(NewWindowsTheme())
+	return &UI{app: app}
 }
 
-func (u *UI) Run() {
-	u.ShowStartupWindow()
-	u.app.Run()
+func (ui *UI) Run() {
+	ui.ShowStartupWindow()
+	ui.app.Run()
 }

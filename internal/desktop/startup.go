@@ -16,8 +16,8 @@ import (
 // puush uses a pre-made background asset for the quick start window.
 // Elements like the login prompt are just added on top of it.
 
-func (u *UI) ShowStartupWindow() {
-	w := u.app.NewWindow("puush quick start")
+func (ui *UI) ShowStartupWindow() {
+	w := ui.app.NewWindow("puush quick start")
 	w.SetFixedSize(true)
 
 	// Create the background image from our embedded asset
@@ -34,11 +34,9 @@ func (u *UI) ShowStartupWindow() {
 	registerBtn.Resize(fyne.NewSize(250, 28))
 
 	emailLabel := canvas.NewText("Email:", color.Black)
-	emailLabel.TextSize = 12
 	emailLabel.Move(fyne.NewPos(155, 207))
 
 	passwordLabel := canvas.NewText("Password:", color.Black)
-	passwordLabel.TextSize = 12
 	passwordLabel.Move(fyne.NewPos(132, 237))
 
 	// Create the inputs that will be placed over the background
@@ -52,8 +50,9 @@ func (u *UI) ShowStartupWindow() {
 
 	// Forgot password hyperlink
 	forgotURL, _ := url.Parse("https://puush.me/reset_password") // TODO: Custom server url
-	forgotLink := widget.NewHyperlink("Forgotten Password?", forgotURL)
-	forgotLink.Move(fyne.NewPos(197, 252))
+	forgotLink := NewUnderlinedLink("Forgotten Password?", forgotURL)
+	forgotLink.Move(fyne.NewPos(201, 256))
+	forgotLink.Resize(forgotLink.MinSize())
 
 	// Create a rectangle to cover the "Login successful" text
 	coverRectangle := canvas.NewRectangle(color.White)

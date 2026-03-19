@@ -4,8 +4,8 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-func (u *UI) ShowSettingsWindow() {
-	w := u.app.NewWindow("Settings")
+func (ui *UI) ShowSettingsWindow() {
+	w := ui.app.NewWindow("Settings")
 	w.Resize(fyne.NewSize(495, 360))
 	w.Show()
 }

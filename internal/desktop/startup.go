@@ -72,6 +72,17 @@ func (ui *UI) ShowStartupWindow() {
 	loginBtn.Resize(fyne.NewSize(160, 55))
 	loginBtn.Instance.Disable()
 
+	// Login button should be enabled once password & email have been filled in
+	checkLoginStatus := func(s string) {
+		if emailEntry.Text != "" && passwordEntry.Text != "" {
+			loginBtn.Instance.Enable()
+		} else {
+			loginBtn.Instance.Disable()
+		}
+	}
+	emailEntry.OnChanged = checkLoginStatus
+	passwordEntry.OnChanged = checkLoginStatus
+
 	// Container for the background and absolutely positioned overlays
 	overlayContainer := container.NewWithoutLayout(
 		bgImage,

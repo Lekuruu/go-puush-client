@@ -12,6 +12,7 @@ import (
 type TrayManager struct {
 	api              *puush.Client
 	menu             *fyne.Menu
+	targetApp        desktop.App
 	settingsCallback func()
 }
 
@@ -42,6 +43,7 @@ func (m *TrayManager) Apply(app fyne.App) error {
 	if desktopApp, ok := app.(desktop.App); ok {
 		desktopApp.SetSystemTrayMenu(m.menu)
 		desktopApp.SetSystemTrayIcon(puushIcon)
+		m.targetApp = desktopApp
 		return nil
 	}
 	return errors.New("provided app is not a desktop app")

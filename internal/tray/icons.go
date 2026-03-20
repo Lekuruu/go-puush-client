@@ -13,3 +13,17 @@ var (
 	uploadIcon     fyne.Resource = fyne.NewStaticResource("icon-upload.png", assets.UploadIconData)
 	selectionIcon  fyne.Resource = fyne.NewStaticResource("icon-selection.png", assets.SelectionIconData)
 )
+
+// OnTrayProgressUpdate gets called once the upload percentage
+// has been updated through `puush.ProgressReader`
+func (m *TrayManager) OnTrayProgressUpdate(percentage float64) {
+	// TODO: ...
+}
+
+// OnTrayProgressComplete will reset the puush tray icon
+// back to its original state
+func (m *TrayManager) OnTrayProgressComplete() {
+	if m.targetApp != nil {
+		m.targetApp.SetSystemTrayIcon(puushIcon)
+	}
+}

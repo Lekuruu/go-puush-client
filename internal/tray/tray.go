@@ -10,12 +10,28 @@ import (
 )
 
 type TrayManager struct {
-	api  *puush.Client
-	menu *fyne.Menu
+	api              *puush.Client
+	menu             *fyne.Menu
+	settingsCallback func()
 }
 
 func NewTrayManager(api *puush.Client) *TrayManager {
 	return &TrayManager{api: api}
+}
+
+// SetSettingsCallback will set the function that will be called
+// once the "Settings..." action has been invoked
+func (m *TrayManager) SetSettingsCallback(callback func()) {
+	m.settingsCallback = callback
+}
+
+// Refresh will instruct the tray to update its menu.
+func (m *TrayManager) Refresh() error {
+	if m.menu == nil {
+		return errors.New("tray was not initialized")
+	}
+	m.menu.Refresh()
+	return nil
 }
 
 // Apply applies the tray menu to the specified app.
@@ -29,15 +45,6 @@ func (m *TrayManager) Apply(app fyne.App) error {
 		return nil
 	}
 	return errors.New("provided app is not a desktop app")
-}
-
-// Refresh will instruct the tray to update its menu.
-func (m *TrayManager) Refresh() error {
-	if m.menu == nil {
-		return errors.New("tray was not initialized")
-	}
-	m.menu.Refresh()
-	return nil
 }
 
 // Initialize populates the system tray menu.
@@ -65,7 +72,7 @@ func (m *TrayManager) Initialize(applicationName string) error {
 		disablePuushing.Checked = !disablePuushing.Checked
 		m.menu.Refresh()
 	})
-	settings := fyne.NewMenuItem("Settings...", func() {})
+	settings := fyne.NewMenuItem("Settings...", func() { m.settingsCallback() })
 
 	m.menu = fyne.NewMenu(applicationName,
 		puushVersion,

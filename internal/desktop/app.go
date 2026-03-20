@@ -33,6 +33,7 @@ func (ui *UI) Run() {
 	if ui.tray != nil {
 		ui.tray.Initialize("puush")
 		ui.tray.Apply(ui.app)
+		ui.tray.SetSettingsCallback(ui.ShowSettingsWindow)
 	}
 
 	// Show quickstart window if no credentials have been set

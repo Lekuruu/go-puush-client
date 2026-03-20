@@ -161,10 +161,6 @@ func (ui *UI) ShowStartupWindow() {
 	)
 	w.SetContent(mainContent)
 	w.Resize(fyne.NewSize(640, 540))
-
-	// `SetMaster` will close the process once the window is closed
-	// TODO: Disable `SetMaster` once we have the tray system running
-	w.SetMaster()
 	w.Show()
 }
 

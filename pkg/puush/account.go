@@ -71,12 +71,9 @@ func (a *Account) UploadLimit() int64 {
 	}
 }
 
-func NewAccountFromCredentials(creds Credentials) (*Account, error) {
-	if !creds.IsValid() {
-		return nil, errors.New("invalid credentials: either API key or login must be provided")
-	}
+func NewAccountFromCredentials(creds *Credentials) (*Account, error) {
 	return &Account{
-		Credentials:     &creds,
+		Credentials:     creds,
 		Type:            AccountTypeRegular,
 		DiskUsage:       0,
 		SubscriptionEnd: nil,

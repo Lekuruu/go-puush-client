@@ -16,7 +16,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func NewClientFromCredentials(creds Credentials) (*Client, error) {
+func NewClientFromCredentials(creds *Credentials) (*Client, error) {
 	account, err := NewAccountFromCredentials(creds)
 	if err != nil {
 		return nil, err
@@ -28,14 +28,14 @@ func NewClientFromCredentials(creds Credentials) (*Client, error) {
 	}, nil
 }
 
-func NewClientFromApiKey(username, apiKey string) *Client {
-	creds := Credentials{Identifier: &username, Key: &apiKey}
+func NewClientFromApiKey(email, apiKey string) *Client {
+	creds := &Credentials{Identifier: stringOrNil(email), Key: stringOrNil(apiKey)}
 	client, _ := NewClientFromCredentials(creds)
 	return client
 }
 
 func NewClientFromLogin(email, password string) *Client {
-	creds := Credentials{Identifier: &email, Password: &password}
+	creds := &Credentials{Identifier: stringOrNil(email), Password: stringOrNil(password)}
 	client, _ := NewClientFromCredentials(creds)
 	return client
 }
@@ -114,4 +114,11 @@ func (c *Client) EvaluateHttpResponse(response *http.Response) PuushError {
 	default:
 		return PuushErrorUnknown
 	}
+}
+
+func stringOrNil(s string) *string {
+	if s != "" {
+		return &s
+	}
+	return nil
 }

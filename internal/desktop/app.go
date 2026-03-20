@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
+	"github.com/Lekuruu/go-puush-client/internal/tray"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
@@ -12,14 +13,35 @@ type UI struct {
 	app    fyne.App
 	api    *puush.Client
 	config *config.Config
+	tray   *tray.TrayManager
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
-	app.Settings().SetTheme(NewWindowsTheme())
-	return &UI{app: app, api: api, config: cfg}
+	return &UI{
+		app:    app,
+		api:    api,
+		config: cfg,
+		tray:   tray.NewTrayManager(api),
+	}
 }
 
 func (ui *UI) Run() {
-	ui.ShowStartupWindow()
+	// TODO: Maybe add some sort of theme customization?
+	ui.app.Settings().SetTheme(NewWindowsTheme())
+
+	// Initialize & start tray
+	if ui.tray != nil {
+		ui.tray.Initialize("puush")
+		ui.tray.Apply(ui.app)
+	}
+
+	// Show quickstart window if no credentials have been set
+	// Otherwise, re-authenticate to see if the API key is still valid
+	if !ui.api.Account.Credentials.HasApiKey() {
+		ui.ShowStartupWindow()
+	} else {
+		// TODO: Implement authentication with tray callback
+	}
+
 	ui.app.Run()
 }

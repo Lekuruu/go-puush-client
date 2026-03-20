@@ -1,23 +1,46 @@
 package tray
 
 import (
+	"errors"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
 	"github.com/Lekuruu/go-puush-client/internal/config"
+	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 type TrayManager struct {
-	app  desktop.App
+	api  *puush.Client
 	menu *fyne.Menu
 }
 
-func NewTrayManager(app fyne.App) *TrayManager {
-	if desktopApp, ok := app.(desktop.App); ok {
-		return &TrayManager{app: desktopApp}
+func NewTrayManager(api *puush.Client) *TrayManager {
+	return &TrayManager{api: api}
+}
+
+// Apply applies the tray menu to the specified app.
+func (m *TrayManager) Apply(app fyne.App) error {
+	if m.menu == nil {
+		return errors.New("tray was not initialized")
 	}
+	if desktopApp, ok := app.(desktop.App); ok {
+		desktopApp.SetSystemTrayMenu(m.menu)
+		desktopApp.SetSystemTrayIcon(puushIcon)
+		return nil
+	}
+	return errors.New("provided app is not a desktop app")
+}
+
+// Refresh will instruct the tray to update its menu.
+func (m *TrayManager) Refresh() error {
+	if m.menu == nil {
+		return errors.New("tray was not initialized")
+	}
+	m.menu.Refresh()
 	return nil
 }
 
+// Initialize populates the system tray menu.
 func (m *TrayManager) Initialize(applicationName string) error {
 	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
 	puushVersion.Disabled = true
@@ -59,7 +82,5 @@ func (m *TrayManager) Initialize(applicationName string) error {
 		disablePuushing,
 		settings,
 	)
-	m.app.SetSystemTrayMenu(m.menu)
-	m.app.SetSystemTrayIcon(puushIcon)
 	return nil
 }

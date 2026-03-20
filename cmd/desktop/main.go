@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"fyne.io/fyne/v2/app"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
@@ -18,18 +20,27 @@ func main() {
 		cfg = config.DefaultConfig()
 	}
 
+	// Save config once app shuts down
+	defer store.Save(cfg)
+
 	api := puush.NewClientFromApiKey(cfg.Account.Username, cfg.Account.Key)
 	defer func() {
 		if !api.Account.Credentials.HasApiKey() {
 			return
 		}
-		// Update credentials in config after shutdown
+		// Update account state in config after shutdown
 		cfg.Account.Key = *api.Account.Credentials.Key
 		cfg.Account.Username = *api.Account.Credentials.Identifier
+		cfg.Account.Type = int(api.Account.Type)
+		cfg.Account.Usage = api.Account.DiskUsage
+		cfg.Account.Expiry = api.Account.SubscriptionEnd.Format(time.DateTime)
 	}()
 
-	// Save config once app shuts down
-	defer store.Save(cfg)
+	// Apply previous account state from config to api
+	expiry, _ := time.Parse(time.DateTime, cfg.Account.Expiry)
+	api.Account.Type = puush.AccountType(cfg.Account.Type)
+	api.Account.DiskUsage = cfg.Account.Usage
+	api.Account.SubscriptionEnd = &expiry
 
 	ui := desktop.NewUI(app, api, cfg)
 	ui.Run()

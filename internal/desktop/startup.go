@@ -69,25 +69,17 @@ func (ui *UI) ShowStartupWindow() {
 	var loginBtn *BorderedButton
 	var okayBtn *BorderedButton
 
-	// TODO: Find a way to wrap fyne calls in `fyne.Do` without it making
-	// 		the code more shit than it already is
-	performLogin := func() {
-		// Disable input & enable it back afterwards
+	disableLoginElements := func() {
 		emailEntry.Disable()
 		passwordEntry.Disable()
 		loginBtn.Instance.Disable()
-		defer emailEntry.Enable()
-		defer passwordEntry.Enable()
-		defer loginBtn.Instance.Enable()
-
-		ui.api.Account.Credentials = &puush.Credentials{Identifier: &emailEntry.Text, Password: &passwordEntry.Text}
-		ui.api.SetBaseURL(serverUrl.String())
-		err := ui.api.Authenticate()
-		if err != nil {
-			showError(err, w)
-			return
-		}
-
+	}
+	enableLoginElements := func() {
+		emailEntry.Enable()
+		passwordEntry.Enable()
+		loginBtn.Instance.Enable()
+	}
+	onLoginSuccess := func() {
 		// Hide login elements
 		loginBtn.Hide()
 		emailEntry.Hide()
@@ -99,6 +91,26 @@ func (ui *UI) ShowStartupWindow() {
 
 		// Enable "okay" button
 		okayBtn.Instance.Enable()
+	}
+
+	performLogin := func() {
+		// Disable input & enable it back afterwards
+		fyne.Do(disableLoginElements)
+		defer fyne.Do(enableLoginElements)
+
+		ui.api.Account.Credentials = &puush.Credentials{
+			Identifier: &emailEntry.Text,
+			Password:   &passwordEntry.Text,
+		}
+		ui.api.SetBaseURL(serverUrl.String())
+
+		// Attempt authentication with new credentials
+		if err := ui.api.Authenticate(); err != nil {
+			showError(err, w)
+			return
+		}
+
+		fyne.Do(onLoginSuccess)
 	}
 
 	loginBtn = NewBorderedButton("Login", func() { go performLogin() })

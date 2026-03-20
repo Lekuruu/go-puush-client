@@ -33,7 +33,10 @@ func main() {
 		cfg.Account.Username = *api.Account.Credentials.Identifier
 		cfg.Account.Type = int(api.Account.Type)
 		cfg.Account.Usage = api.Account.DiskUsage
-		cfg.Account.Expiry = api.Account.SubscriptionEnd.Format(time.DateTime)
+
+		if api.Account.SubscriptionEnd != nil {
+			cfg.Account.Expiry = api.Account.SubscriptionEnd.Format(time.DateTime)
+		}
 	}()
 
 	// Apply previous account state from config to api
@@ -41,6 +44,7 @@ func main() {
 	api.Account.Type = puush.AccountType(cfg.Account.Type)
 	api.Account.DiskUsage = cfg.Account.Usage
 	api.Account.SubscriptionEnd = &expiry
+	// TODO: Handle time parsing better, I'm just too lazy right now and also cba tbh
 
 	ui := desktop.NewUI(app, api, cfg)
 	ui.Run()

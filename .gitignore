@@ -121,3 +121,6 @@ fabric.properties
 # Ignore all local history of files
 .history
 .ionide
+
+# Debugging sessions
+__debug_bin*

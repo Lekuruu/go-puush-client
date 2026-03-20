@@ -41,7 +41,7 @@ func (ui *UI) Run() {
 	if !ui.api.Account.Credentials.HasApiKey() {
 		ui.ShowStartupWindow()
 	} else {
-		// TODO: Implement authentication with tray callback
+		ui.tray.PerformBackgroundAuthentication()
 	}
 
 	ui.app.Run()

@@ -58,15 +58,15 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	recentUploads := fyne.NewMenuItem("Recent Uploads", func() {})
 	recentUploads.Disabled = true
 
-	captureWindow := fyne.NewMenuItem("Capture Current Window", func() {})
+	captureWindow := fyne.NewMenuItem("Capture Current Window", m.UploadWindowScreenshot)
 	captureWindow.Icon = windowIcon
-	captureDesktop := fyne.NewMenuItem("Capture Desktop", func() {})
+	captureDesktop := fyne.NewMenuItem("Capture Desktop", m.UploadDesktopScreenshot)
 	captureDesktop.Icon = fullscreenIcon
-	captureArea := fyne.NewMenuItem("Capture Area", func() {})
+	captureArea := fyne.NewMenuItem("Capture Area", m.UploadAreaScreenshot)
 	captureArea.Icon = selectionIcon
 	uploadFile := fyne.NewMenuItem("Upload File", m.UploadFileFromDialog)
 	uploadFile.Icon = uploadIcon
-	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", func() {})
+	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", m.UploadFromClipboard)
 
 	var disablePuushing *fyne.MenuItem
 

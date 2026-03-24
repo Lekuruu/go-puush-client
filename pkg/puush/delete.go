@@ -17,6 +17,7 @@ func (c *Client) Delete(id int) ([]*HistoryItem, error) {
 	params := url.Values{}
 	params.Add("k", *c.Account.Credentials.Key)
 	params.Add("i", strconv.Itoa(id))
+	params.Add("z", "poop")
 
 	request, err := http.NewRequest("POST", c.FormatURL("/api/del"), strings.NewReader(params.Encode()))
 	if err != nil {

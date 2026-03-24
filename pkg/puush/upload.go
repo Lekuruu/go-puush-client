@@ -40,6 +40,11 @@ func (c *Client) Upload(file io.Reader, filename string) (string, error) {
 			return
 		}
 
+		err = writer.WriteField("z", "poop")
+		if err != nil {
+			return
+		}
+
 		err = writer.Close()
 	}()
 

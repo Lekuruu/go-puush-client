@@ -20,5 +20,8 @@ var UploadIconData []byte
 //go:embed icons/icon-selection.png
 var SelectionIconData []byte
 
+//go:embed icons/icon-clipboard.png
+var ClipboardIconData []byte // NOTE: Not part of the original client
+
 //go:embed quickstart.png
 var QuickstartData []byte // TODO: Remove "windows" text from quickstart asset

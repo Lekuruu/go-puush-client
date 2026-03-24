@@ -14,6 +14,7 @@ var (
 	windowIcon     fyne.Resource = fyne.NewStaticResource("icon-window.png", assets.WindowIconData)
 	fullscreenIcon fyne.Resource = fyne.NewStaticResource("icon-fullscreen.png", assets.FullscreenIconData)
 	uploadIcon     fyne.Resource = fyne.NewStaticResource("icon-upload.png", assets.UploadIconData)
+	clipboardIcon  fyne.Resource = fyne.NewStaticResource("icon-clipboard.png", assets.ClipboardIconData)
 	selectionIcon  fyne.Resource = fyne.NewStaticResource("icon-selection.png", assets.SelectionIconData)
 )
 

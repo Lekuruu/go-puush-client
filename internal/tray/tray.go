@@ -79,6 +79,7 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	uploadFile := fyne.NewMenuItem("Upload File", m.UploadFileFromDialog)
 	uploadFile.Icon = uploadIcon
 	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", m.UploadFromClipboard)
+	uploadClipboard.Icon = clipboardIcon
 
 	var disablePuushing *fyne.MenuItem
 

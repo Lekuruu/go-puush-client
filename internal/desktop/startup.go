@@ -1,16 +1,15 @@
 package desktop
 
 import (
-	"errors"
 	"image/color"
 	"net/url"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/sqweek/dialog"
 
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
@@ -106,7 +105,7 @@ func (ui *UI) ShowStartupWindow() {
 
 		// Attempt authentication with new credentials
 		if err := ui.api.Authenticate(); err != nil {
-			showError(err, w)
+			showError(err)
 			return
 		}
 
@@ -176,25 +175,23 @@ func (ui *UI) ShowStartupWindow() {
 	w.Show()
 }
 
-// TODO: Make error dialogs look better
-
-func showError(err error, window fyne.Window) {
+func showError(err error) {
 	puushErr, ok := err.(puush.PuushError)
 	if !ok {
-		dialog.ShowError(errors.New("An unexpected error occured. Please try again!"), window)
+		dialog.Message("%s", "An unexpected error occured. Please try again!").Title("Error").Error()
 		return
 	}
 
 	switch puushErr {
 	case puush.PuushErrorInvalidCredentials:
-		dialog.ShowError(errors.New("The username or password you entered is incorrect."), window)
+		dialog.Message("%s", "The username or password you entered is incorrect.").Title("Error").Error()
 	case puush.PuushErrorRequestFailure:
-		dialog.ShowError(errors.New("Connection with server went wrong.  Please check your connection and try again."), window)
+		dialog.Message("%s", "Connection with server went wrong.  Please check your connection and try again.").Title("Error").Error()
 	case puush.PuushErrorChecksumFailure:
-		dialog.ShowError(errors.New("Server responded with an unexpected checksum error."), window)
+		dialog.Message("%s", "Server responded with an unexpected checksum error.").Title("Error").Error()
 	case puush.PuushErrorInsufficientStorage:
-		dialog.ShowError(errors.New("Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!"), window)
+		dialog.Message("%s", "Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!").Title("Error").Error()
 	default:
-		dialog.ShowError(errors.New("An unexpected error occured. Please try again!"), window)
+		dialog.Message("%s", "An unexpected error occured. Please try again!").Title("Error").Error()
 	}
 }

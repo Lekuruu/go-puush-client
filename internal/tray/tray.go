@@ -64,7 +64,7 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	captureDesktop.Icon = fullscreenIcon
 	captureArea := fyne.NewMenuItem("Capture Area", func() {})
 	captureArea.Icon = selectionIcon
-	uploadFile := fyne.NewMenuItem("Upload File", func() {})
+	uploadFile := fyne.NewMenuItem("Upload File", m.UploadFileFromDialog)
 	uploadFile.Icon = uploadIcon
 	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", func() {})
 

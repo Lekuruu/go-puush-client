@@ -69,3 +69,11 @@ func FormatError(err error) string {
 		return "An unexpected error occured. Please try again!"
 	}
 }
+
+func ShouldRetryError(err error) bool {
+	puushErr, ok := err.(PuushError)
+	if !ok {
+		return false
+	}
+	return puushErr.ShouldRetry()
+}

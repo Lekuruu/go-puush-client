@@ -21,6 +21,7 @@ func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
 		return
 	}
 	m.OnUploadComplete(url)
+	// TODO: Implement upload retries
 }
 
 func (m *TrayManager) PerformProgressUpload(reader io.ReadCloser, total int64, filename string) {

@@ -2,6 +2,8 @@ package tray
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
@@ -53,8 +55,18 @@ func (m *TrayManager) Apply(app fyne.App) error {
 func (m *TrayManager) Initialize(applicationName string) error {
 	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
 	puushVersion.Disabled = true
-	accountSettings := fyne.NewMenuItem("My Account", func() {})
 
+	accountSettings := fyne.NewMenuItem("My Account", func() {
+		if !m.api.Account.Credentials.HasApiKey() {
+			return
+		}
+
+		path := fmt.Sprintf("/login/go/?k=%s", *m.api.Account.Credentials.Key)
+		accountUrl, _ := url.Parse(m.api.FormatURL(path))
+		fyne.CurrentApp().OpenURL(accountUrl)
+	})
+
+	// TODO: Implement recent uploads
 	recentUploads := fyne.NewMenuItem("Recent Uploads", func() {})
 	recentUploads.Disabled = true
 

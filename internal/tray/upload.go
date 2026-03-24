@@ -40,6 +40,9 @@ func (m *TrayManager) PerformFileUpload(path string) {
 }
 
 func (m *TrayManager) OnUploadComplete(url string) {
+	// Update the tray icon to the "complete" state
+	m.OnTrayProgressComplete()
+
 	go notifications.NewNotification("puush complete!", "", url).
 		WithSoundData(assets.SuccessSoundData).
 		WithIconData(assets.PuushIconData).
@@ -49,6 +52,9 @@ func (m *TrayManager) OnUploadComplete(url string) {
 }
 
 func (m *TrayManager) OnUploadError(err error) {
+	// Update the tray icon to the "failed" state
+	m.OnTrayProgressFail()
+
 	go notifications.NewNotification("puush error", "", puush.FormatError(err)).
 		WithIconData(assets.PuushIconData).
 		Push()

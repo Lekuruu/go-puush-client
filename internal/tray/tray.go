@@ -42,8 +42,8 @@ func (m *TrayManager) Apply(app fyne.App) error {
 	}
 	if desktopApp, ok := app.(desktop.App); ok {
 		desktopApp.SetSystemTrayMenu(m.menu)
-		desktopApp.SetSystemTrayIcon(puushIcon)
 		m.targetApp = app
+		m.ResetTrayIcon()
 		return nil
 	}
 	return errors.New("provided app is not a desktop app")

@@ -35,8 +35,6 @@ var (
 	puushTrayProgress100Icon fyne.Resource = fyne.NewStaticResource("tray-icon-progress100.ico", assets.TrayProgress100IconData)
 )
 
-// TODO: Add osx-specific icons for tray
-
 // ResetTrayIcon resets the puush tray icon back to its original state
 func (m *TrayManager) ResetTrayIcon() {
 	if desktopApp, ok := m.targetApp.(desktop.App); ok {

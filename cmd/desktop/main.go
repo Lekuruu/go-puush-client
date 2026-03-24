@@ -24,6 +24,7 @@ func main() {
 	defer store.Save(cfg)
 
 	api := puush.NewClientFromApiKey(cfg.Account.Username, cfg.Account.Key)
+	api.SetBaseURL(cfg.Misc.ParseServerURL().String())
 	defer func() {
 		if !api.Account.Credentials.HasApiKey() {
 			return

@@ -176,6 +176,13 @@ func (ui *UI) ShowStartupWindow() {
 }
 
 func showError(err error) {
-	errorMessage := puush.FormatError(err)
+	errorMessage := formatStartupError(err)
 	dialog.Message("%s", errorMessage).Title("puush error").Error()
+}
+
+func formatStartupError(err error) string {
+	if err == puush.PuushErrorInvalidCredentials {
+		return "The username or password you entered is incorrect."
+	}
+	return puush.FormatError(err)
 }

@@ -58,9 +58,9 @@ func FormatError(err error) string {
 
 	switch puushErr {
 	case PuushErrorInvalidCredentials:
-		return "Authentication failure. The username or password you entered is incorrect."
+		return "Authentication failure. Your API key may no longer be valid."
 	case PuushErrorRequestFailure:
-		return "Connection with server went wrong.  Please check your connection and try again."
+		return "Connection with server went wrong. Please check your connection and try again."
 	case PuushErrorChecksumFailure:
 		return "Server responded with an unexpected checksum error."
 	case PuushErrorInsufficientStorage:

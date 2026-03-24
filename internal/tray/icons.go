@@ -4,6 +4,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/assets"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/driver/desktop"
 )
 
 var (
@@ -24,6 +25,6 @@ func (m *TrayManager) OnTrayProgressUpdate(percentage float64) {
 // back to its original state
 func (m *TrayManager) OnTrayProgressComplete() {
 	if m.targetApp != nil {
-		m.targetApp.SetSystemTrayIcon(puushIcon)
+		m.targetApp.(desktop.App).SetSystemTrayIcon(puushIcon)
 	}
 }

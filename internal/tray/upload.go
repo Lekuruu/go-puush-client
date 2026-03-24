@@ -40,17 +40,17 @@ func (m *TrayManager) PerformFileUpload(path string) {
 }
 
 func (m *TrayManager) OnUploadComplete(url string) {
-	go notifications.NewNotification("puush", "puush complete", url).
+	go notifications.NewNotification("puush complete!", "", url).
 		WithSoundData(assets.SuccessSoundData).
 		WithIconData(assets.PuushIconData).
 		WithAction(url).
 		Push()
+	// TODO: Copy to clipboard depending on config
 }
 
 func (m *TrayManager) OnUploadError(err error) {
-	go notifications.NewNotification("puush", "puush error", err.Error()).
+	go notifications.NewNotification("puush error", "", puush.FormatError(err)).
 		WithIconData(assets.PuushIconData).
 		Push()
 	// TODO: Find right icon for error
-	// TODO: Handle error formatting
 }

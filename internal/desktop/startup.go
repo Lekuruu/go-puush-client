@@ -176,22 +176,6 @@ func (ui *UI) ShowStartupWindow() {
 }
 
 func showError(err error) {
-	puushErr, ok := err.(puush.PuushError)
-	if !ok {
-		dialog.Message("%s", "An unexpected error occured. Please try again!").Title("Error").Error()
-		return
-	}
-
-	switch puushErr {
-	case puush.PuushErrorInvalidCredentials:
-		dialog.Message("%s", "The username or password you entered is incorrect.").Title("Error").Error()
-	case puush.PuushErrorRequestFailure:
-		dialog.Message("%s", "Connection with server went wrong.  Please check your connection and try again.").Title("Error").Error()
-	case puush.PuushErrorChecksumFailure:
-		dialog.Message("%s", "Server responded with an unexpected checksum error.").Title("Error").Error()
-	case puush.PuushErrorInsufficientStorage:
-		dialog.Message("%s", "Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!").Title("Error").Error()
-	default:
-		dialog.Message("%s", "An unexpected error occured. Please try again!").Title("Error").Error()
-	}
+	errorMessage := puush.FormatError(err)
+	dialog.Message("%s", errorMessage).Title("puush error").Error()
 }

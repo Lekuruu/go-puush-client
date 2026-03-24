@@ -49,3 +49,23 @@ func NewPuushError(name string, value int, shouldRetry bool) PuushError {
 		shouldRetry: shouldRetry,
 	}
 }
+
+func FormatError(err error) string {
+	puushErr, ok := err.(PuushError)
+	if !ok {
+		return "An unexpected error occured. Please try again!"
+	}
+
+	switch puushErr {
+	case PuushErrorInvalidCredentials:
+		return "Authentication failure. The username or password you entered is incorrect."
+	case PuushErrorRequestFailure:
+		return "Connection with server went wrong.  Please check your connection and try again."
+	case PuushErrorChecksumFailure:
+		return "Server responded with an unexpected checksum error."
+	case PuushErrorInsufficientStorage:
+		return "Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!"
+	default:
+		return "An unexpected error occured. Please try again!"
+	}
+}

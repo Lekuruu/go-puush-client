@@ -24,10 +24,6 @@ func (pr *ProgressReader) Read(p []byte) (int, error) {
 	return n, err
 }
 
-func (pr *ProgressReader) Close() error {
-	return pr.ReadCloser.Close()
-}
-
 func NewProgressReader(reader io.ReadCloser, total int64, onProgress func(percentage float64)) *ProgressReader {
 	return &ProgressReader{
 		ReadCloser: reader,
@@ -36,8 +32,8 @@ func NewProgressReader(reader io.ReadCloser, total int64, onProgress func(percen
 	}
 }
 
-func NewProgressReaderFromFile(filename string, onProgress func(percentage float64)) (*ProgressReader, error) {
-	file, err := os.Open(filename)
+func NewProgressReaderFromFile(path string, onProgress func(percentage float64)) (*ProgressReader, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}

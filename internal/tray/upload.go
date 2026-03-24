@@ -10,6 +10,11 @@ import (
 )
 
 func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
+	if !m.api.Account.Credentials.HasApiKey() {
+		// TODO: Open startup window?
+		return
+	}
+
 	url, err := m.api.Upload(reader, filename)
 	if err != nil {
 		m.OnUploadError(err)

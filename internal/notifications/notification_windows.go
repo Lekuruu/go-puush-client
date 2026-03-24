@@ -16,6 +16,7 @@ func (n *Notification) Push() error {
 }
 
 func notification(appName string, title string, text string, iconPath string, actionUrl string) toast.Notification {
+	// TODO: Use balloon notifications for windows 7 and below
 	return toast.Notification{
 		AppID:               appName,
 		Title:               title,

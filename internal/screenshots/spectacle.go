@@ -18,7 +18,7 @@ type SpectacleScreenshotProvider struct {
 	timeout time.Duration
 }
 
-func NewSpectacleProvider() (*SpectacleScreenshotProvider, error) {
+func NewSpectacleProvider() (ScreenshotProvider, error) {
 	binPath, err := exec.LookPath("spectacle")
 	if err != nil {
 		return nil, fmt.Errorf("spectacle not found in PATH: %w", err)
@@ -28,6 +28,17 @@ func NewSpectacleProvider() (*SpectacleScreenshotProvider, error) {
 		binPath: binPath,
 		timeout: 15 * time.Second,
 	}, nil
+}
+
+// Name returns the name of the screenshot provider
+func (p *SpectacleScreenshotProvider) Name() string {
+	return "Spectacle"
+}
+
+// Available checks if the spectacle binary is available in the system
+func (p *SpectacleScreenshotProvider) Available() bool {
+	_, err := exec.LookPath("spectacle")
+	return err == nil
 }
 
 // CaptureScreen captures the entire screen
@@ -120,4 +131,9 @@ func (c *temporaryReadCloser) Close() error {
 		return removeErr
 	}
 	return nil
+}
+
+func init() {
+	// Add spectacle to the list of available screenshot providers
+	ScreenshotProviders = append(ScreenshotProviders, NewSpectacleProvider)
 }

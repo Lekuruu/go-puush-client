@@ -6,11 +6,16 @@ import (
 	"testing"
 )
 
-func TestSpectacleProvider(t *testing.T) {
-	provider, err := NewSpectacleProvider()
-	if err != nil {
-		t.Skipf("failed to create spectacle provider: %v", err)
+func TestAnyProvider(t *testing.T) {
+	if len(ScreenshotProviders) <= 0 {
+		t.Skip("no screenshot providers available")
 	}
+
+	provider, err := ScreenshotProviders[0]()
+	if err != nil {
+		t.Skipf("failed to create provider: %v", err)
+	}
+	t.Logf("Testing provider: '%s'", provider.Name())
 
 	t.Run("CaptureScreen", func(t *testing.T) {
 		reader, err := provider.CaptureScreen()
@@ -19,7 +24,6 @@ func TestSpectacleProvider(t *testing.T) {
 		}
 		defer reader.Close()
 	})
-
 	t.Run("CaptureArea", func(t *testing.T) {
 		reader, err := provider.CaptureArea()
 		if err != nil {
@@ -27,7 +31,6 @@ func TestSpectacleProvider(t *testing.T) {
 		}
 		defer reader.Close()
 	})
-
 	t.Run("CaptureWindow", func(t *testing.T) {
 		reader, err := provider.CaptureWindow()
 		if err != nil {

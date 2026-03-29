@@ -111,6 +111,5 @@ func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.Rea
 }
 
 func init() {
-	// Add spectacle to the list of available screenshot providers
 	ScreenshotProviders = append(ScreenshotProviders, NewSpectacleProvider)
 }

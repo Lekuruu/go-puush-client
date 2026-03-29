@@ -6,6 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.7.3
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/sqweek/dialog v0.0.0-20260123140253-64c163d53aac
+	golang.org/x/sys v0.42.0
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 )
 
@@ -41,7 +42,6 @@ require (
 	github.com/yuin/goldmark v1.8.1 // indirect
 	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.35.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

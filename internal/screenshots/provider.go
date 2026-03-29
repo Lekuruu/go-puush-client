@@ -19,5 +19,5 @@ type ScreenshotProvider interface {
 	CaptureWindow() (io.ReadCloser, error)
 }
 
-// Add list of screenshot provider types
+// ScreenshotProviders is a list of functions that return available screenshot providers
 var ScreenshotProviders []func() (ScreenshotProvider, error)

@@ -4,8 +4,6 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/Lekuruu/go-puush-client/assets"
-	"github.com/Lekuruu/go-puush-client/internal/notifications"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
@@ -48,21 +46,12 @@ func (m *TrayManager) PerformFileUpload(path string) {
 func (m *TrayManager) OnUploadComplete(url string) {
 	// Update the tray icon to the "complete" state
 	m.OnTrayProgressComplete()
-
-	go notifications.NewNotification("puush complete!", "", url).
-		WithSoundData(assets.SuccessSoundData).
-		WithIconData(assets.PuushIconData).
-		WithAction(url).
-		Push()
+	m.ShowUploadNotification(url)
 	// TODO: Copy to clipboard depending on config
 }
 
 func (m *TrayManager) OnUploadError(err error) {
 	// Update the tray icon to the "failed" state
 	m.OnTrayProgressFail()
-
-	go notifications.NewNotification("puush error", "", puush.FormatError(err)).
-		WithIconData(assets.PuushIconData).
-		Push()
-	// TODO: Find right icon for error
+	m.ShowErrorNotification(puush.FormatError(err))
 }

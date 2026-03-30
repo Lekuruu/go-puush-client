@@ -7,25 +7,58 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/Lekuruu/go-puush-client/internal/config"
+	"github.com/Lekuruu/go-puush-client/internal/notifications"
+	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 type TrayManager struct {
-	api              *puush.Client
+	api         *puush.Client
+	screenshots screenshots.ScreenshotProvider
+
 	menu             *fyne.Menu
 	targetApp        fyne.App
 	settingsCallback func()
 }
 
 func NewTrayManager(api *puush.Client) *TrayManager {
-	return &TrayManager{api: api}
+	provider, _ := screenshots.GetDefaultProvider()
+	return &TrayManager{api: api, screenshots: provider}
 }
 
 // SetSettingsCallback will set the function that will be called
 // once the "Settings..." action has been invoked
 func (m *TrayManager) SetSettingsCallback(callback func()) {
 	m.settingsCallback = callback
+}
+
+// GetScreenshotProvider returns the screenshot provider used by the tray manager
+func (m *TrayManager) GetScreenshotProvider() screenshots.ScreenshotProvider {
+	return m.screenshots
+}
+
+// SetScreenshotProvider sets the screenshot provider for the tray manager
+func (m *TrayManager) SetScreenshotProvider(provider screenshots.ScreenshotProvider) {
+	m.screenshots = provider
+}
+
+// ShowUploadNotification will display a notification indicating that an upload was successful
+func (m *TrayManager) ShowUploadNotification(url string) {
+	go notifications.NewNotification("puush complete!", "", url).
+		WithSoundData(assets.SuccessSoundData).
+		WithIconData(assets.PuushIconData).
+		WithAction(url).
+		Push()
+}
+
+// ShowErrorNotification will display an error notification with the provided message
+func (m *TrayManager) ShowErrorNotification(message string) {
+	go notifications.NewNotification("puush error", "", message).
+		WithIconData(assets.PuushIconData).
+		Push()
+	// TODO: Find right icon for error
 }
 
 // Refresh will instruct the tray to update its menu.

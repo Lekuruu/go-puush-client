@@ -1,6 +1,9 @@
 package screenshots
 
-import "io"
+import (
+	"errors"
+	"io"
+)
 
 type ScreenshotProvider interface {
 	// Name returns the name of the screenshot provider
@@ -21,3 +24,14 @@ type ScreenshotProvider interface {
 
 // ScreenshotProviders is a list of functions that return available screenshot providers
 var ScreenshotProviders []func() (ScreenshotProvider, error)
+
+// GetDefaultProvider returns the first available screenshot provider
+func GetDefaultProvider() (ScreenshotProvider, error) {
+	for _, providerFunc := range ScreenshotProviders {
+		provider, err := providerFunc()
+		if err == nil && provider.Available() {
+			return provider, nil
+		}
+	}
+	return nil, errors.New("no available screenshot provider found")
+}

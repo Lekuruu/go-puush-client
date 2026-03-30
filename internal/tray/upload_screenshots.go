@@ -1,17 +1,60 @@
 package tray
 
-// TODO: Add a customizable screenshot system
-// 		 I want to let users decide on a custom screenshot application, e.g. spectacle, flameshot, etc.
-// 		 This will require some platform-specific code, but it would save the hassle of making our own cross-platform screenshot system
+import (
+	"fmt"
+	"time"
+)
 
 func (m *TrayManager) UploadAreaScreenshot() {
-	// TODO: ...
+	provider := m.GetScreenshotProvider()
+	if provider == nil {
+		m.ShowErrorNotification("No screenshot provider available. Please install a compatible screenshot tool to use this feature!")
+		return
+	}
+
+	reader, err := provider.CaptureArea()
+	if err != nil {
+		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		return
+	}
+	defer reader.Close()
+
+	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	m.PerformUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadDesktopScreenshot() {
-	// TODO: ...
+	provider := m.GetScreenshotProvider()
+	if provider == nil {
+		m.ShowErrorNotification("No screenshot provider available. Please install a compatible screenshot tool to use this feature!")
+		return
+	}
+
+	reader, err := provider.CaptureScreen()
+	if err != nil {
+		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		return
+	}
+	defer reader.Close()
+
+	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	m.PerformUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadWindowScreenshot() {
-	// TODO: ...
+	provider := m.GetScreenshotProvider()
+	if provider == nil {
+		m.ShowErrorNotification("No screenshot provider available. Please install a compatible screenshot tool to use this feature!")
+		return
+	}
+
+	reader, err := provider.CaptureWindow()
+	if err != nil {
+		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		return
+	}
+	defer reader.Close()
+
+	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	m.PerformUpload(reader, filename)
 }

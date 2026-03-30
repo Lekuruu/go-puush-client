@@ -3,6 +3,7 @@ package tray
 import (
 	"fmt"
 	"net/url"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
@@ -67,7 +68,8 @@ func (m *TrayManager) BuildHistoryMenuItem(historyItem *puush.HistoryItem) *fyne
 	)
 
 	// TODO: Add icons to history menu items
-	historyMenuItem := fyne.NewMenuItem(historyItem.FileName, nil)
+	fileName := strings.ReplaceAll(historyItem.FileName, "_", "__")
+	historyMenuItem := fyne.NewMenuItem(fileName, nil)
 	historyMenuItem.ChildMenu = historyMenu
 	return historyMenuItem
 }

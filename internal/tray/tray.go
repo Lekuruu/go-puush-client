@@ -87,19 +87,6 @@ func (m *TrayManager) Refresh() error {
 	return nil
 }
 
-// RefreshHistory will update the tray's upload history
-func (m *TrayManager) RefreshHistory() {
-	if !m.api.Account.Credentials.HasApiKey() {
-		return
-	}
-	history, err := m.api.History()
-	if err != nil {
-		return
-	}
-	m.uploadHistory = history
-	m.rebuildMenuItems()
-}
-
 // Apply applies the tray menu to the specified app.
 func (m *TrayManager) Apply(app fyne.App) error {
 	if m.menu == nil {
@@ -125,7 +112,6 @@ func (m *TrayManager) rebuildMenuItems() {
 	if m.menu == nil {
 		return
 	}
-
 	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
 	puushVersion.Disabled = true
 
@@ -133,62 +119,19 @@ func (m *TrayManager) rebuildMenuItems() {
 		if !m.api.Account.Credentials.HasApiKey() {
 			return
 		}
-
 		path := fmt.Sprintf("/login/go/?k=%s", *m.api.Account.Credentials.Key)
 		accountUrl, _ := url.Parse(m.api.FormatURL(path))
 		fyne.CurrentApp().OpenURL(accountUrl)
 	})
 
-	recentUploads := fyne.NewMenuItem("Recent Uploads", func() {})
-	recentUploads.Disabled = true
-
 	items := []*fyne.MenuItem{
 		puushVersion,
 		accountSettings,
 		fyne.NewMenuItemSeparator(),
-		recentUploads,
 	}
 
-	for _, historyItem := range m.uploadHistory {
-		timeItem := fyne.NewMenuItem(fmt.Sprintf("Uploaded: %s", historyItem.Time.Format("2006-01-02 15:04:05")), func() {})
-		timeItem.Disabled = true
-
-		viewsItem := fyne.NewMenuItem(fmt.Sprintf("Views: %d", historyItem.Views), func() {})
-		viewsItem.Disabled = true
-
-		openItem := fyne.NewMenuItem("Open in browser", func() {
-			if u, err := url.Parse(historyItem.Url); err == nil {
-				fyne.CurrentApp().OpenURL(u)
-			}
-		})
-
-		copyItem := fyne.NewMenuItem("Copy link to clipboard", func() {
-			fyne.CurrentApp().Clipboard().SetContent(historyItem.Url)
-		})
-
-		deleteItem := fyne.NewMenuItem("Delete", func() {
-			if newHistory, err := m.api.Delete(historyItem.Id); err == nil {
-				m.uploadHistory = newHistory
-				m.rebuildMenuItems()
-			}
-		})
-
-		historyMenu := fyne.NewMenu(historyItem.FileName,
-			timeItem,
-			viewsItem,
-			fyne.NewMenuItemSeparator(),
-			openItem,
-			copyItem,
-			fyne.NewMenuItemSeparator(),
-			deleteItem,
-		)
-
-		historyMenuItem := fyne.NewMenuItem(historyItem.FileName, nil)
-		historyMenuItem.ChildMenu = historyMenu
-
-		items = append(items, historyMenuItem)
-	}
-
+	// Append the upload history menu items
+	items = append(items, m.BuildHistoryMenu()...)
 	items = append(items, fyne.NewMenuItemSeparator())
 
 	captureWindow := fyne.NewMenuItem("Capture Current Window", m.UploadWindowScreenshot)

@@ -21,7 +21,7 @@ func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
 		app:    app,
 		api:    api,
 		config: cfg,
-		tray:   tray.NewTrayManager(cfg, api),
+		tray:   tray.NewTrayManager(api),
 	}
 }
 
@@ -42,6 +42,13 @@ func (ui *UI) Run() {
 		ui.ShowStartupWindow()
 	} else {
 		ui.tray.PerformBackgroundAuthentication()
+	}
+
+	// Apply configuration for copying to clipboard
+	if ui.config.General.CopyToClipboard {
+		ui.tray.EnableClipboard()
+	} else {
+		ui.tray.DisableClipboard()
 	}
 
 	ui.app.Run()

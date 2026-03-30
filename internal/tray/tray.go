@@ -16,17 +16,17 @@ import (
 
 type TrayManager struct {
 	api         *puush.Client
-	config      *config.Config
 	screenshots screenshots.ScreenshotProvider
 
 	menu             *fyne.Menu
 	targetApp        fyne.App
+	clipboardEnabled bool
 	settingsCallback func()
 }
 
-func NewTrayManager(config *config.Config, api *puush.Client) *TrayManager {
+func NewTrayManager(api *puush.Client) *TrayManager {
 	provider, _ := screenshots.GetDefaultProvider()
-	return &TrayManager{api: api, screenshots: provider, config: config}
+	return &TrayManager{api: api, screenshots: provider}
 }
 
 // SetSettingsCallback will set the function that will be called
@@ -60,6 +60,16 @@ func (m *TrayManager) ShowErrorNotification(message string) {
 		WithIconData(assets.PuushIconData).
 		Push()
 	// TODO: Find right icon for error
+}
+
+// EnableClipboard will enable copying upload urls to the clipboard
+func (m *TrayManager) EnableClipboard() {
+	m.clipboardEnabled = true
+}
+
+// DisableClipboard will disable copying upload urls to the clipboard
+func (m *TrayManager) DisableClipboard() {
+	m.clipboardEnabled = false
 }
 
 // Refresh will instruct the tray to update its menu.

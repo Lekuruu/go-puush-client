@@ -49,7 +49,7 @@ func (m *TrayManager) OnUploadComplete(url string) {
 	m.OnTrayProgressComplete()
 	m.ShowUploadNotification(url)
 
-	if m.config.General.CopyToClipboard {
+	if m.clipboardEnabled {
 		fyne.CurrentApp().Clipboard().SetContent(url)
 	}
 }

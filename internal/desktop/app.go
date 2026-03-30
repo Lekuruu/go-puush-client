@@ -51,5 +51,10 @@ func (ui *UI) Run() {
 		ui.tray.DisableClipboard()
 	}
 
+	// Start directory monitoring
+	if len(ui.config.Capture.MonitorDirectories) > 0 {
+		ui.tray.StartMonitor(ui.config.Capture.MonitorDirectories)
+	}
+
 	ui.app.Run()
 }

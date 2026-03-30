@@ -46,6 +46,7 @@ type CaptureConfig struct {
 	SelectionRectangle bool
 	SaveImages         bool
 	SaveImagePath      string
+	MonitorDirectories []string
 }
 
 type HotkeyConfig struct {
@@ -94,6 +95,7 @@ func DefaultConfig() *Config {
 			SelectionRectangle: true,
 			SaveImages:         false,
 			SaveImagePath:      "Desktop",
+			MonitorDirectories: []string{},
 		},
 		Hotkeys: HotkeyConfig{
 			ScreenSelection:         "Ctrl+Shift+4",

@@ -12,6 +12,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/internal/notifications"
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
+	"github.com/fsnotify/fsnotify"
 )
 
 type TrayManager struct {
@@ -22,6 +23,8 @@ type TrayManager struct {
 	targetApp        fyne.App
 	clipboardEnabled bool
 	settingsCallback func()
+
+	watcher *fsnotify.Watcher
 }
 
 func NewTrayManager(api *puush.Client) *TrayManager {

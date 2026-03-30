@@ -5,6 +5,7 @@ go 1.26.1
 require (
 	fyne.io/fyne/v2 v2.7.3
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/sqweek/dialog v0.0.0-20260123140253-64c163d53aac
 	golang.org/x/sys v0.42.0
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
@@ -16,7 +17,6 @@ require (
 	github.com/TheTitanrain/w32 v0.0.0-20200114052255-2654d97dbd3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fredbi/uri v1.1.1 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fyne-io/gl-js v0.2.0 // indirect
 	github.com/fyne-io/glfw-js v0.3.0 // indirect
 	github.com/fyne-io/image v0.1.1 // indirect

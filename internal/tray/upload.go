@@ -4,6 +4,7 @@ import (
 	"io"
 	"path/filepath"
 
+	"fyne.io/fyne/v2"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
@@ -47,7 +48,10 @@ func (m *TrayManager) OnUploadComplete(url string) {
 	// Update the tray icon to the "complete" state
 	m.OnTrayProgressComplete()
 	m.ShowUploadNotification(url)
-	// TODO: Copy to clipboard depending on config
+
+	if m.config.General.CopyToClipboard {
+		fyne.CurrentApp().Clipboard().SetContent(url)
+	}
 }
 
 func (m *TrayManager) OnUploadError(err error) {

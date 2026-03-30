@@ -21,7 +21,7 @@ func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
 		app:    app,
 		api:    api,
 		config: cfg,
-		tray:   tray.NewTrayManager(api),
+		tray:   tray.NewTrayManager(cfg, api),
 	}
 }
 

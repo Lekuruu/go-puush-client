@@ -16,6 +16,7 @@ import (
 
 type TrayManager struct {
 	api         *puush.Client
+	config      *config.Config
 	screenshots screenshots.ScreenshotProvider
 
 	menu             *fyne.Menu
@@ -23,9 +24,9 @@ type TrayManager struct {
 	settingsCallback func()
 }
 
-func NewTrayManager(api *puush.Client) *TrayManager {
+func NewTrayManager(config *config.Config, api *puush.Client) *TrayManager {
 	provider, _ := screenshots.GetDefaultProvider()
-	return &TrayManager{api: api, screenshots: provider}
+	return &TrayManager{api: api, screenshots: provider, config: config}
 }
 
 // SetSettingsCallback will set the function that will be called

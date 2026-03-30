@@ -29,31 +29,32 @@ func (ui *UI) Run() {
 	// TODO: Maybe add some sort of theme customization?
 	ui.app.Settings().SetTheme(NewWindowsTheme())
 
+	// Show quickstart window if no credentials have been set
+	// Otherwise, re-authenticate to see if the API key is still valid
+	if !ui.api.Account.Credentials.HasApiKey() {
+		ui.ShowStartupWindow()
+	}
+
 	// Initialize & start tray
 	if ui.tray != nil {
 		ui.tray.Initialize("puush")
 		ui.tray.Apply(ui.app)
 		ui.tray.SetSettingsCallback(ui.ShowSettingsWindow)
-	}
 
-	// Show quickstart window if no credentials have been set
-	// Otherwise, re-authenticate to see if the API key is still valid
-	if !ui.api.Account.Credentials.HasApiKey() {
-		ui.ShowStartupWindow()
-	} else {
-		ui.tray.PerformBackgroundAuthentication()
-	}
+		// Apply configuration for copying to clipboard
+		if ui.config.General.CopyToClipboard {
+			ui.tray.EnableClipboard()
+		} else {
+			ui.tray.DisableClipboard()
+		}
 
-	// Apply configuration for copying to clipboard
-	if ui.config.General.CopyToClipboard {
-		ui.tray.EnableClipboard()
-	} else {
-		ui.tray.DisableClipboard()
-	}
+		// Start directory monitoring
+		if len(ui.config.Capture.MonitorDirectories) > 0 {
+			ui.tray.StartMonitor(ui.config.Capture.MonitorDirectories)
+		}
 
-	// Start directory monitoring
-	if len(ui.config.Capture.MonitorDirectories) > 0 {
-		ui.tray.StartMonitor(ui.config.Capture.MonitorDirectories)
+		go ui.tray.PerformBackgroundAuthentication()
+		go ui.tray.RefreshHistory()
 	}
 
 	ui.app.Run()

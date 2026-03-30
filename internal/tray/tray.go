@@ -21,8 +21,11 @@ type TrayManager struct {
 
 	menu             *fyne.Menu
 	targetApp        fyne.App
-	clipboardEnabled bool
 	settingsCallback func()
+
+	uploadHistory    []*puush.HistoryItem
+	clipboardEnabled bool
+	puushingDisabled bool
 
 	watcher *fsnotify.Watcher
 }
@@ -84,6 +87,19 @@ func (m *TrayManager) Refresh() error {
 	return nil
 }
 
+// RefreshHistory will update the tray's upload history
+func (m *TrayManager) RefreshHistory() {
+	if !m.api.Account.Credentials.HasApiKey() {
+		return
+	}
+	history, err := m.api.History()
+	if err != nil {
+		return
+	}
+	m.uploadHistory = history
+	m.rebuildMenuItems()
+}
+
 // Apply applies the tray menu to the specified app.
 func (m *TrayManager) Apply(app fyne.App) error {
 	if m.menu == nil {
@@ -100,6 +116,16 @@ func (m *TrayManager) Apply(app fyne.App) error {
 
 // Initialize populates the system tray menu.
 func (m *TrayManager) Initialize(applicationName string) error {
+	m.menu = fyne.NewMenu(applicationName)
+	m.rebuildMenuItems()
+	return nil
+}
+
+func (m *TrayManager) rebuildMenuItems() {
+	if m.menu == nil {
+		return
+	}
+
 	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
 	puushVersion.Disabled = true
 
@@ -113,9 +139,57 @@ func (m *TrayManager) Initialize(applicationName string) error {
 		fyne.CurrentApp().OpenURL(accountUrl)
 	})
 
-	// TODO: Implement recent uploads
 	recentUploads := fyne.NewMenuItem("Recent Uploads", func() {})
 	recentUploads.Disabled = true
+
+	items := []*fyne.MenuItem{
+		puushVersion,
+		accountSettings,
+		fyne.NewMenuItemSeparator(),
+		recentUploads,
+	}
+
+	for _, historyItem := range m.uploadHistory {
+		timeItem := fyne.NewMenuItem(fmt.Sprintf("Uploaded: %s", historyItem.Time.Format("2006-01-02 15:04:05")), func() {})
+		timeItem.Disabled = true
+
+		viewsItem := fyne.NewMenuItem(fmt.Sprintf("Views: %d", historyItem.Views), func() {})
+		viewsItem.Disabled = true
+
+		openItem := fyne.NewMenuItem("Open in browser", func() {
+			if u, err := url.Parse(historyItem.Url); err == nil {
+				fyne.CurrentApp().OpenURL(u)
+			}
+		})
+
+		copyItem := fyne.NewMenuItem("Copy link to clipboard", func() {
+			fyne.CurrentApp().Clipboard().SetContent(historyItem.Url)
+		})
+
+		deleteItem := fyne.NewMenuItem("Delete", func() {
+			if newHistory, err := m.api.Delete(historyItem.Id); err == nil {
+				m.uploadHistory = newHistory
+				m.rebuildMenuItems()
+			}
+		})
+
+		historyMenu := fyne.NewMenu(historyItem.FileName,
+			timeItem,
+			viewsItem,
+			fyne.NewMenuItemSeparator(),
+			openItem,
+			copyItem,
+			fyne.NewMenuItemSeparator(),
+			deleteItem,
+		)
+
+		historyMenuItem := fyne.NewMenuItem(historyItem.FileName, nil)
+		historyMenuItem.ChildMenu = historyMenu
+
+		items = append(items, historyMenuItem)
+	}
+
+	items = append(items, fyne.NewMenuItemSeparator())
 
 	captureWindow := fyne.NewMenuItem("Capture Current Window", m.UploadWindowScreenshot)
 	captureWindow.Icon = windowIcon
@@ -129,19 +203,20 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	uploadClipboard.Icon = clipboardIcon
 
 	var disablePuushing *fyne.MenuItem
-
 	disablePuushing = fyne.NewMenuItem("Disable puushing", func() {
-		disablePuushing.Checked = !disablePuushing.Checked
-		m.menu.Refresh()
+		disablePuushing.Checked = !m.puushingDisabled
+		m.puushingDisabled = !m.puushingDisabled
+		m.Refresh()
 	})
-	settings := fyne.NewMenuItem("Settings...", func() { m.settingsCallback() })
+	disablePuushing.Checked = m.puushingDisabled
 
-	m.menu = fyne.NewMenu(applicationName,
-		puushVersion,
-		accountSettings,
-		fyne.NewMenuItemSeparator(),
-		recentUploads,
-		fyne.NewMenuItemSeparator(),
+	settings := fyne.NewMenuItem("Settings...", func() {
+		if m.settingsCallback != nil {
+			m.settingsCallback()
+		}
+	})
+
+	items = append(items,
 		captureWindow,
 		captureDesktop,
 		captureArea,
@@ -151,5 +226,6 @@ func (m *TrayManager) Initialize(applicationName string) error {
 		disablePuushing,
 		settings,
 	)
-	return nil
+	m.menu.Items = items
+	m.menu.Refresh()
 }

@@ -10,8 +10,10 @@ import (
 )
 
 func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
+	if m.puushingDisabled {
+		return
+	}
 	if !m.api.Account.Credentials.HasApiKey() {
-		// TODO: Open startup window?
 		return
 	}
 	log.Println("Starting upload:", filename)
@@ -56,6 +58,9 @@ func (m *TrayManager) OnUploadComplete(url string) {
 	if m.clipboardEnabled {
 		fyne.CurrentApp().Clipboard().SetContent(url)
 	}
+
+	// Refresh the history to reflect the new upload
+	go m.RefreshHistory()
 }
 
 func (m *TrayManager) OnUploadError(err error) {

@@ -2,6 +2,7 @@ package tray
 
 import (
 	"io"
+	"log"
 	"path/filepath"
 
 	"fyne.io/fyne/v2"
@@ -13,6 +14,7 @@ func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
 		// TODO: Open startup window?
 		return
 	}
+	log.Println("Starting upload:", filename)
 
 	url, err := m.api.Upload(reader, filename)
 	if err != nil {
@@ -45,6 +47,8 @@ func (m *TrayManager) PerformFileUpload(path string) {
 }
 
 func (m *TrayManager) OnUploadComplete(url string) {
+	log.Println("Upload complete:", url)
+
 	// Update the tray icon to the "complete" state
 	m.OnTrayProgressComplete()
 	m.ShowUploadNotification(url)
@@ -55,6 +59,8 @@ func (m *TrayManager) OnUploadComplete(url string) {
 }
 
 func (m *TrayManager) OnUploadError(err error) {
+	log.Println("Upload error:", err)
+
 	// Update the tray icon to the "failed" state
 	m.OnTrayProgressFail()
 	m.ShowErrorNotification(puush.FormatError(err))

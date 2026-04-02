@@ -17,6 +17,17 @@ The main application is mostly feature complete, with a few notable exceptions:
 
 Otherwise, the application does what I want it to do, which is to upload files and take screenshots.
 
+## Build instructions
+
+If you know at least a little bit of how to use go, this should be pretty straightforward.
+
+```bash
+go build -o puush-client ./cmd/desktop
+```
+
+Since this project uses [fyne](https://fyne.io/), you may also need some C compiler dependencies depending on your platform. See [Fyne's prerequisite documentation](https://docs.fyne.io/started/quick/) for more information.  
+Note that these can be pretty painful to set up on windows especially (speaking from experience).
+
 ## Usage example
 
 The `pkg/puush` package contains the implementation of the puush api.

@@ -85,7 +85,7 @@ func newPngReadCloser(img image.Image) (io.ReadCloser, error) {
 	if err := png.Encode(&buf, img); err != nil {
 		return nil, fmt.Errorf("encode png: %w", err)
 	}
-	return io.NopCloser(&buf), nil
+	return &memoryReadCloser{bytes.NewReader(buf.Bytes())}, nil
 }
 
 func init() {

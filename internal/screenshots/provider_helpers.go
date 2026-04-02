@@ -37,10 +37,11 @@ func (c *temporaryFileReader) Close() error {
 	return nil
 }
 
-type temporaryBuffer struct {
-	*bytes.Buffer
+// idk bro i just needed a bytes reader that can close
+type memoryReadCloser struct {
+	*bytes.Reader
 }
 
-func (b *temporaryBuffer) Close() error {
+func (b *memoryReadCloser) Close() error {
 	return nil
 }

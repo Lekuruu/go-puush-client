@@ -30,14 +30,12 @@ type AccountConfig struct {
 }
 
 type GeneralConfig struct {
-	OpenBrowser          bool
-	NotificationSound    bool
-	CopyToClipboard      bool
-	Startup              bool
-	ContextMenu          bool
-	DoubleClickBehaviour int
-	Experimental         bool
-	DisabledToggle       bool
+	OpenBrowser       bool
+	NotificationSound bool
+	CopyToClipboard   bool
+	Startup           bool
+	ContextMenu       bool
+	DisabledToggle    bool
 }
 
 type CaptureConfig struct {
@@ -80,21 +78,19 @@ func (misc *MiscConfig) ParseServerURL() *url.URL {
 func DefaultConfig() *Config {
 	return &Config{
 		General: GeneralConfig{
-			OpenBrowser:          false,
-			NotificationSound:    true,
-			CopyToClipboard:      true,
-			Startup:              true,
-			ContextMenu:          true,
-			DoubleClickBehaviour: 0,
-			Experimental:         false,
-			DisabledToggle:       false,
+			OpenBrowser:       false,
+			NotificationSound: true,
+			CopyToClipboard:   true,
+			Startup:           true,
+			ContextMenu:       true,
+			DisabledToggle:    false,
 		},
 		Capture: CaptureConfig{
 			UploadQuality:      1,
 			FullscreenMode:     0,
 			SelectionRectangle: true,
 			SaveImages:         false,
-			SaveImagePath:      "Desktop",
+			SaveImagePath:      "",
 			MonitorDirectories: []string{},
 		},
 		Hotkeys: HotkeyConfig{

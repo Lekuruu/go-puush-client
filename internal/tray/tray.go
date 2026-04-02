@@ -41,6 +41,11 @@ func (m *TrayManager) SetSettingsCallback(callback func()) {
 
 // GetScreenshotProvider returns the screenshot provider used by the tray manager
 func (m *TrayManager) GetScreenshotProvider() screenshots.ScreenshotProvider {
+	if m.screenshots == nil {
+		return nil
+	}
+	m.screenshots.SetQuality(m.config.Capture.UploadQuality)
+	m.screenshots.SetFullscreenMode(m.config.Capture.FullscreenMode)
 	return m.screenshots
 }
 

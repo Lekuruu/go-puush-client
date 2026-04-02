@@ -4,24 +4,30 @@ import (
 	"fyne.io/fyne/v2"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
+	"github.com/Lekuruu/go-puush-client/internal/hotkeys"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 // UI manages the desktop application windows and state.
 type UI struct {
-	app    fyne.App
-	api    *puush.Client
-	config *config.Config
-	tray   *tray.TrayManager
+	app     fyne.App
+	api     *puush.Client
+	config  *config.Config
+	tray    *tray.TrayManager
+	hotkeys *hotkeys.HotkeyManager
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
+	tm := tray.NewTrayManager(api)
+	hkm := hotkeys.NewHotkeyManager(cfg, tm)
+
 	return &UI{
-		app:    app,
-		api:    api,
-		config: cfg,
-		tray:   tray.NewTrayManager(api),
+		app:     app,
+		api:     api,
+		config:  cfg,
+		tray:    tm,
+		hotkeys: hkm,
 	}
 }
 
@@ -55,6 +61,8 @@ func (ui *UI) Run() {
 
 		go ui.tray.PerformBackgroundAuthentication()
 		go ui.tray.RefreshHistory()
+
+		ui.hotkeys.Start()
 	}
 
 	ui.app.Run()

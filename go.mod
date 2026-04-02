@@ -7,6 +7,7 @@ require (
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/sqweek/dialog v0.0.0-20260123140253-64c163d53aac
+	golang.design/x/hotkey v0.4.1
 	golang.org/x/sys v0.42.0
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 )

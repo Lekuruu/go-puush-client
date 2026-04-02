@@ -68,6 +68,12 @@ func (m *TrayManager) ShowErrorNotification(message string) {
 	// TODO: Find right icon for error
 }
 
+// TogglePuushing will toggle the puushing functionality on or off
+func (m *TrayManager) TogglePuushing() {
+	m.puushingDisabled = !m.puushingDisabled
+	m.rebuildMenuItems()
+}
+
 // EnableClipboard will enable copying upload urls to the clipboard
 func (m *TrayManager) EnableClipboard() {
 	m.clipboardEnabled = true

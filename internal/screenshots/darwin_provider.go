@@ -42,28 +42,28 @@ func (p *DarwinScreenshotProvider) Available() bool {
 }
 
 // CaptureScreen captures the entire screen
-func (p *DarwinScreenshotProvider) CaptureScreen() (io.ReadCloser, error) {
+func (p *DarwinScreenshotProvider) CaptureScreen() (io.ReadSeekCloser, error) {
 	// -m captures the main monitor only, or standard behavior for desktop capture
 	// -x prevents sound
 	return p.performCapture("-x", "-m")
 }
 
 // CaptureArea captures a specific region of the screen
-func (p *DarwinScreenshotProvider) CaptureArea() (io.ReadCloser, error) {
+func (p *DarwinScreenshotProvider) CaptureArea() (io.ReadSeekCloser, error) {
 	// -i for interactive capture / area selection
 	// -x prevents sound
 	return p.performCapture("-x", "-i")
 }
 
 // CaptureWindow captures a specific window
-func (p *DarwinScreenshotProvider) CaptureWindow() (io.ReadCloser, error) {
+func (p *DarwinScreenshotProvider) CaptureWindow() (io.ReadSeekCloser, error) {
 	// -W starts in window selection mode
 	// -i for interactive capture / area selection
 	// -x prevents sound
 	return p.performCapture("-x", "-i", "-W")
 }
 
-func (p *DarwinScreenshotProvider) performCapture(modeArgs ...string) (io.ReadCloser, error) {
+func (p *DarwinScreenshotProvider) performCapture(modeArgs ...string) (io.ReadSeekCloser, error) {
 	tmp, err := os.CreateTemp("", "screencapture-*.png")
 	if err != nil {
 		return nil, fmt.Errorf("create temp file: %w", err)

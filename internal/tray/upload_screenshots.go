@@ -67,18 +67,14 @@ func (m *TrayManager) UploadWindowScreenshot() {
 	m.OnScreenshotUploaded(reader, filename)
 }
 
-func (m *TrayManager) OnScreenshotUploaded(reader io.Reader, filename string) {
+func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string) {
 	if m.screenshotsPath == "" {
 		return
 	}
 	if !strings.HasSuffix(m.screenshotsPath, "/") {
 		m.screenshotsPath += "/"
 	}
-
-	if seeker, ok := reader.(io.Seeker); ok {
-		// Seek back to start, if possible
-		seeker.Seek(0, io.SeekStart)
-	}
+	reader.Seek(0, io.SeekStart)
 
 	savePath := m.screenshotsPath + filename
 	outFile, err := os.Create(savePath)

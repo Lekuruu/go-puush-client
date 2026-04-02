@@ -42,25 +42,25 @@ func (p *SpectacleScreenshotProvider) Available() bool {
 }
 
 // CaptureScreen captures the entire screen
-func (p *SpectacleScreenshotProvider) CaptureScreen() (io.ReadCloser, error) {
+func (p *SpectacleScreenshotProvider) CaptureScreen() (io.ReadSeekCloser, error) {
 	// -f fullscreen
 	return p.performCapture("-f")
 }
 
 // CaptureArea captures a specific region of the screen
-func (p *SpectacleScreenshotProvider) CaptureArea() (io.ReadCloser, error) {
+func (p *SpectacleScreenshotProvider) CaptureArea() (io.ReadSeekCloser, error) {
 	// -r rectangular region
 	return p.performCapture("-r")
 }
 
 // CaptureWindow captures a specific window
-func (p *SpectacleScreenshotProvider) CaptureWindow() (io.ReadCloser, error) {
+func (p *SpectacleScreenshotProvider) CaptureWindow() (io.ReadSeekCloser, error) {
 	// -u window under the cursor
 	// -w wait for click
 	return p.performCapture("-u", "-w")
 }
 
-func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.ReadCloser, error) {
+func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.ReadSeekCloser, error) {
 	tmp, err := os.CreateTemp("", "spectacle-*.png")
 	if err != nil {
 		return nil, fmt.Errorf("create temp file: %w", err)

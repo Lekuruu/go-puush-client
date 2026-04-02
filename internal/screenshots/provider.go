@@ -13,13 +13,13 @@ type ScreenshotProvider interface {
 	Available() bool
 
 	// CaptureScreen captures the entire screen
-	CaptureScreen() (io.ReadCloser, error)
+	CaptureScreen() (io.ReadSeekCloser, error)
 
 	// CaptureArea captures a specific region of the screen
-	CaptureArea() (io.ReadCloser, error)
+	CaptureArea() (io.ReadSeekCloser, error)
 
 	// CaptureWindow captures a specific window
-	CaptureWindow() (io.ReadCloser, error)
+	CaptureWindow() (io.ReadSeekCloser, error)
 }
 
 // ScreenshotProviders is a list of functions that return available screenshot providers

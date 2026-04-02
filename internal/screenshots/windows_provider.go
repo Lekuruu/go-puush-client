@@ -30,7 +30,7 @@ func (p *WindowsScreenshotProvider) Available() bool {
 	return true // TODO
 }
 
-func (p *WindowsScreenshotProvider) CaptureScreen() (io.ReadCloser, error) {
+func (p *WindowsScreenshotProvider) CaptureScreen() (io.ReadSeekCloser, error) {
 	x := getSystemMetrics(smXVirtualScreen)
 	y := getSystemMetrics(smYVirtualScreen)
 	width := getSystemMetrics(smCXVirtualScreen)
@@ -41,10 +41,10 @@ func (p *WindowsScreenshotProvider) CaptureScreen() (io.ReadCloser, error) {
 		return nil, fmt.Errorf("capture screen: %w", err)
 	}
 
-	return newPngReadCloser(img)
+	return newPngReader(img)
 }
 
-func (p *WindowsScreenshotProvider) CaptureArea() (io.ReadCloser, error) {
+func (p *WindowsScreenshotProvider) CaptureArea() (io.ReadSeekCloser, error) {
 	r, err := selectAreaRect()
 	if err != nil {
 		return nil, fmt.Errorf("select area: %w", err)
@@ -63,10 +63,10 @@ func (p *WindowsScreenshotProvider) CaptureArea() (io.ReadCloser, error) {
 		return nil, fmt.Errorf("capture area: %w", err)
 	}
 
-	return newPngReadCloser(img)
+	return newPngReader(img)
 }
 
-func (p *WindowsScreenshotProvider) CaptureWindow() (io.ReadCloser, error) {
+func (p *WindowsScreenshotProvider) CaptureWindow() (io.ReadSeekCloser, error) {
 	hwnd, err := getForegroundWindow()
 	if err != nil {
 		return nil, fmt.Errorf("get foreground window: %w", err)
@@ -77,10 +77,10 @@ func (p *WindowsScreenshotProvider) CaptureWindow() (io.ReadCloser, error) {
 		return nil, fmt.Errorf("capture window: %w", err)
 	}
 
-	return newPngReadCloser(img)
+	return newPngReader(img)
 }
 
-func newPngReadCloser(img image.Image) (io.ReadCloser, error) {
+func newPngReader(img image.Image) (io.ReadSeekCloser, error) {
 	var buf bytes.Buffer
 	if err := png.Encode(&buf, img); err != nil {
 		return nil, fmt.Errorf("encode png: %w", err)

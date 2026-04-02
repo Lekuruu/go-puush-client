@@ -3,8 +3,6 @@
 This repository contains a go implementation of the puush api and an almost feature-complete, cross-platform desktop application recreation of the original puush client.
 My main motivation was to have a usable puush client for linux, since it was the only platform that didn't have an official client. It was also a good way for me to learn more about [fyne](https://fyne.io/), which is a cross-platform gui toolkit for go.
 
----
-
 <img src="https://raw.githubusercontent.com/Lekuruu/go-puush-client/refs/heads/main/.github/screenshot-1.png" alt="tray" width="400px" />
 <img src="https://raw.githubusercontent.com/Lekuruu/go-puush-client/refs/heads/main/.github/screenshot-2.png" alt="notification" width="400px" />
 

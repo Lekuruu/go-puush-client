@@ -16,24 +16,21 @@ import (
 )
 
 type TrayManager struct {
-	api         *puush.Client
-	screenshots screenshots.ScreenshotProvider
+	api           *puush.Client
+	config        *config.Config
+	screenshots   screenshots.ScreenshotProvider
+	uploadHistory []*puush.HistoryItem
 
 	menu             *fyne.Menu
 	targetApp        fyne.App
 	settingsCallback func()
 
-	uploadHistory    []*puush.HistoryItem
-	clipboardEnabled bool
-	puushingDisabled bool
-	screenshotsPath  string
-
 	watcher *fsnotify.Watcher
 }
 
-func NewTrayManager(api *puush.Client) *TrayManager {
+func NewTrayManager(cfg *config.Config, api *puush.Client) *TrayManager {
 	provider, _ := screenshots.GetDefaultProvider()
-	return &TrayManager{api: api, screenshots: provider}
+	return &TrayManager{api: api, config: cfg, screenshots: provider}
 }
 
 // SetSettingsCallback will set the function that will be called
@@ -76,18 +73,12 @@ func (m *TrayManager) ShowErrorNotification(message string) {
 	// TODO: Find right icon for error
 }
 
-// SetScreenshotsPath will set the path where screenshots are saved
-// If the path is empty, screenshots won't be saved locally
-func (m *TrayManager) SetScreenshotsPath(path string) {
-	m.screenshotsPath = path
-}
-
 // TogglePuushing will toggle the puushing functionality on or off
 func (m *TrayManager) TogglePuushing() {
-	m.puushingDisabled = !m.puushingDisabled
+	m.config.General.DisabledToggle = !m.config.General.DisabledToggle
 	m.rebuildMenuItems()
 
-	if m.puushingDisabled {
+	if m.config.General.DisabledToggle {
 		m.ShowNotification("puush was disabled!", "Shortcut keys will no longer be accepted.")
 	} else {
 		m.ShowNotification("puush was enabled!", "Shortcut keys will now be accepted.")
@@ -96,23 +87,7 @@ func (m *TrayManager) TogglePuushing() {
 
 // PuushingDisabled returns whether puushing is currently disabled
 func (m *TrayManager) PuushingDisabled() bool {
-	return m.puushingDisabled
-}
-
-// SetPuushingDisabled sets the puushing disabled state to the specified value
-func (m *TrayManager) SetPuushingDisabled(disabled bool) {
-	m.puushingDisabled = disabled
-	m.rebuildMenuItems()
-}
-
-// EnableClipboard will enable copying upload urls to the clipboard
-func (m *TrayManager) EnableClipboard() {
-	m.clipboardEnabled = true
-}
-
-// DisableClipboard will disable copying upload urls to the clipboard
-func (m *TrayManager) DisableClipboard() {
-	m.clipboardEnabled = false
+	return m.config.General.DisabledToggle
 }
 
 // Refresh will instruct the tray to update its menu.
@@ -183,7 +158,7 @@ func (m *TrayManager) rebuildMenuItems() {
 	uploadClipboard.Icon = clipboardIcon
 
 	disablePuushing := fyne.NewMenuItem("Disable puushing", m.TogglePuushing)
-	disablePuushing.Checked = m.puushingDisabled
+	disablePuushing.Checked = m.config.General.DisabledToggle
 
 	settings := fyne.NewMenuItem("Settings...", func() {
 		if m.settingsCallback != nil {

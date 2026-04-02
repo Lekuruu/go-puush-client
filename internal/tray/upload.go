@@ -3,6 +3,7 @@ package tray
 import (
 	"io"
 	"log"
+	"net/url"
 	"path/filepath"
 
 	"fyne.io/fyne/v2"
@@ -15,12 +16,12 @@ func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
 	}
 	log.Println("Starting upload:", filename)
 
-	url, err := m.api.Upload(reader, filename)
+	urlResponse, err := m.api.Upload(reader, filename)
 	if err != nil {
 		m.OnUploadError(err)
 		return
 	}
-	m.OnUploadComplete(url)
+	m.OnUploadComplete(urlResponse)
 	// TODO: Implement upload retries
 }
 
@@ -45,15 +46,20 @@ func (m *TrayManager) PerformFileUpload(path string) {
 	m.PerformUpload(pr, filename)
 }
 
-func (m *TrayManager) OnUploadComplete(url string) {
-	log.Println("Upload complete:", url)
+func (m *TrayManager) OnUploadComplete(urlResponse string) {
+	log.Println("Upload complete:", urlResponse)
 
 	// Update the tray icon to the "complete" state
 	m.OnTrayProgressComplete()
-	m.ShowUploadNotification(url)
+	m.ShowUploadNotification(urlResponse)
 
-	if m.clipboardEnabled {
-		fyne.CurrentApp().Clipboard().SetContent(url)
+	if m.config.General.CopyToClipboard {
+		fyne.CurrentApp().Clipboard().SetContent(urlResponse)
+	}
+	if m.config.General.OpenBrowser {
+		if u, err := url.Parse(urlResponse); err == nil {
+			fyne.CurrentApp().OpenURL(u)
+		}
 	}
 
 	// Refresh the history to reflect the new upload

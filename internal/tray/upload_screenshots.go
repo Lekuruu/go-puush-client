@@ -68,15 +68,19 @@ func (m *TrayManager) UploadWindowScreenshot() {
 }
 
 func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string) {
-	if m.screenshotsPath == "" {
+	if !m.config.Capture.SaveImages || m.config.Capture.SaveImagePath == "" {
 		return
 	}
-	if !strings.HasSuffix(m.screenshotsPath, "/") {
-		m.screenshotsPath += "/"
+
+	saveDir := m.config.Capture.SaveImagePath
+	if !strings.HasSuffix(saveDir, "/") {
+		saveDir += "/"
 	}
+
+	// Seek back to start of reader, otherwise we aren't going to save anything
 	reader.Seek(0, io.SeekStart)
 
-	savePath := m.screenshotsPath + filename
+	savePath := saveDir + filename
 	outFile, err := os.Create(savePath)
 	if err != nil {
 		log.Printf("Error creating file for saving screenshot: %v", err)

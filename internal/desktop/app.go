@@ -21,7 +21,7 @@ type UI struct {
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
-	tm := tray.NewTrayManager(api)
+	tm := tray.NewTrayManager(cfg, api)
 	hkm := hotkeys.NewHotkeyManager(cfg, tm)
 
 	return &UI{
@@ -48,19 +48,6 @@ func (ui *UI) Run() {
 		ui.tray.Initialize("puush")
 		ui.tray.Apply(ui.app)
 		ui.tray.SetSettingsCallback(ui.ShowSettingsWindow)
-		ui.tray.SetPuushingDisabled(ui.config.General.DisabledToggle)
-
-		// Apply configuration for copying to clipboard
-		if ui.config.General.CopyToClipboard {
-			ui.tray.EnableClipboard()
-		} else {
-			ui.tray.DisableClipboard()
-		}
-
-		// Save images locally, if enabled
-		if ui.config.Capture.SaveImages {
-			ui.tray.SetScreenshotsPath(ui.config.Capture.SaveImagePath)
-		}
 
 		// Start directory monitoring
 		if len(ui.config.Capture.MonitorDirectories) > 0 {
@@ -78,12 +65,11 @@ func (ui *UI) Run() {
 
 func (ui *UI) OnShutdown() {
 	ui.tray.StopMonitor()
+	ui.UpdateAccountConfiguration()
+}
 
-	// Keep "puushing disabled" state
-	ui.config.General.DisabledToggle = ui.tray.PuushingDisabled()
-
+func (ui *UI) UpdateAccountConfiguration() {
 	if ui.api.Account.Credentials.HasApiKey() {
-		// Update account state in config after shutdown
 		ui.config.Account.Key = *ui.api.Account.Credentials.Key
 		ui.config.Account.Username = *ui.api.Account.Credentials.Identifier
 		ui.config.Account.Type = int(ui.api.Account.Type)

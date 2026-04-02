@@ -90,6 +90,9 @@ func (ui *UI) ShowStartupWindow() {
 
 		// Enable "okay" button
 		okayBtn.Instance.Enable()
+
+		// Save values in config
+		ui.UpdateAccountConfiguration()
 	}
 
 	performLogin := func() {

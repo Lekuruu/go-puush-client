@@ -39,9 +39,8 @@ type GeneralConfig struct {
 }
 
 type CaptureConfig struct {
-	UploadQuality      int
-	FullscreenMode     int
-	SelectionRectangle bool
+	UploadQuality      UploadQuality
+	FullscreenMode     FullscreenMode
 	SaveImages         bool
 	SaveImagePath      string
 	MonitorDirectories []string
@@ -60,6 +59,22 @@ type MiscConfig struct {
 	LastUpdate time.Time
 	ServerURL  string
 }
+
+type UploadQuality int
+
+const (
+	UploadQualityBest UploadQuality = iota
+	UploadQualityHigh
+	UploadQualityMedium
+)
+
+type FullscreenMode int
+
+const (
+	FullscreenModeMouse FullscreenMode = iota
+	FullscreenModeAllScreens
+	FullscreenModePrimary
+)
 
 func (misc *MiscConfig) ParseServerURL() *url.URL {
 	obj, err := url.Parse(misc.ServerURL)
@@ -86,9 +101,8 @@ func DefaultConfig() *Config {
 			DisabledToggle:    false,
 		},
 		Capture: CaptureConfig{
-			UploadQuality:      1,
-			FullscreenMode:     0,
-			SelectionRectangle: true,
+			UploadQuality:      UploadQualityBest,
+			FullscreenMode:     FullscreenModeAllScreens,
 			SaveImages:         false,
 			SaveImagePath:      "",
 			MonitorDirectories: []string{},

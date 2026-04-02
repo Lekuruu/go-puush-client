@@ -26,6 +26,14 @@ func (p *WindowsScreenshotProvider) Name() string {
 	return "Windows (Native)"
 }
 
+func (p *WindowsScreenshotProvider) SetQuality(quality Quality) {
+	// TODO: ...
+}
+
+func (p *WindowsScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
+	// TODO: ...
+}
+
 func (p *WindowsScreenshotProvider) Available() bool {
 	return true // TODO
 }

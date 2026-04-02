@@ -3,6 +3,8 @@ package config
 import (
 	"net/url"
 	"time"
+
+	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 )
 
 // Store defines the interface for loading and saving the
@@ -39,8 +41,8 @@ type GeneralConfig struct {
 }
 
 type CaptureConfig struct {
-	UploadQuality      UploadQuality
-	FullscreenMode     FullscreenMode
+	UploadQuality      screenshots.Quality
+	FullscreenMode     screenshots.FullscreenMode
 	SaveImages         bool
 	SaveImagePath      string
 	MonitorDirectories []string
@@ -59,22 +61,6 @@ type MiscConfig struct {
 	LastUpdate time.Time
 	ServerURL  string
 }
-
-type UploadQuality int
-
-const (
-	UploadQualityBest UploadQuality = iota
-	UploadQualityHigh
-	UploadQualityMedium
-)
-
-type FullscreenMode int
-
-const (
-	FullscreenModeMouse FullscreenMode = iota
-	FullscreenModeAllScreens
-	FullscreenModePrimary
-)
 
 func (misc *MiscConfig) ParseServerURL() *url.URL {
 	obj, err := url.Parse(misc.ServerURL)
@@ -101,8 +87,8 @@ func DefaultConfig() *Config {
 			DisabledToggle:    false,
 		},
 		Capture: CaptureConfig{
-			UploadQuality:      UploadQualityBest,
-			FullscreenMode:     FullscreenModeAllScreens,
+			UploadQuality:      screenshots.QualityBest,
+			FullscreenMode:     screenshots.FullscreenModeAllScreens,
 			SaveImages:         false,
 			SaveImagePath:      "",
 			MonitorDirectories: []string{},

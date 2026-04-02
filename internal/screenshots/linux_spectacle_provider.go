@@ -32,7 +32,15 @@ func NewSpectacleProvider() (ScreenshotProvider, error) {
 
 // Name returns the name of the screenshot provider
 func (p *SpectacleScreenshotProvider) Name() string {
-	return "Spectacle"
+	return "KDE Spectacle"
+}
+
+func (p *SpectacleScreenshotProvider) SetQuality(quality Quality) {
+	// TODO: ...
+}
+
+func (p *SpectacleScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
+	// TODO: ...
 }
 
 // Available checks if the spectacle binary is available in the system

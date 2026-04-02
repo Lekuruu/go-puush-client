@@ -9,6 +9,12 @@ type ScreenshotProvider interface {
 	// Name returns the name of the screenshot provider
 	Name() string
 
+	// SetQuality sets the quality for the screenshots taken by this provider
+	SetQuality(quality Quality)
+
+	// SetFullscreenMode sets the mode for fullscreen screenshots taken by this provider
+	SetFullscreenMode(mode FullscreenMode)
+
 	// Available checks if the provider is available on the system
 	Available() bool
 

@@ -32,10 +32,17 @@ func NewDarwinProvider() (ScreenshotProvider, error) {
 
 // Name returns the name of the screenshot provider
 func (p *DarwinScreenshotProvider) Name() string {
-	return "macOS Screencapture"
+	return "macOS (screencapture)"
 }
 
-// Available checks if the screencapture binary is available in the system
+func (p *DarwinScreenshotProvider) SetQuality(quality Quality) {
+	// TODO: ...
+}
+
+func (p *DarwinScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
+	// TODO: ...
+}
+
 func (p *DarwinScreenshotProvider) Available() bool {
 	_, err := resolveScreenCaptureBinary()
 	return err == nil

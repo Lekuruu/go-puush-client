@@ -12,7 +12,9 @@ import (
 	"time"
 )
 
-type WindowsScreenshotProvider struct{}
+type WindowsScreenshotProvider struct {
+	quality Quality
+}
 
 func NewWindowsScreenshotProvider() (ScreenshotProvider, error) {
 	p := &WindowsScreenshotProvider{}
@@ -27,7 +29,7 @@ func (p *WindowsScreenshotProvider) Name() string {
 }
 
 func (p *WindowsScreenshotProvider) SetQuality(quality Quality) {
-	// TODO: ...
+	p.quality = quality
 }
 
 func (p *WindowsScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
@@ -49,7 +51,11 @@ func (p *WindowsScreenshotProvider) CaptureScreen() (io.ReadSeekCloser, error) {
 		return nil, fmt.Errorf("capture screen: %w", err)
 	}
 
-	return newPngReader(img)
+	reader, err := newPngReader(img)
+	if err != nil {
+		return nil, err
+	}
+	return ApplyQuality(reader, p.quality)
 }
 
 func (p *WindowsScreenshotProvider) CaptureArea() (io.ReadSeekCloser, error) {
@@ -71,7 +77,11 @@ func (p *WindowsScreenshotProvider) CaptureArea() (io.ReadSeekCloser, error) {
 		return nil, fmt.Errorf("capture area: %w", err)
 	}
 
-	return newPngReader(img)
+	reader, err := newPngReader(img)
+	if err != nil {
+		return nil, err
+	}
+	return ApplyQuality(reader, p.quality)
 }
 
 func (p *WindowsScreenshotProvider) CaptureWindow() (io.ReadSeekCloser, error) {
@@ -85,7 +95,11 @@ func (p *WindowsScreenshotProvider) CaptureWindow() (io.ReadSeekCloser, error) {
 		return nil, fmt.Errorf("capture window: %w", err)
 	}
 
-	return newPngReader(img)
+	reader, err := newPngReader(img)
+	if err != nil {
+		return nil, err
+	}
+	return ApplyQuality(reader, p.quality)
 }
 
 func newPngReader(img image.Image) (io.ReadSeekCloser, error) {

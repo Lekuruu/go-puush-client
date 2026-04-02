@@ -17,6 +17,7 @@ type SpectacleScreenshotProvider struct {
 	binPath        string
 	timeout        time.Duration
 	fullscreenMode FullscreenMode
+	quality        Quality
 }
 
 func NewSpectacleProvider() (ScreenshotProvider, error) {
@@ -37,7 +38,7 @@ func (p *SpectacleScreenshotProvider) Name() string {
 }
 
 func (p *SpectacleScreenshotProvider) SetQuality(quality Quality) {
-	// TODO: ...
+	p.quality = quality
 }
 
 func (p *SpectacleScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
@@ -130,10 +131,11 @@ func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.Rea
 		return nil, fmt.Errorf("screenshot file is empty")
 	}
 
-	return &temporaryFileReader{
+	reader := &temporaryFileReader{
 		file: file,
 		path: path,
-	}, nil
+	}
+	return ApplyQuality(reader, p.quality)
 }
 
 func init() {

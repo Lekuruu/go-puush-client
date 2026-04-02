@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -24,7 +25,7 @@ func (m *TrayManager) UploadAreaScreenshot() {
 	}
 	defer reader.Close()
 
-	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	filename := getImageFilename(reader)
 	m.PerformUpload(reader, filename)
 	m.OnScreenshotUploaded(reader, filename)
 }
@@ -43,7 +44,7 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 	}
 	defer reader.Close()
 
-	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	filename := getImageFilename(reader)
 	m.PerformUpload(reader, filename)
 	m.OnScreenshotUploaded(reader, filename)
 }
@@ -62,7 +63,7 @@ func (m *TrayManager) UploadWindowScreenshot() {
 	}
 	defer reader.Close()
 
-	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
+	filename := getImageFilename(reader)
 	m.PerformUpload(reader, filename)
 	m.OnScreenshotUploaded(reader, filename)
 }
@@ -95,4 +96,29 @@ func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string
 	}
 
 	log.Printf("Screenshot saved to: %s", savePath)
+}
+
+func getImageFilename(reader io.ReadSeeker) string {
+	ext := getImageExtension(reader)
+	return fmt.Sprintf("ss (%s)%s", time.Now().Format("2006-01-02 at 15.04.05"), ext)
+}
+
+func getImageExtension(reader io.ReadSeeker) string {
+	buffer := make([]byte, 512)
+	n, _ := reader.Read(buffer)
+	reader.Seek(0, io.SeekStart)
+
+	contentType := http.DetectContentType(buffer[:n])
+	switch contentType {
+	case "image/jpeg":
+		return ".jpg"
+	case "image/png":
+		return ".png"
+	case "image/gif":
+		return ".gif"
+	case "image/webp":
+		return ".webp"
+	default:
+		return ".png"
+	}
 }

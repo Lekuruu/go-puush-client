@@ -16,6 +16,7 @@ import (
 type DarwinScreenshotProvider struct {
 	binPath string
 	timeout time.Duration
+	quality Quality
 }
 
 func NewDarwinProvider() (ScreenshotProvider, error) {
@@ -36,7 +37,7 @@ func (p *DarwinScreenshotProvider) Name() string {
 }
 
 func (p *DarwinScreenshotProvider) SetQuality(quality Quality) {
-	// TODO: ...
+	p.quality = quality
 }
 
 func (p *DarwinScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
@@ -118,10 +119,11 @@ func (p *DarwinScreenshotProvider) performCapture(modeArgs ...string) (io.ReadSe
 		return nil, fmt.Errorf("open screenshot: %w", err)
 	}
 
-	return &temporaryFileReader{
+	reader := &temporaryFileReader{
 		file: file,
 		path: path,
-	}, nil
+	}
+	return ApplyQuality(reader, p.quality)
 }
 
 func resolveScreenCaptureBinary() (string, error) {

@@ -2,7 +2,10 @@ package tray
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -23,6 +26,7 @@ func (m *TrayManager) UploadAreaScreenshot() {
 
 	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
 	m.PerformUpload(reader, filename)
+	m.OnScreenshotUploaded(reader, filename)
 }
 
 func (m *TrayManager) UploadDesktopScreenshot() {
@@ -41,6 +45,7 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 
 	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
 	m.PerformUpload(reader, filename)
+	m.OnScreenshotUploaded(reader, filename)
 }
 
 func (m *TrayManager) UploadWindowScreenshot() {
@@ -59,4 +64,35 @@ func (m *TrayManager) UploadWindowScreenshot() {
 
 	filename := fmt.Sprintf("ss (%s).png", time.Now().Format("2006-01-02 at 15.04.05"))
 	m.PerformUpload(reader, filename)
+	m.OnScreenshotUploaded(reader, filename)
+}
+
+func (m *TrayManager) OnScreenshotUploaded(reader io.Reader, filename string) {
+	if m.screenshotsPath == "" {
+		return
+	}
+	if !strings.HasSuffix(m.screenshotsPath, "/") {
+		m.screenshotsPath += "/"
+	}
+
+	if seeker, ok := reader.(io.Seeker); ok {
+		// Seek back to start, if possible
+		seeker.Seek(0, io.SeekStart)
+	}
+
+	savePath := m.screenshotsPath + filename
+	outFile, err := os.Create(savePath)
+	if err != nil {
+		log.Printf("Error creating file for saving screenshot: %v", err)
+		return
+	}
+	defer outFile.Close()
+
+	_, err = io.Copy(outFile, reader)
+	if err != nil {
+		log.Printf("Error saving screenshot to file: %v", err)
+		return
+	}
+
+	log.Printf("Screenshot saved to: %s", savePath)
 }

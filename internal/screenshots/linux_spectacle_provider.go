@@ -116,7 +116,7 @@ func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.Rea
 		return nil, fmt.Errorf("screenshot file is empty")
 	}
 
-	return &temporaryReadCloser{
+	return &temporaryFileReader{
 		file: file,
 		path: path,
 	}, nil

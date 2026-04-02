@@ -54,6 +54,11 @@ func (ui *UI) Run() {
 			ui.tray.DisableClipboard()
 		}
 
+		// Save images locally, if enabled
+		if ui.config.Capture.SaveImages {
+			ui.tray.SetScreenshotsPath(ui.config.Capture.SaveImagePath)
+		}
+
 		// Start directory monitoring
 		if len(ui.config.Capture.MonitorDirectories) > 0 {
 			ui.tray.StartMonitor(ui.config.Capture.MonitorDirectories)

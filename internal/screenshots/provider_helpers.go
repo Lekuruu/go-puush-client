@@ -1,21 +1,30 @@
 package screenshots
 
 import (
+	"bytes"
 	"errors"
 	"os"
 )
 
-// temporaryReadCloser is an io.ReadCloser that deletes the underlying file when closed
-type temporaryReadCloser struct {
+// temporaryFileReader is a `ReadSeekCloser` that deletes the underlying file when closed
+type temporaryFileReader struct {
 	file *os.File
 	path string
 }
 
-func (c *temporaryReadCloser) Read(p []byte) (int, error) {
+func (c *temporaryFileReader) Read(p []byte) (int, error) {
 	return c.file.Read(p)
 }
 
-func (c *temporaryReadCloser) Close() error {
+func (c *temporaryFileReader) Seek(offset int64, whence int) (int64, error) {
+	return c.file.Seek(offset, whence)
+}
+
+func (c *temporaryFileReader) Stat() (os.FileInfo, error) {
+	return c.file.Stat()
+}
+
+func (c *temporaryFileReader) Close() error {
 	closeErr := c.file.Close()
 	removeErr := os.Remove(c.path)
 
@@ -25,5 +34,13 @@ func (c *temporaryReadCloser) Close() error {
 	if removeErr != nil && !errors.Is(removeErr, os.ErrNotExist) {
 		return removeErr
 	}
+	return nil
+}
+
+type temporaryBuffer struct {
+	*bytes.Buffer
+}
+
+func (b *temporaryBuffer) Close() error {
 	return nil
 }

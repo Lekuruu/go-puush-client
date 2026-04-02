@@ -26,6 +26,7 @@ type TrayManager struct {
 	uploadHistory    []*puush.HistoryItem
 	clipboardEnabled bool
 	puushingDisabled bool
+	screenshotsPath  string
 
 	watcher *fsnotify.Watcher
 }
@@ -66,6 +67,12 @@ func (m *TrayManager) ShowErrorNotification(message string) {
 		WithIconData(assets.PuushIconData).
 		Push()
 	// TODO: Find right icon for error
+}
+
+// SetScreenshotsPath will set the path where screenshots are saved
+// If the path is empty, screenshots won't be saved locally
+func (m *TrayManager) SetScreenshotsPath(path string) {
+	m.screenshotsPath = path
 }
 
 // TogglePuushing will toggle the puushing functionality on or off

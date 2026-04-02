@@ -111,7 +111,7 @@ func (p *DarwinScreenshotProvider) performCapture(modeArgs ...string) (io.ReadCl
 		return nil, fmt.Errorf("open screenshot: %w", err)
 	}
 
-	return &temporaryReadCloser{
+	return &temporaryFileReader{
 		file: file,
 		path: path,
 	}, nil

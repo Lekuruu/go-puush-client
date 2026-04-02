@@ -10,9 +10,6 @@ import (
 )
 
 func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
-	if m.puushingDisabled {
-		return
-	}
 	if !m.api.Account.Credentials.HasApiKey() {
 		return
 	}

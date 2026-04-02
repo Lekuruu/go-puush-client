@@ -71,6 +71,9 @@ func (m *HotkeyManager) register(shortcut string, action func()) {
 	go func() {
 		for {
 			<-hk.Keydown()
+			if m.tray.PuushingDisabled() {
+				continue
+			}
 			action()
 		}
 	}()

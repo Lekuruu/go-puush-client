@@ -52,6 +52,13 @@ func (m *TrayManager) SetScreenshotProvider(provider screenshots.ScreenshotProvi
 	m.screenshots = provider
 }
 
+// ShowNotification will display a regular notification with a specified title & message
+func (m *TrayManager) ShowNotification(title, message string) {
+	go notifications.NewNotification(title, "", message).
+		WithIconData(assets.PuushIconData).
+		Push()
+}
+
 // ShowUploadNotification will display a notification indicating that an upload was successful
 func (m *TrayManager) ShowUploadNotification(url string) {
 	go notifications.NewNotification("puush complete!", "", url).
@@ -79,6 +86,17 @@ func (m *TrayManager) SetScreenshotsPath(path string) {
 func (m *TrayManager) TogglePuushing() {
 	m.puushingDisabled = !m.puushingDisabled
 	m.rebuildMenuItems()
+
+	if m.puushingDisabled {
+		m.ShowNotification("puush was disabled!", "Shortcut keys will no longer be accepted.")
+	} else {
+		m.ShowNotification("puush was enabled!", "Shortcut keys will now be accepted.")
+	}
+}
+
+// PuushingDisabled returns whether puushing is currently disabled
+func (m *TrayManager) PuushingDisabled() bool {
+	return m.puushingDisabled
 }
 
 // EnableClipboard will enable copying upload urls to the clipboard
@@ -158,12 +176,7 @@ func (m *TrayManager) rebuildMenuItems() {
 	uploadClipboard := fyne.NewMenuItem("Upload Clipboard", m.UploadFromClipboard)
 	uploadClipboard.Icon = clipboardIcon
 
-	var disablePuushing *fyne.MenuItem
-	disablePuushing = fyne.NewMenuItem("Disable puushing", func() {
-		disablePuushing.Checked = !m.puushingDisabled
-		m.puushingDisabled = !m.puushingDisabled
-		m.Refresh()
-	})
+	disablePuushing := fyne.NewMenuItem("Disable puushing", m.TogglePuushing)
 	disablePuushing.Checked = m.puushingDisabled
 
 	settings := fyne.NewMenuItem("Settings...", func() {

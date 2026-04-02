@@ -58,11 +58,15 @@ func (m *TrayManager) ShowNotification(title, message string) {
 
 // ShowUploadNotification will display a notification indicating that an upload was successful
 func (m *TrayManager) ShowUploadNotification(url string) {
-	go notifications.NewNotification("puush complete!", "", url).
-		WithSoundData(assets.SuccessSoundData).
+	notification := notifications.NewNotification("puush complete!", "", url).
 		WithIconData(assets.PuushIconData).
-		WithAction(url).
-		Push()
+		WithAction(url)
+
+	if m.config.General.NotificationSound {
+		notification = notification.WithSoundData(assets.SuccessSoundData)
+	}
+
+	notification.Push()
 }
 
 // ShowErrorNotification will display an error notification with the provided message

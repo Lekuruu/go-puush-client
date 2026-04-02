@@ -25,20 +25,6 @@ func main() {
 
 	api := puush.NewClientFromApiKey(cfg.Account.Username, cfg.Account.Key)
 	api.SetBaseURL(cfg.Misc.ParseServerURL().String())
-	defer func() {
-		if !api.Account.Credentials.HasApiKey() {
-			return
-		}
-		// Update account state in config after shutdown
-		cfg.Account.Key = *api.Account.Credentials.Key
-		cfg.Account.Username = *api.Account.Credentials.Identifier
-		cfg.Account.Type = int(api.Account.Type)
-		cfg.Account.Usage = api.Account.DiskUsage
-
-		if api.Account.SubscriptionEnd != nil {
-			cfg.Account.Expiry = api.Account.SubscriptionEnd.Format(time.DateTime)
-		}
-	}()
 
 	// Apply previous account state from config to api
 	expiry, _ := time.Parse(time.DateTime, cfg.Account.Expiry)
@@ -48,5 +34,6 @@ func main() {
 	// TODO: Handle time parsing better, I'm just too lazy right now and also cba tbh
 
 	ui := desktop.NewUI(app, api, cfg)
+	defer ui.OnShutdown()
 	ui.Run()
 }

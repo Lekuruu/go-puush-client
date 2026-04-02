@@ -1,6 +1,8 @@
 package desktop
 
 import (
+	"time"
+
 	"fyne.io/fyne/v2"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
@@ -46,6 +48,7 @@ func (ui *UI) Run() {
 		ui.tray.Initialize("puush")
 		ui.tray.Apply(ui.app)
 		ui.tray.SetSettingsCallback(ui.ShowSettingsWindow)
+		ui.tray.SetPuushingDisabled(ui.config.General.DisabledToggle)
 
 		// Apply configuration for copying to clipboard
 		if ui.config.General.CopyToClipboard {
@@ -71,4 +74,23 @@ func (ui *UI) Run() {
 	}
 
 	ui.app.Run()
+}
+
+func (ui *UI) OnShutdown() {
+	ui.tray.StopMonitor()
+
+	// Keep "puushing disabled" state
+	ui.config.General.DisabledToggle = ui.tray.PuushingDisabled()
+
+	if ui.api.Account.Credentials.HasApiKey() {
+		// Update account state in config after shutdown
+		ui.config.Account.Key = *ui.api.Account.Credentials.Key
+		ui.config.Account.Username = *ui.api.Account.Credentials.Identifier
+		ui.config.Account.Type = int(ui.api.Account.Type)
+		ui.config.Account.Usage = ui.api.Account.DiskUsage
+
+		if ui.api.Account.SubscriptionEnd != nil {
+			ui.config.Account.Expiry = ui.api.Account.SubscriptionEnd.Format(time.DateTime)
+		}
+	}
 }

@@ -99,6 +99,12 @@ func (m *TrayManager) PuushingDisabled() bool {
 	return m.puushingDisabled
 }
 
+// SetPuushingDisabled sets the puushing disabled state to the specified value
+func (m *TrayManager) SetPuushingDisabled(disabled bool) {
+	m.puushingDisabled = disabled
+	m.rebuildMenuItems()
+}
+
 // EnableClipboard will enable copying upload urls to the clipboard
 func (m *TrayManager) EnableClipboard() {
 	m.clipboardEnabled = true

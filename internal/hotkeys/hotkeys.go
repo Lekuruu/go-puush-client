@@ -69,8 +69,7 @@ func (m *HotkeyManager) register(shortcut string, action func()) {
 
 	// Listen for the hotkey press in a background goroutine
 	go func() {
-		for {
-			<-hk.Keydown()
+		for range hk.Keydown() {
 			if m.tray.PuushingDisabled() {
 				continue
 			}

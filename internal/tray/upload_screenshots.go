@@ -2,6 +2,7 @@ package tray
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -14,7 +15,8 @@ func (m *TrayManager) UploadAreaScreenshot() {
 
 	reader, err := provider.CaptureArea()
 	if err != nil {
-		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		// TODO: Show notification to user if it's not a cancelled screeenshot
+		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
 	defer reader.Close()

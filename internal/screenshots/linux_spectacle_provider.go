@@ -104,6 +104,18 @@ func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.Rea
 		return nil, fmt.Errorf("open screenshot: %w", err)
 	}
 
+	info, err := file.Stat()
+	if err != nil {
+		file.Close()
+		os.Remove(path)
+		return nil, fmt.Errorf("stat screenshot: %w", err)
+	}
+	if info.Size() == 0 {
+		file.Close()
+		os.Remove(path)
+		return nil, fmt.Errorf("screenshot file is empty")
+	}
+
 	return &temporaryReadCloser{
 		file: file,
 		path: path,

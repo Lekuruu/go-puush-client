@@ -14,8 +14,9 @@ import (
 )
 
 type SpectacleScreenshotProvider struct {
-	binPath string
-	timeout time.Duration
+	binPath        string
+	timeout        time.Duration
+	fullscreenMode FullscreenMode
 }
 
 func NewSpectacleProvider() (ScreenshotProvider, error) {
@@ -40,7 +41,7 @@ func (p *SpectacleScreenshotProvider) SetQuality(quality Quality) {
 }
 
 func (p *SpectacleScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
-	// TODO: ...
+	p.fullscreenMode = mode
 }
 
 // Available checks if the spectacle binary is available in the system
@@ -51,8 +52,13 @@ func (p *SpectacleScreenshotProvider) Available() bool {
 
 // CaptureScreen captures the entire screen
 func (p *SpectacleScreenshotProvider) CaptureScreen() (io.ReadSeekCloser, error) {
-	// -f fullscreen
-	return p.performCapture("-f")
+	if p.fullscreenMode == FullscreenModeMouse || p.fullscreenMode == FullscreenModePrimary {
+		// -m current monitor
+		return p.performCapture("-m")
+	} else {
+		// -f fullscreen (all screens)
+		return p.performCapture("-f")
+	}
 }
 
 // CaptureArea captures a specific region of the screen

@@ -49,6 +49,9 @@ func (m *TrayManager) PerformFileUpload(path string) {
 func (m *TrayManager) OnUploadComplete(urlResponse string) {
 	log.Println("Upload complete:", urlResponse)
 
+	// Set updated disk usage to config
+	m.config.Account.Usage = m.api.Account.DiskUsage
+
 	// Update the tray icon to the "complete" state
 	m.OnTrayProgressComplete()
 	m.ShowUploadNotification(urlResponse)

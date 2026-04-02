@@ -1,8 +1,18 @@
 # go-puush-client
 
-This repository contains a go implementation of the puush api.
-In the future, it will contain a feature-complete, cross-platform desktop application, similar to the original client.
-How long will this take? No idea.
+This repository contains a go implementation of the puush api and an almost feature-complete, cross-platform desktop application recreation of the original puush client.
+My main motivation was to have a usable puush client for linux, since it was the only platform that didn't have an official client. It was also a good way for me to learn more about [fyne](https://fyne.io/), which is a cross-platform gui toolkit for go.
+
+## Progress
+
+The main application is mostly feature complete, with a few notable exceptions:
+
+- Settings window
+- Context menu's + IPC
+- Startup behavior
+- An updater
+
+Otherwise, the application does what I want it to do, which is to upload files and take screenshots.
 
 ## Usage example
 

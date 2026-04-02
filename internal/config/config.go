@@ -102,7 +102,8 @@ func DefaultConfig() *Config {
 			Toggle:                  "Ctrl+Alt+P",
 		},
 		Misc: MiscConfig{
-			ServerURL: "https://puush.me",
+			ServerURL:  "https://puush.me",
+			LastUpdate: time.Now(),
 		},
 	}
 }

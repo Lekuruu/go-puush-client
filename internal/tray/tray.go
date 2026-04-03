@@ -3,6 +3,7 @@ package tray
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 
 	"fyne.io/fyne/v2"
@@ -13,6 +14,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 	"github.com/fsnotify/fsnotify"
+	"golang.design/x/clipboard"
 )
 
 type TrayManager struct {
@@ -126,6 +128,12 @@ func (m *TrayManager) Apply(app fyne.App) error {
 func (m *TrayManager) Initialize(applicationName string) error {
 	m.menu = fyne.NewMenu(applicationName)
 	m.rebuildMenuItems()
+
+	err := clipboard.Init()
+	if err != nil {
+		log.Printf("Error initializing clipboard: %v", err)
+		m.ShowErrorNotification("Failed to initialize the clipboard. You may encounter issues when using this feature.")
+	}
 	return nil
 }
 

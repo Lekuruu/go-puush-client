@@ -80,12 +80,6 @@ func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string
 }
 
 func (m *TrayManager) CopyScreenshotToClipboard(reader io.ReadSeeker) {
-	err := clipboard.Init()
-	if err != nil {
-		log.Printf("Error initializing clipboard: %v", err)
-		return
-	}
-
 	reader.Seek(0, io.SeekStart)
 	data, err := io.ReadAll(reader)
 	if err != nil {
@@ -93,8 +87,10 @@ func (m *TrayManager) CopyScreenshotToClipboard(reader io.ReadSeeker) {
 		return
 	}
 
-	clipboard.Write(clipboard.FmtImage, data)
-	log.Printf("Screenshot image copied to clipboard")
+	go func() {
+		clipboard.Write(clipboard.FmtImage, data)
+		log.Printf("Screenshot image copied to clipboard")
+	}()
 }
 
 func (m *TrayManager) SaveScreenshotToDisk(reader io.ReadSeeker, filename string, path string) string {

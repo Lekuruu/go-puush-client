@@ -69,5 +69,6 @@ func (ui *UI) buildGeneralTab() fyne.CanvasObject {
 }
 
 func createGroup(title string, content fyne.CanvasObject) fyne.CanvasObject {
-	return widget.NewCard("", title, content)
+	indentedContent := container.NewBorder(nil, nil, widget.NewLabel("    "), nil, content)
+	return widget.NewCard("", title, indentedContent)
 }

@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"golang.design/x/clipboard"
 )
 
 func (m *TrayManager) UploadAreaScreenshot() {
@@ -81,24 +79,18 @@ func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string
 
 func (m *TrayManager) CopyScreenshotToClipboard(reader io.ReadSeeker) {
 	reader.Seek(0, io.SeekStart)
-	data, err := io.ReadAll(reader)
+	err := SetClipboard(reader)
 	if err != nil {
-		log.Printf("Error reading screenshot data for clipboard: %v", err)
-		return
+		log.Printf("Error setting clipboard: %v", err)
+	} else {
+		log.Printf("Screenshot copied to clipboard")
 	}
-
-	go func() {
-		clipboard.Write(clipboard.FmtImage, data)
-		log.Printf("Screenshot image copied to clipboard")
-	}()
 }
 
 func (m *TrayManager) SaveScreenshotToDisk(reader io.ReadSeeker, filename string, path string) string {
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
-
-	// Seek back to start of reader, otherwise we aren't going to save anything
 	reader.Seek(0, io.SeekStart)
 
 	outputPath := path + filename

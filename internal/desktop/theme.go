@@ -47,13 +47,17 @@ func (w *classicTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant
 		return color.NRGBA{R: 128, G: 128, B: 128, A: 255}
 	case theme.ColorNameInputBorder:
 		return color.NRGBA{R: 171, G: 173, B: 179, A: 255}
+	case theme.ColorNameSeparator:
+		return color.NRGBA{R: 213, G: 223, B: 229, A: 255}
+	case theme.ColorNameShadow:
+		return color.Transparent
 	}
 	return theme.DefaultTheme().Color(name, variant)
 }
 
 func (w *classicTheme) Size(name fyne.ThemeSizeName) float32 {
 	switch name {
-	case theme.SizeNameInputRadius, theme.SizeNameSelectionRadius, theme.SizeNameScrollBarRadius:
+	case theme.SizeNameInputRadius, theme.SizeNameSelectionRadius, theme.SizeNameScrollBarRadius, theme.SizeNameWindowButtonRadius:
 		return 0
 	case theme.SizeNamePadding:
 		return 4

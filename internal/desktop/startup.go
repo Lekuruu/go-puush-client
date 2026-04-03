@@ -21,6 +21,7 @@ import (
 func (ui *UI) ShowStartupWindow() {
 	w := ui.app.NewWindow("puush quick start")
 	w.SetFixedSize(true)
+	w.SetIcon(puushIcon)
 
 	serverUrl := ui.config.Misc.ParseServerURL()
 	registerUrl := serverUrl.String() + "/register"

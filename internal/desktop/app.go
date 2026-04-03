@@ -5,11 +5,14 @@ import (
 
 	"fyne.io/fyne/v2"
 
+	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/hotkeys"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
+
+var puushIcon fyne.Resource = fyne.NewStaticResource("icon-puush.png", assets.PuushIconData)
 
 // UI manages the desktop application windows and state.
 type UI struct {

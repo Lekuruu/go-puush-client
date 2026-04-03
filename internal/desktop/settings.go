@@ -14,7 +14,7 @@ func (ui *UI) ShowSettingsWindow() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("General", ui.buildGeneralTab()),
-		container.NewTabItem("Key Bindings", widget.NewLabel("todo")),
+		container.NewTabItem("Key Bindings", ui.buildKeyBindingsTab()),
 		container.NewTabItem("Account", widget.NewLabel("todo")),
 		container.NewTabItem("Updates", widget.NewLabel("todo")),
 		container.NewTabItem("Advanced", widget.NewLabel("todo")),
@@ -68,7 +68,39 @@ func (ui *UI) buildGeneralTab() fyne.CanvasObject {
 	)
 }
 
+func (ui *UI) buildKeyBindingsTab() fyne.CanvasObject {
+	fullScreenBtn := widget.NewButton("Ctrl+Shift+3", func() {})
+	currentWindowBtn := widget.NewButton("Ctrl+Shift+2", func() {})
+	captureAreaBtn := widget.NewButton("Ctrl+Shift+4", func() {})
+	uploadFileBtn := widget.NewButton("Ctrl+Shift+U", func() {})
+	uploadClipboardBtn := widget.NewButton("Ctrl+Shift+5", func() {})
+	togglePuushBtn := widget.NewButton("Ctrl+Alt+P", func() {})
+
+	rowFullscreen := container.NewGridWithColumns(2, widget.NewLabel("Capture full screen:"), fullScreenBtn)
+	rowWindow := container.NewGridWithColumns(2, widget.NewLabel("Capture current window:"), currentWindowBtn)
+	rowArea := container.NewGridWithColumns(2, widget.NewLabel("Capture Area:"), captureAreaBtn)
+	rowFile := container.NewGridWithColumns(2, widget.NewLabel("Upload File:"), uploadFileBtn)
+	// infoLabel := container.NewCenter(widget.NewLabel("Use this shortcut in Windows Explorer to quickly upload selected files."))
+	rowClipboard := container.NewGridWithColumns(2, widget.NewLabel("Upload Clipboard:"), uploadClipboardBtn)
+	rowToggle := container.NewGridWithColumns(2, widget.NewLabel("Toggle puush functionality:"), togglePuushBtn)
+
+	content := container.NewVBox(
+		rowFullscreen,
+		rowWindow,
+		rowArea,
+		rowFile,
+		rowClipboard,
+		rowToggle,
+	)
+
+	return container.NewVBox(
+		widget.NewSeparator(),
+		createGroup("Keyboard Bindings", content),
+		widget.NewSeparator(),
+	)
+}
+
 func createGroup(title string, content fyne.CanvasObject) fyne.CanvasObject {
-	indentedContent := container.NewBorder(nil, nil, widget.NewLabel("    "), nil, content)
+	indentedContent := container.NewBorder(nil, nil, widget.NewLabel("    "), widget.NewLabel("    "), content)
 	return widget.NewCard("", title, indentedContent)
 }

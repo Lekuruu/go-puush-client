@@ -34,18 +34,19 @@ type AccountConfig struct {
 type GeneralConfig struct {
 	OpenBrowser       bool
 	NotificationSound bool
-	CopyToClipboard   bool
 	Startup           bool
 	ContextMenu       bool
 	DisabledToggle    bool
+	CopyToClipboard   bool
 }
 
 type CaptureConfig struct {
-	UploadQuality      screenshots.Quality
-	FullscreenMode     screenshots.FullscreenMode
-	SaveImages         bool
-	SaveImagePath      string
-	MonitorDirectories []string
+	UploadQuality         screenshots.Quality
+	FullscreenMode        screenshots.FullscreenMode
+	SaveImages            bool
+	SaveImagesToClipboard bool
+	SaveImagePath         string
+	MonitorDirectories    []string
 }
 
 type HotkeyConfig struct {
@@ -87,11 +88,12 @@ func DefaultConfig() *Config {
 			DisabledToggle:    false,
 		},
 		Capture: CaptureConfig{
-			UploadQuality:      screenshots.QualityBest,
-			FullscreenMode:     screenshots.FullscreenModeAllScreens,
-			SaveImages:         false,
-			SaveImagePath:      "",
-			MonitorDirectories: []string{},
+			UploadQuality:         screenshots.QualityBest,
+			FullscreenMode:        screenshots.FullscreenModeAllScreens,
+			SaveImages:            false,
+			SaveImagesToClipboard: false,
+			SaveImagePath:         "",
+			MonitorDirectories:    []string{},
 		},
 		Hotkeys: HotkeyConfig{
 			ScreenSelection:         "Ctrl+Shift+4",

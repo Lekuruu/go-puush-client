@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"golang.design/x/clipboard"
 )
 
 func (m *TrayManager) UploadAreaScreenshot() {
@@ -69,33 +71,56 @@ func (m *TrayManager) UploadWindowScreenshot() {
 }
 
 func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string) {
-	if !m.config.Capture.SaveImages || m.config.Capture.SaveImagePath == "" {
+	if m.config.Capture.SaveImagesToClipboard {
+		m.CopyScreenshotToClipboard(reader)
+	}
+	if m.config.Capture.SaveImages && m.config.Capture.SaveImagePath != "" {
+		m.SaveScreenshotToDisk(reader, filename, m.config.Capture.SaveImagePath)
+	}
+}
+
+func (m *TrayManager) CopyScreenshotToClipboard(reader io.ReadSeeker) {
+	err := clipboard.Init()
+	if err != nil {
+		log.Printf("Error initializing clipboard: %v", err)
 		return
 	}
 
-	saveDir := m.config.Capture.SaveImagePath
-	if !strings.HasSuffix(saveDir, "/") {
-		saveDir += "/"
+	reader.Seek(0, io.SeekStart)
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		log.Printf("Error reading screenshot data for clipboard: %v", err)
+		return
+	}
+
+	clipboard.Write(clipboard.FmtImage, data)
+	log.Printf("Screenshot image copied to clipboard")
+}
+
+func (m *TrayManager) SaveScreenshotToDisk(reader io.ReadSeeker, filename string, path string) string {
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
 	}
 
 	// Seek back to start of reader, otherwise we aren't going to save anything
 	reader.Seek(0, io.SeekStart)
 
-	savePath := saveDir + filename
-	outFile, err := os.Create(savePath)
+	outputPath := path + filename
+	outFile, err := os.Create(outputPath)
 	if err != nil {
 		log.Printf("Error creating file for saving screenshot: %v", err)
-		return
+		return ""
 	}
 	defer outFile.Close()
 
 	_, err = io.Copy(outFile, reader)
 	if err != nil {
 		log.Printf("Error saving screenshot to file: %v", err)
-		return
+		return ""
 	}
 
-	log.Printf("Screenshot saved to: %s", savePath)
+	log.Printf("Screenshot saved to: %s", outputPath)
+	return outputPath
 }
 
 func getImageFilename(reader io.ReadSeeker) string {

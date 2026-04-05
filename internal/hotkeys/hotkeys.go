@@ -42,6 +42,7 @@ func (m *HotkeyManager) Stop() {
 		}
 	}
 	m.hotkeys = make(map[string]*hotkey.Hotkey)
+	log.Println("All hotkeys unregistered")
 }
 
 func (m *HotkeyManager) register(shortcut string, action func()) {

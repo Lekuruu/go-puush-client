@@ -132,7 +132,7 @@ func (p *SpectacleScreenshotProvider) performCapture(modeArgs ...string) (io.Rea
 	if info.Size() == 0 {
 		file.Close()
 		os.Remove(path)
-		return nil, fmt.Errorf("screenshot file is empty")
+		return nil, fmt.Errorf("screenshot was cancelled or is empty")
 	}
 
 	reader := &temporaryFileReader{

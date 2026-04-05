@@ -19,7 +19,9 @@ func (m *TrayManager) UploadAreaScreenshot() {
 
 	reader, err := provider.CaptureArea()
 	if err != nil {
-		// TODO: Show notification to user if it's not a cancelled screeenshot
+		if !isCancelledError(err) {
+			m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		}
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
@@ -39,7 +41,9 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 
 	reader, err := provider.CaptureScreen()
 	if err != nil {
-		// TODO: Show notification to user if it's not a cancelled screeenshot
+		if !isCancelledError(err) {
+			m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		}
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
@@ -59,7 +63,9 @@ func (m *TrayManager) UploadWindowScreenshot() {
 
 	reader, err := provider.CaptureWindow()
 	if err != nil {
-		// TODO: Show notification to user if it's not a cancelled screeenshot
+		if !isCancelledError(err) {
+			m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		}
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
@@ -136,4 +142,12 @@ func getImageExtension(reader io.ReadSeeker) string {
 	default:
 		return ".png"
 	}
+}
+
+func isCancelledError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "cancelled")
 }

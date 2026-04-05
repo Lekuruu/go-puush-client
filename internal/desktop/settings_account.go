@@ -3,6 +3,7 @@ package desktop
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -19,7 +20,7 @@ func (ui *UI) buildAccountTab() fyne.CanvasObject {
 		defer accountContainer.Refresh()
 		accountContainer.Objects = nil
 
-		if ui.config.Account.Key != "" {
+		if ui.config.Account.HasCredentials() {
 			accountContainer.Add(ui.buildAccountDetails(updateView))
 		} else {
 			accountContainer.Add(ui.buildAccountSetup(updateView))
@@ -60,28 +61,45 @@ func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {
 	registerLink := NewUnderlinedLink("Sign up for free account...", registerURL)
 	linksContainer := container.NewHBox(forgotLink, layout.NewSpacer(), registerLink)
 
+	var loginButton *BorderedButton
+
+	disableLogin := func() {
+		loginButton.Instance.Disable()
+		emailEntry.Disable()
+		passwordEntry.Disable()
+	}
+	enableLogin := func() {
+		loginButton.Instance.Enable()
+		emailEntry.Enable()
+		passwordEntry.Enable()
+	}
 	performLogin := func() {
+		fyne.Do(disableLogin)
+		defer fyne.Do(enableLogin)
+
 		ui.api.Account.Credentials = &puush.Credentials{
 			Identifier: &emailEntry.Text,
 			Password:   &passwordEntry.Text,
 		}
 		ui.api.SetBaseURL(serverUrl.String())
+
+		// Attempt authentication with new credentials
 		if err := ui.api.Authenticate(); err != nil {
 			showError(err)
 			return
 		}
-		ui.UpdateAccountConfiguration()
-		updateView()
-		// TODO: Disable buttons when performing login & do it inside a go routine
+
+		defer ui.UpdateAccountConfiguration()
+		defer fyne.Do(updateView)
 	}
-	loginBtn := NewBorderedButton("Login", performLogin)
+	loginButton = NewBorderedButton("Login", func() { go performLogin() })
 
 	sizedForm := container.NewGridWrap(fyne.NewSize(350, 55), form)
-	sizedLoginBtn := container.NewGridWrap(fyne.NewSize(140, 53), loginBtn)
+	sizedLoginButton := container.NewGridWrap(fyne.NewSize(140, 53), loginButton)
 
 	loginContainer := container.NewHBox(
 		layout.NewSpacer(),
-		sizedForm, widget.NewLabel(" "), sizedLoginBtn,
+		sizedForm, widget.NewLabel(" "), sizedLoginButton,
 		layout.NewSpacer(),
 	)
 
@@ -97,36 +115,37 @@ func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {
 }
 
 func (ui *UI) buildAccountDetails(updateView func()) fyne.CanvasObject {
-	accountTypeStr := ui.config.Account.Type.String() + " Account"
-	diskUsageStr := ui.config.Account.DiskUsageHumanReadable()
+	accountTypeString := ui.config.Account.Type.String() + " Account" // e.g. "Pro Account"
+	diskUsageString := ui.config.Account.DiskUsageHumanReadable()     // e.g. 1.5 GB
 
-	expiryStr := ui.config.Account.Expiry
-	if expiryStr == "" {
-		expiryStr = "Never"
+	expiryTime := ui.config.Account.SubscriptionExpiry()
+	expiryString := "Never"
+	if expiryTime != nil {
+		// TODO: Check if this is the right date time format
+		expiryString = expiryTime.Format(time.DateTime)
 	}
 
 	detailsGrid := container.NewGridWithColumns(2,
 		trailingLabel("Logged in as:"), widget.NewLabel(ui.config.Account.Username),
 		trailingLabel("API Key:"), widget.NewLabel(ui.config.Account.Key),
-		trailingLabel("Account Type:"), widget.NewLabel(accountTypeStr),
-		trailingLabel("Expiry Date:"), widget.NewLabel(expiryStr),
-		trailingLabel("Disk Usage:"), widget.NewLabel(diskUsageStr),
+		trailingLabel("Account Type:"), widget.NewLabel(accountTypeString),
+		trailingLabel("Expiry Date:"), widget.NewLabel(expiryString),
+		trailingLabel("Disk Usage:"), widget.NewLabel(diskUsageString),
 	)
 
-	myAccountBtn := widget.NewButton("My Account", func() {
+	myAccountButton := widget.NewButton("My Account", func() {
 		path := fmt.Sprintf("/login/go/?k=%s", ui.config.Account.Key)
 		OpenBrowser(ui.api.FormatURL(path))
 	})
-
-	logoutBtn := widget.NewButton("Logout", func() {
+	logoutButton := widget.NewButton("Logout", func() {
 		ui.config.Account.Reset()
 		ui.api.Account.Reset()
 		updateView()
 	})
-
 	buttons := container.NewGridWithColumns(
-		2, myAccountBtn, logoutBtn,
+		2, myAccountButton, logoutButton,
 	)
+
 	content := container.NewVBox(
 		container.NewPadded(detailsGrid),
 		widget.NewLabel(""),

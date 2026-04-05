@@ -37,12 +37,30 @@ func (a *AccountConfig) DiskUsageHumanReadable() string {
 	return formatBytes(a.Usage)
 }
 
+func (a *AccountConfig) HasCredentials() bool {
+	return a.Username != "" && a.Key != ""
+}
+
 func (a *AccountConfig) Reset() {
 	a.Username = ""
 	a.Key = ""
 	a.Type = puush.AccountTypeRegular
 	a.Usage = 0
 	a.Expiry = ""
+}
+
+func (a *AccountConfig) SubscriptionExpiry() *time.Time {
+	if a.Expiry == "" {
+		return nil
+	}
+	expiryTime, err := time.Parse(time.RFC3339, a.Expiry)
+	if err != nil {
+		return nil
+	}
+	if expiryTime.IsZero() {
+		return nil
+	}
+	return &expiryTime
 }
 
 type GeneralConfig struct {

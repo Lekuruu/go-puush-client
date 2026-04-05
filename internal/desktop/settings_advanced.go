@@ -14,6 +14,10 @@ func (ui *UI) buildAdvancedTab(accountViewUpdate func()) fyne.CanvasObject {
 	var providerNames []string = screenshots.GetProviderList()
 
 	providerSelect := widget.NewSelect(providerNames, func(s string) {
+		if s == ui.config.Capture.ScreenshotProvider {
+			return
+		}
+
 		provider, err := screenshots.GetProviderByName(s)
 		if err != nil {
 			log.Println("Failed to get screenshot provider: " + err.Error())
@@ -21,6 +25,10 @@ func (ui *UI) buildAdvancedTab(accountViewUpdate func()) fyne.CanvasObject {
 		}
 		ui.tray.SetScreenshotProvider(provider)
 		ui.config.Capture.ScreenshotProvider = s
+
+		if warning := provider.Warning(); warning != "" {
+			ui.tray.ShowNotification("Notice", warning)
+		}
 	})
 
 	// If no provider has been set yet, use the default provider

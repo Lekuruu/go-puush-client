@@ -16,7 +16,7 @@ func (ui *UI) ShowSettingsWindow() {
 		container.NewTabItem("Key Bindings", ui.buildKeyBindingsTab()),
 		container.NewTabItem("Account", ui.buildAccountTab()),
 		// container.NewTabItem("Updates", widget.NewLabel("todo")),
-		// container.NewTabItem("Advanced", widget.NewLabel("todo")),
+		container.NewTabItem("Advanced", ui.buildAdvancedTab()),
 	)
 	w.SetContent(container.NewPadded(tabs))
 	w.Show()

@@ -39,7 +39,8 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 
 	reader, err := provider.CaptureScreen()
 	if err != nil {
-		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		// TODO: Show notification to user if it's not a cancelled screeenshot
+		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
 	defer reader.Close()
@@ -58,7 +59,8 @@ func (m *TrayManager) UploadWindowScreenshot() {
 
 	reader, err := provider.CaptureWindow()
 	if err != nil {
-		m.ShowErrorNotification("An error occurred while capturing the screenshot. Please try again.")
+		// TODO: Show notification to user if it's not a cancelled screeenshot
+		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
 	defer reader.Close()

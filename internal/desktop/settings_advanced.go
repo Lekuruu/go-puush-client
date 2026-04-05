@@ -107,6 +107,12 @@ func (ui *UI) buildAdvancedTab() fyne.CanvasObject {
 	serverUrlEntry.OnChanged = func(s string) {
 		ui.config.Misc.ServerURL = s
 	}
+	serverUrlEntry.OnSubmitted = func(s string) {
+		ui.config.Misc.ServerURL = s
+		ui.config.Account.Reset()
+		ui.api.SetBaseURL(s)
+		ui.api.Account.Credentials.Reset()
+	}
 
 	return container.NewVScroll(container.NewVBox(
 		widget.NewSeparator(),

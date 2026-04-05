@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -31,7 +32,7 @@ func (p *GnomeScreenshotProvider) Name() string {
 }
 
 func (p *GnomeScreenshotProvider) Warning() string {
-	return "GNOME Screenshot only works on GNOME desktop environments."
+	return ""
 }
 
 func (p *GnomeScreenshotProvider) SetQuality(quality Quality) {
@@ -42,10 +43,15 @@ func (p *GnomeScreenshotProvider) SetFullscreenMode(mode FullscreenMode) {
 	p.fullscreenMode = mode
 }
 
-// Available checks if the gnome-screenshot binary is available in the system
+// Available checks if the gnome-screenshot binary is available & if the user is running GNOME
 func (p *GnomeScreenshotProvider) Available() bool {
 	_, err := exec.LookPath("gnome-screenshot")
-	return err == nil
+	if err != nil {
+		return false
+	}
+
+	desktop := strings.ToLower(os.Getenv("XDG_CURRENT_DESKTOP"))
+	return slices.Contains(strings.Split(desktop, ":"), "gnome")
 }
 
 // CaptureScreen captures the entire screen

@@ -146,10 +146,8 @@ func (ui *UI) ShowStartupWindow() {
 	)
 	bgContainer := container.NewStack(bgImage, overlayContainer)
 
-	startupCheckbox := widget.NewCheck("Start puush on startup", func(checked bool) {
-		// TODO: Implement startup logic
-	})
-	startupCheckbox.SetChecked(true)
+	startupCheckbox := widget.NewCheck("Start puush on startup", ui.UpdateAutostartConfiguration)
+	startupCheckbox.SetChecked(ui.config.General.Startup)
 
 	okayBtn = NewBorderedButton("Okay, I've got it!", func() {
 		w.Close()

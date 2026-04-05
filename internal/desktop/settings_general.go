@@ -8,7 +8,7 @@ import (
 )
 
 func (ui *UI) buildGeneralTab() fyne.CanvasObject {
-	startupCheckbox := widget.NewCheck("Start puush on startup", func(b bool) { ui.config.General.Startup = b })
+	startupCheckbox := widget.NewCheck("Start puush on startup", ui.UpdateAutostartConfiguration)
 	startupCheckbox.Checked = ui.config.General.Startup
 
 	soundCheckbox := widget.NewCheck("Play a notification sound", func(b bool) { ui.config.General.NotificationSound = b })

@@ -42,6 +42,9 @@ func (ui *UI) Run() {
 	// TODO: Maybe add some sort of theme customization?
 	ui.app.Settings().SetTheme(NewWindowsTheme())
 
+	// Update autostart configuration based on current settings
+	ui.UpdateAutostartConfiguration(ui.config.General.Startup)
+
 	// Show quickstart window if no credentials have been set
 	// Otherwise, re-authenticate to see if the API key is still valid
 	if !ui.api.Account.Credentials.HasApiKey() {
@@ -94,6 +97,22 @@ func (ui *UI) UpdateAccountConfiguration() {
 
 		if ui.api.Account.SubscriptionEnd != nil {
 			ui.config.Account.Expiry = ui.api.Account.SubscriptionEnd.Format(time.DateTime)
+		}
+	}
+}
+
+func (ui *UI) UpdateAutostartConfiguration(enabled bool) {
+	ui.config.General.Startup = enabled
+
+	if enabled {
+		err := EnableAutostart()
+		if err != nil {
+			log.Printf("Failed to enable autostart: %v", err)
+		}
+	} else {
+		err := DisableAutostart()
+		if err != nil {
+			log.Printf("Failed to disable autostart: %v", err)
 		}
 	}
 }

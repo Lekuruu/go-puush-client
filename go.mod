@@ -6,6 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.7.3
 	github.com/Lekuruu/go-hotkey v0.0.0-20260405113918-a7a445c88a22
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
+	github.com/emersion/go-autostart v0.0.0-20250403115856-34830d6457d2
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/sqweek/dialog v0.0.0-20260123140253-64c163d53aac
 	golang.design/x/clipboard v0.7.1

@@ -33,7 +33,6 @@ Other providers include `flameshot`, `maim` & `grim`/`slurp`, however, your mile
 The main application is mostly feature complete, with a few minor exceptions:
 
 - Context menu's + IPC
-- Startup behavior
 - An updater
 
 Otherwise, the application does what I want it to do, which is to upload files and take screenshots.

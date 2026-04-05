@@ -134,11 +134,11 @@ func (ui *UI) buildAccountDetails(updateView func()) fyne.CanvasObject {
 		trailingLabel("Disk Usage:"), widget.NewLabel(diskUsageString),
 	)
 
-	myAccountButton := widget.NewButton("My Account", func() {
+	myAccountButton := NewBorderedButton("My Account", func() {
 		path := fmt.Sprintf("/login/go/?k=%s", ui.config.Account.Key)
 		OpenBrowser(ui.api.FormatURL(path))
 	})
-	logoutButton := widget.NewButton("Logout", func() {
+	logoutButton := NewBorderedButton("Logout", func() {
 		ui.config.Account.Reset()
 		ui.api.Account.Reset()
 		updateView()

@@ -28,6 +28,10 @@ func (p *WindowsScreenshotProvider) Name() string {
 	return "Windows (Native)"
 }
 
+func (p *WindowsScreenshotProvider) Warning() string {
+	return ""
+}
+
 func (p *WindowsScreenshotProvider) SetQuality(quality Quality) {
 	p.quality = quality
 }

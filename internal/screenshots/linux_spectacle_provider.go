@@ -37,6 +37,10 @@ func (p *SpectacleScreenshotProvider) Name() string {
 	return "KDE Spectacle"
 }
 
+func (p *SpectacleScreenshotProvider) Warning() string {
+	return ""
+}
+
 func (p *SpectacleScreenshotProvider) SetQuality(quality Quality) {
 	p.quality = quality
 }

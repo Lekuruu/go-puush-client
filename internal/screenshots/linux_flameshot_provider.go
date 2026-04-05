@@ -29,6 +29,10 @@ func (p *FlameshotScreenshotProvider) Name() string {
 	return "Flameshot"
 }
 
+func (p *FlameshotScreenshotProvider) Warning() string {
+	return "Flameshot does not support window captures."
+}
+
 func (p *FlameshotScreenshotProvider) SetQuality(quality Quality) {
 	p.quality = quality
 }

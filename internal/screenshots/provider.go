@@ -9,6 +9,9 @@ type ScreenshotProvider interface {
 	// Name returns the name of the screenshot provider
 	Name() string
 
+	// Warning returns a warning message to be displayed to the user when selecting the provider
+	Warning() string
+
 	// SetQuality sets the quality for the screenshots taken by this provider
 	SetQuality(quality Quality)
 

@@ -36,6 +36,10 @@ func (p *DarwinScreenshotProvider) Name() string {
 	return "macOS (screencapture)"
 }
 
+func (p *DarwinScreenshotProvider) Warning() string {
+	return ""
+}
+
 func (p *DarwinScreenshotProvider) SetQuality(quality Quality) {
 	p.quality = quality
 }

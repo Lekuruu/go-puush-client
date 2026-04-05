@@ -195,4 +195,13 @@ func (m *TrayManager) rebuildMenuItems() {
 	)
 	m.menu.Items = items
 	m.menu.Refresh()
+
+	if m.targetApp == nil {
+		return
+	}
+
+	// Add back "Quit" button by applying the menu again
+	if desktopApp, ok := m.targetApp.(desktop.App); ok {
+		desktopApp.SetSystemTrayMenu(m.menu)
+	}
 }

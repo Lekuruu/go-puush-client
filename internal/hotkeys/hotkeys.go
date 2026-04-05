@@ -4,9 +4,9 @@ import (
 	"log"
 	"strings"
 
+	"github.com/Lekuruu/go-hotkey"
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
-	"golang.design/x/hotkey"
 )
 
 // HotkeyManager handles the logic of global hotkeys
@@ -14,6 +14,7 @@ type HotkeyManager struct {
 	config  *config.Config
 	tray    *tray.TrayManager
 	hotkeys map[string]*hotkey.Hotkey
+	done    chan struct{}
 }
 
 func NewHotkeyManager(cfg *config.Config, tm *tray.TrayManager) *HotkeyManager {
@@ -26,6 +27,7 @@ func NewHotkeyManager(cfg *config.Config, tm *tray.TrayManager) *HotkeyManager {
 
 // Start registers all hotkeys defined in the configuration
 func (m *HotkeyManager) Start() {
+	m.done = make(chan struct{})
 	m.register(m.config.Hotkeys.ScreenSelection, m.tray.UploadAreaScreenshot)
 	m.register(m.config.Hotkeys.FullscreenScreenshot, m.tray.UploadDesktopScreenshot)
 	m.register(m.config.Hotkeys.CurrentWindowScreenshot, m.tray.UploadWindowScreenshot)
@@ -41,8 +43,8 @@ func (m *HotkeyManager) Stop() {
 			log.Printf("Failed to unregister hotkey %s: %v", shortcut, err)
 		}
 	}
-	// Clear the mapping
 	m.hotkeys = make(map[string]*hotkey.Hotkey)
+	close(m.done)
 }
 
 func (m *HotkeyManager) register(shortcut string, action func()) {
@@ -69,11 +71,16 @@ func (m *HotkeyManager) register(shortcut string, action func()) {
 
 	// Listen for the hotkey press in a background goroutine
 	go func() {
-		for range hk.Keydown() {
-			if m.tray.PuushingDisabled() {
-				continue
+		for {
+			select {
+			case <-hk.Keydown():
+				if m.tray.PuushingDisabled() {
+					continue
+				}
+				action()
+			case <-m.done:
+				return
 			}
-			action()
 		}
 	}()
 

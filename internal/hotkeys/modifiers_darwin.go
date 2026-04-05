@@ -1,6 +1,6 @@
 package hotkeys
 
-import "golang.design/x/hotkey"
+import "github.com/Lekuruu/go-hotkey"
 
 const (
 	ModCtrl  = hotkey.ModCtrl

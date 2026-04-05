@@ -4,11 +4,11 @@ go 1.25.5
 
 require (
 	fyne.io/fyne/v2 v2.7.3
+	github.com/Lekuruu/go-hotkey v0.0.0-20260405105215-fc907e3dc320
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/sqweek/dialog v0.0.0-20260123140253-64c163d53aac
 	golang.design/x/clipboard v0.7.1
-	golang.design/x/hotkey v0.4.1
 	golang.org/x/sys v0.42.0
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 )
@@ -42,6 +42,7 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/yuin/goldmark v1.8.2 // indirect
+	golang.design/x/hotkey v0.4.1 // indirect
 	golang.org/x/exp/shiny v0.0.0-20260312153236-7ab1446f8b90 // indirect
 	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/mobile v0.0.0-20260312152759-81488f6aeb60 // indirect

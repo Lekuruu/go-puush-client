@@ -3,7 +3,7 @@ package hotkeys
 import (
 	"strings"
 
-	"golang.design/x/hotkey"
+	"github.com/Lekuruu/go-hotkey"
 )
 
 var modifierMapping = map[string]hotkey.Modifier{

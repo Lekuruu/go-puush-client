@@ -1,6 +1,6 @@
 package hotkeys
 
-import "golang.design/x/hotkey"
+import "github.com/Lekuruu/go-hotkey"
 
 // On Linux, the hotkey library has Key1 mapped to 0x0030
 // However, it seems like 0x0030 should actually be Key0...?

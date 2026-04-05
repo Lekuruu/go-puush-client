@@ -8,9 +8,8 @@ My main motivation was to have a usable puush client for linux, since it was the
 
 ## Progress
 
-The main application is mostly feature complete, with a few notable exceptions:
+The main application is mostly feature complete, with a few minor exceptions:
 
-- Settings window
 - Context menu's + IPC
 - Startup behavior
 - An updater

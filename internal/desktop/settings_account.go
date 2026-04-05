@@ -1,6 +1,7 @@
 package desktop
 
 import (
+	"fmt"
 	"net/url"
 
 	"fyne.io/fyne/v2"
@@ -17,6 +18,7 @@ func (ui *UI) buildAccountTab() fyne.CanvasObject {
 	updateView = func() {
 		defer accountContainer.Refresh()
 		accountContainer.Objects = nil
+
 		if ui.config.Account.Key != "" {
 			accountContainer.Add(ui.buildAccountDetails(updateView))
 		} else {
@@ -44,11 +46,8 @@ func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {
 
 	emailEntry := widget.NewEntry()
 	passwordEntry := widget.NewPasswordEntry()
-
-	emailLabel := widget.NewLabel("Email:")
-	emailLabel.Alignment = fyne.TextAlignTrailing
-	passwordLabel := widget.NewLabel("Password:")
-	passwordLabel.Alignment = fyne.TextAlignTrailing
+	emailLabel := trailingLabel("Email:")
+	passwordLabel := trailingLabel("Password:")
 
 	form := container.NewGridWithColumns(2,
 		emailLabel, emailEntry,
@@ -73,7 +72,7 @@ func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {
 		}
 		ui.UpdateAccountConfiguration()
 		updateView()
-		// TODO: Disable buttons when performing login
+		// TODO: Disable buttons when performing login & do it inside a go routine
 	}
 	loginBtn := NewBorderedButton("Login", performLogin)
 
@@ -98,6 +97,40 @@ func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {
 }
 
 func (ui *UI) buildAccountDetails(updateView func()) fyne.CanvasObject {
-	// TODO
-	return nil
+	accountTypeStr := ui.config.Account.Type.String() + " Account"
+	diskUsageStr := ui.config.Account.DiskUsageHumanReadable()
+
+	expiryStr := ui.config.Account.Expiry
+	if expiryStr == "" {
+		expiryStr = "Never"
+	}
+
+	detailsGrid := container.NewGridWithColumns(2,
+		trailingLabel("Logged in as:"), widget.NewLabel(ui.config.Account.Username),
+		trailingLabel("API Key:"), widget.NewLabel(ui.config.Account.Key),
+		trailingLabel("Account Type:"), widget.NewLabel(accountTypeStr),
+		trailingLabel("Expiry Date:"), widget.NewLabel(expiryStr),
+		trailingLabel("Disk Usage:"), widget.NewLabel(diskUsageStr),
+	)
+
+	myAccountBtn := widget.NewButton("My Account", func() {
+		path := fmt.Sprintf("/login/go/?k=%s", ui.config.Account.Key)
+		OpenBrowser(ui.api.FormatURL(path))
+	})
+
+	logoutBtn := widget.NewButton("Logout", func() {
+		ui.config.Account.Reset()
+		ui.api.Account.Reset()
+		updateView()
+	})
+
+	buttons := container.NewGridWithColumns(
+		2, myAccountBtn, logoutBtn,
+	)
+	content := container.NewVBox(
+		container.NewPadded(detailsGrid),
+		widget.NewLabel(""),
+		container.NewPadded(buttons),
+	)
+	return createGroup("Account Details", content)
 }

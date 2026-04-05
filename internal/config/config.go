@@ -1,10 +1,12 @@
 package config
 
 import (
+	"fmt"
 	"net/url"
 	"time"
 
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
+	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 // Store defines the interface for loading and saving the
@@ -26,9 +28,21 @@ type Config struct {
 type AccountConfig struct {
 	Username string
 	Key      string
-	Type     int
+	Type     puush.AccountType
 	Usage    int64
 	Expiry   string
+}
+
+func (a *AccountConfig) DiskUsageHumanReadable() string {
+	return formatBytes(a.Usage)
+}
+
+func (a *AccountConfig) Reset() {
+	a.Username = ""
+	a.Key = ""
+	a.Type = puush.AccountTypeRegular
+	a.Usage = 0
+	a.Expiry = ""
 }
 
 type GeneralConfig struct {
@@ -108,4 +122,20 @@ func DefaultConfig() *Config {
 			LastUpdate: time.Now(),
 		},
 	}
+}
+
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%dB", bytes)
+	}
+
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+
+	units := []string{"KB", "MB", "GB", "TB", "PB", "EB"}
+	return fmt.Sprintf("%.2f%s", float64(bytes)/float64(div), units[exp])
 }

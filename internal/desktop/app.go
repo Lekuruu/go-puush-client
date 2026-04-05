@@ -75,7 +75,7 @@ func (ui *UI) UpdateAccountConfiguration() {
 	if ui.api.Account.Credentials.HasApiKey() {
 		ui.config.Account.Key = *ui.api.Account.Credentials.Key
 		ui.config.Account.Username = *ui.api.Account.Credentials.Identifier
-		ui.config.Account.Type = int(ui.api.Account.Type)
+		ui.config.Account.Type = ui.api.Account.Type
 		ui.config.Account.Usage = ui.api.Account.DiskUsage
 
 		if ui.api.Account.SubscriptionEnd != nil {

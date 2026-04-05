@@ -30,3 +30,9 @@ func createGroup(title string, content fyne.CanvasObject) fyne.CanvasObject {
 func createGroupNoIndent(title string, content fyne.CanvasObject) fyne.CanvasObject {
 	return widget.NewCard("", title, content)
 }
+
+func trailingLabel(text string) *widget.Label {
+	label := widget.NewLabel(text)
+	label.Alignment = fyne.TextAlignTrailing
+	return label
+}

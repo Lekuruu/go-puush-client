@@ -1,0 +1,76 @@
+name: Build & Release
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+    release:
+        types: [published, created]
+
+jobs:
+    build:
+        name: Build ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                include:
+                    - os: windows-latest
+                      name: windows
+                    - os: ubuntu-latest
+                      name: linux
+                    - os: macos-legacy
+                      name: macos-x86_64
+                    - os: macos-latest
+                      name: macos-arm64
+            fail-fast: false
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: "stable"
+                  check-latest: true
+
+            - name: Install Dependencies (Linux)
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev libgtk-3-dev
+
+            - name: Set output filename
+              id: vars
+              shell: bash
+              run: |
+                  if [ "${{ matrix.os }}" = "windows-latest" ]; then
+                    echo "filename=puush-${{ runner.os }}.exe" >> $GITHUB_OUTPUT
+                  else
+                    echo "filename=puush-${{ runner.os }}" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Build
+              env:
+                  CGO_ENABLED: 1
+              shell: bash
+              run: |
+                  mkdir -p build
+                  go build -ldflags="-s -w" -trimpath -o build/${{ steps.vars.outputs.filename }} ./cmd/desktop
+
+            - name: Upload Artifact
+              if: github.event_name != 'release'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: puush-${{ runner.os }}
+                  path: build/${{ steps.vars.outputs.filename }}
+                  retention-days: 7
+
+            - name: Upload Release Asset
+              if: github.event_name == 'release'
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: build/${{ steps.vars.outputs.filename }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -30,6 +30,12 @@ func (c *Credentials) IsValid() bool {
 	return c.HasApiKey() || c.HasLoginCredentials()
 }
 
+func (c *Credentials) Reset() {
+	c.Identifier = nil
+	c.Password = nil
+	c.Key = nil
+}
+
 func (c *Credentials) toFormData() url.Values {
 	params := url.Values{}
 	if c.HasApiKey() {
@@ -69,6 +75,13 @@ func (a *Account) UploadLimit() int64 {
 	default:
 		return -1
 	}
+}
+
+func (a *Account) Reset() {
+	a.Credentials.Reset()
+	a.Type = AccountTypeRegular
+	a.DiskUsage = 0
+	a.SubscriptionEnd = nil
 }
 
 func NewAccountFromCredentials(creds *Credentials) (*Account, error) {

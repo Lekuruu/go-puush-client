@@ -14,9 +14,9 @@ func (ui *UI) ShowSettingsWindow() {
 	tabs := container.NewAppTabs(
 		container.NewTabItem("General", ui.buildGeneralTab()),
 		container.NewTabItem("Key Bindings", ui.buildKeyBindingsTab()),
-		container.NewTabItem("Account", widget.NewLabel("todo")),
-		container.NewTabItem("Updates", widget.NewLabel("todo")),
-		container.NewTabItem("Advanced", widget.NewLabel("todo")),
+		container.NewTabItem("Account", ui.buildAccountTab()),
+		// container.NewTabItem("Updates", widget.NewLabel("todo")),
+		// container.NewTabItem("Advanced", widget.NewLabel("todo")),
 	)
 	w.SetContent(container.NewPadded(tabs))
 	w.Show()
@@ -25,4 +25,8 @@ func (ui *UI) ShowSettingsWindow() {
 func createGroup(title string, content fyne.CanvasObject) fyne.CanvasObject {
 	indentedContent := container.NewBorder(nil, nil, widget.NewLabel("    "), widget.NewLabel("    "), content)
 	return widget.NewCard("", title, indentedContent)
+}
+
+func createGroupNoIndent(title string, content fyne.CanvasObject) fyne.CanvasObject {
+	return widget.NewCard("", title, content)
 }

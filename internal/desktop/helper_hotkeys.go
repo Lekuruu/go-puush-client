@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Lekuruu/go-puush-client/internal/hotkeys"
 )
 
 type HotkeyButton struct {
@@ -106,7 +107,7 @@ func (b *HotkeyButton) KeyDown(e *fyne.KeyEvent) {
 		parts = append(parts, "Alt")
 	}
 	if b.modifiers&fyne.KeyModifierSuper != 0 {
-		parts = append(parts, "Cmd")
+		parts = append(parts, hotkeys.SuperKeyIdentifier)
 	}
 
 	keyName := string(e.Name)

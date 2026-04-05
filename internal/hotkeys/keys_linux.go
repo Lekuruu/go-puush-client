@@ -17,3 +17,5 @@ const (
 	Key8 = hotkey.Key(0x0038)
 	Key9 = hotkey.Key(0x0039)
 )
+
+const SuperKeyIdentifier = "Super"

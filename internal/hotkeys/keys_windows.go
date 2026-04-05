@@ -14,3 +14,5 @@ const (
 	Key8 = hotkey.Key8
 	Key9 = hotkey.Key9
 )
+
+const SuperKeyIdentifier = "Win"

@@ -9,7 +9,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 )
 
-func (ui *UI) buildAdvancedTab() fyne.CanvasObject {
+func (ui *UI) buildAdvancedTab(accountViewUpdate func()) fyne.CanvasObject {
 	// Screenshot Provider
 	var providerNames []string = screenshots.GetProviderList()
 
@@ -112,6 +112,7 @@ func (ui *UI) buildAdvancedTab() fyne.CanvasObject {
 		ui.config.Account.Reset()
 		ui.api.SetBaseURL(s)
 		ui.api.Account.Credentials.Reset()
+		accountViewUpdate()
 	}
 
 	return container.NewVScroll(container.NewVBox(

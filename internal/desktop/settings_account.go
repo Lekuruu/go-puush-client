@@ -12,7 +12,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
-func (ui *UI) buildAccountTab() fyne.CanvasObject {
+func (ui *UI) buildAccountTab() (fyne.CanvasObject, func()) {
 	var updateView func()
 
 	accountContainer := container.NewStack()
@@ -28,11 +28,12 @@ func (ui *UI) buildAccountTab() fyne.CanvasObject {
 	}
 	updateView()
 
-	return container.NewVBox(
+	view := container.NewVBox(
 		widget.NewSeparator(),
 		accountContainer,
 		widget.NewSeparator(),
 	)
+	return view, updateView
 }
 
 func (ui *UI) buildAccountSetup(updateView func()) fyne.CanvasObject {

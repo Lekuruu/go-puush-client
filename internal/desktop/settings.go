@@ -11,12 +11,16 @@ func (ui *UI) ShowSettingsWindow() {
 	w.Resize(fyne.NewSize(500, 350))
 	w.SetIcon(puushIcon)
 
+	generalView := ui.buildGeneralTab()
+	keyBindingsView := ui.buildKeyBindingsTab()
+	accountView, accountViewUpdate := ui.buildAccountTab()
+	advancedView := ui.buildAdvancedTab(accountViewUpdate)
+
 	tabs := container.NewAppTabs(
-		container.NewTabItem("General", ui.buildGeneralTab()),
-		container.NewTabItem("Key Bindings", ui.buildKeyBindingsTab()),
-		container.NewTabItem("Account", ui.buildAccountTab()),
-		// container.NewTabItem("Updates", widget.NewLabel("todo")),
-		container.NewTabItem("Advanced", ui.buildAdvancedTab()),
+		container.NewTabItem("General", generalView),
+		container.NewTabItem("Key Bindings", keyBindingsView),
+		container.NewTabItem("Account", accountView),
+		container.NewTabItem("Advanced", advancedView),
 	)
 	w.SetContent(container.NewPadded(tabs))
 	w.Show()

@@ -79,6 +79,7 @@ type CaptureConfig struct {
 	SaveImagesToClipboard bool
 	SaveImagePath         string
 	MonitorDirectories    []string
+	ScreenshotProvider    string
 }
 
 type HotkeyConfig struct {
@@ -126,6 +127,7 @@ func DefaultConfig() *Config {
 			SaveImagesToClipboard: false,
 			SaveImagePath:         "",
 			MonitorDirectories:    []string{},
+			ScreenshotProvider:    "",
 		},
 		Hotkeys: HotkeyConfig{
 			ScreenSelection:         "Ctrl+Shift+4",

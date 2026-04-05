@@ -41,3 +41,33 @@ func GetDefaultProvider() (ScreenshotProvider, error) {
 	}
 	return nil, errors.New("no available screenshot provider found")
 }
+
+// GetProviderList returns a list of available screenshot providers by name
+func GetProviderList() []string {
+	var providerNames []string
+	for _, providerFunc := range ScreenshotProviders {
+		provider, err := providerFunc()
+		if err == nil && provider.Available() {
+			providerNames = append(providerNames, provider.Name())
+		}
+	}
+	return providerNames
+}
+
+// GetProviderByName returns a screenshot provider by its name
+func GetProviderByName(name string) (ScreenshotProvider, error) {
+	for _, providerFunc := range ScreenshotProviders {
+		provider, err := providerFunc()
+		if err != nil {
+			continue
+		}
+		if provider.Name() != name {
+			continue
+		}
+		if !provider.Available() {
+			return nil, errors.New("screenshot provider not available")
+		}
+		return provider, nil
+	}
+	return nil, errors.New("screenshot provider not found")
+}

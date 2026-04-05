@@ -1,6 +1,7 @@
 package desktop
 
 import (
+	"log"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -8,6 +9,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/hotkeys"
+	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
@@ -59,6 +61,18 @@ func (ui *UI) Run() {
 
 		go ui.tray.PerformBackgroundAuthentication()
 		go ui.tray.RefreshHistory()
+
+		// Setup screenshot provider
+		providerName := ui.config.Capture.ScreenshotProvider
+		provider, err := screenshots.GetProviderByName(providerName)
+		if err == nil {
+			ui.tray.SetScreenshotProvider(provider)
+		}
+
+		if ui.tray.GetScreenshotProvider() == nil {
+			log.Println("No valid screenshot provider could be set")
+			ui.tray.ShowErrorNotification("Could not find a screenshot provider. Screenshots may not work properly.")
+		}
 
 		ui.hotkeys.Start()
 	}

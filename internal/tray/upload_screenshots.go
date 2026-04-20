@@ -28,8 +28,8 @@ func (m *TrayManager) UploadAreaScreenshot() {
 	defer reader.Close()
 
 	filename := getImageFilename(reader)
+	m.OnScreenshotCaptured(reader, filename)
 	m.PerformUpload(reader, filename)
-	m.OnScreenshotUploaded(reader, filename)
 }
 
 func (m *TrayManager) UploadDesktopScreenshot() {
@@ -50,8 +50,8 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 	defer reader.Close()
 
 	filename := getImageFilename(reader)
+	m.OnScreenshotCaptured(reader, filename)
 	m.PerformUpload(reader, filename)
-	m.OnScreenshotUploaded(reader, filename)
 }
 
 func (m *TrayManager) UploadWindowScreenshot() {
@@ -72,21 +72,23 @@ func (m *TrayManager) UploadWindowScreenshot() {
 	defer reader.Close()
 
 	filename := getImageFilename(reader)
+	m.OnScreenshotCaptured(reader, filename)
 	m.PerformUpload(reader, filename)
-	m.OnScreenshotUploaded(reader, filename)
 }
 
-func (m *TrayManager) OnScreenshotUploaded(reader io.ReadSeeker, filename string) {
+func (m *TrayManager) OnScreenshotCaptured(reader io.ReadSeeker, filename string) {
 	if m.config.Capture.SaveImagesToClipboard {
+		reader.Seek(0, io.SeekStart)
 		m.CopyScreenshotToClipboard(reader)
 	}
 	if m.config.Capture.SaveImages && m.config.Capture.SaveImagePath != "" {
+		reader.Seek(0, io.SeekStart)
 		m.SaveScreenshotToDisk(reader, filename, m.config.Capture.SaveImagePath)
 	}
+	reader.Seek(0, io.SeekStart)
 }
 
 func (m *TrayManager) CopyScreenshotToClipboard(reader io.ReadSeeker) {
-	reader.Seek(0, io.SeekStart)
 	err := SetClipboard(reader)
 	if err != nil {
 		log.Printf("Error setting clipboard: %v", err)
@@ -99,7 +101,6 @@ func (m *TrayManager) SaveScreenshotToDisk(reader io.ReadSeeker, filename string
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
-	reader.Seek(0, io.SeekStart)
 
 	outputPath := path + filename
 	outFile, err := os.Create(outputPath)

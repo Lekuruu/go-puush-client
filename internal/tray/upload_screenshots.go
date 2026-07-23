@@ -25,11 +25,10 @@ func (m *TrayManager) UploadAreaScreenshot() {
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
-	defer reader.Close()
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformUpload(reader, filename)
+	m.PerformSeekableUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadDesktopScreenshot() {
@@ -47,11 +46,10 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
-	defer reader.Close()
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformUpload(reader, filename)
+	m.PerformSeekableUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadWindowScreenshot() {
@@ -69,11 +67,10 @@ func (m *TrayManager) UploadWindowScreenshot() {
 		log.Printf("Error capturing area screenshot: %v", err)
 		return
 	}
-	defer reader.Close()
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformUpload(reader, filename)
+	m.PerformSeekableUpload(reader, filename)
 }
 
 func (m *TrayManager) OnScreenshotCaptured(reader io.ReadSeeker, filename string) {

@@ -32,6 +32,28 @@ func (m *TrayManager) PerformProgressUpload(reader io.ReadCloser, total int64, f
 	m.PerformUpload(pr, filename)
 }
 
+func (m *TrayManager) PerformSeekableUpload(reader io.ReadSeekCloser, filename string) {
+	total, err := seekableReaderSize(reader)
+	if err == nil {
+		// If we can determine the size of the reader, we can
+		// show the progress bar during the upload
+		m.PerformProgressUpload(reader, total, filename)
+		return
+	}
+
+	// If we can't determine the size of the reader, we can still perform
+	// the upload, but we won't be able to show the progress bar
+	log.Printf("Unable to determine upload size for %s: %v", filename, err)
+
+	if seekErr := seekToStart(reader); seekErr != nil {
+		reader.Close()
+		m.OnUploadError(seekErr)
+		return
+	}
+	defer reader.Close()
+	m.PerformUpload(reader, filename)
+}
+
 func (m *TrayManager) PerformFileUpload(path string) {
 	pr, err := puush.NewProgressReaderFromFile(path, m.OnTrayProgressUpdate)
 	if err != nil {
@@ -73,4 +95,28 @@ func (m *TrayManager) OnUploadError(err error) {
 	// Update the tray icon to the "failed" state
 	m.OnTrayProgressFail()
 	m.ShowErrorNotification(puush.FormatError(err))
+}
+
+func seekableReaderSize(reader io.Seeker) (int64, error) {
+	total, err := seekToEnd(reader)
+	if err != nil {
+		return 0, err
+	}
+	if err = seekToStart(reader); err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
+func seekToStart(reader io.Seeker) error {
+	_, err := reader.Seek(0, io.SeekStart)
+	return err
+}
+
+func seekToEnd(reader io.Seeker) (int64, error) {
+	total, err := reader.Seek(0, io.SeekEnd)
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }

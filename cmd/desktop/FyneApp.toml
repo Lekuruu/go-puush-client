@@ -1,7 +1,7 @@
 Website = "https://puush.me"
 
 [Details]
-Icon = "assets/icons/puush.png"
+Icon = "../../assets/icons/puush.png"
 Name = "puush"
 ID = "me.puush.client"
 Version = "1.0.0"

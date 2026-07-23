@@ -1,0 +1,21 @@
+Website = "https://puush.me"
+
+[Details]
+Icon = "assets/icons/puush.png"
+Name = "puush"
+ID = "me.puush.client"
+Version = "1.0.0"
+Build = 100
+
+[Source]
+Repo = "https://github.com/Lekuruu/go-puush-client"
+Dir = "cmd/desktop"
+
+[LinuxAndBSD]
+GenericName = "Screenshot and file uploader"
+Categories = ["Graphics", "Utility"]
+Comment = "Capture screenshots and upload files to puush."
+Keywords = ["puush", "screenshot", "upload", "sharing"]
+
+[Migrations]
+fyneDo = true

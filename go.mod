@@ -4,6 +4,7 @@ go 1.26
 
 require (
 	fyne.io/fyne/v2 v2.8.0
+	fyne.io/systray v1.12.2
 	github.com/Lekuruu/go-hotkey v0.0.0-20260405113918-a7a445c88a22
 	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/emersion/go-autostart v0.0.0-20250403115856-34830d6457d2
@@ -15,7 +16,6 @@ require (
 )
 
 require (
-	fyne.io/systray v1.12.2 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/TheTitanrain/w32 v0.0.0-20200114052255-2654d97dbd3d // indirect
 	github.com/anthonynsimon/bild v0.16.1 // indirect
@@ -28,7 +28,6 @@ require (
 	github.com/fyne-io/image v0.1.1 // indirect
 	github.com/fyne-io/oksvg v0.2.0 // indirect
 	github.com/go-gl/gl v0.0.0-20260331235117-4566fea9a276 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20260707082822-2a407d02d01a // indirect
 	github.com/go-gl/glfw/v3.4/glfw v0.1.0-pre.1.0.20260707082822-2a407d02d01a // indirect
 	github.com/go-text/render v0.2.1 // indirect
 	github.com/go-text/typesetting v0.3.4 // indirect

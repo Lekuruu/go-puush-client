@@ -1,6 +1,7 @@
 package tray
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -41,6 +42,7 @@ var (
 func (m *TrayManager) ResetTrayIcon() {
 	if desktopApp, ok := m.targetApp.(desktop.App); ok {
 		desktopApp.SetSystemTrayIcon(puushTrayIcon)
+		setTrayTooltip("puush")
 	}
 }
 
@@ -55,6 +57,7 @@ func (m *TrayManager) ResetTrayIconSoon() {
 func (m *TrayManager) OnTrayProgressComplete() {
 	if desktopApp, ok := m.targetApp.(desktop.App); ok {
 		desktopApp.SetSystemTrayIcon(puushTrayCompleteIcon)
+		setTrayTooltip("puush: upload complete!")
 		m.ResetTrayIconSoon()
 	}
 }
@@ -64,6 +67,7 @@ func (m *TrayManager) OnTrayProgressComplete() {
 func (m *TrayManager) OnTrayProgressFail() {
 	if desktopApp, ok := m.targetApp.(desktop.App); ok {
 		desktopApp.SetSystemTrayIcon(puushTrayFailIcon)
+		setTrayTooltip("puush: upload failed!")
 		m.ResetTrayIconSoon()
 	}
 }
@@ -96,6 +100,7 @@ func (m *TrayManager) OnTrayProgressUpdate(percentage float64) {
 		default:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress0Icon)
 		}
+		setTrayTooltip(fmt.Sprintf("puush: Uploading (%.2f%%)", percentage))
 	}
 }
 

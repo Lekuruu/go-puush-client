@@ -1,6 +1,7 @@
 package tray
 
 import (
+	"math"
 	"time"
 
 	"github.com/Lekuruu/go-puush-client/assets"
@@ -71,29 +72,34 @@ func (m *TrayManager) OnTrayProgressFail() {
 // has been updated through `puush.ProgressReader`
 func (m *TrayManager) OnTrayProgressUpdate(percentage float64) {
 	if desktopApp, ok := m.targetApp.(desktop.App); ok {
-		switch {
-		case percentage >= 100:
+		switch roundedPercentage(percentage) {
+		case 100:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress100Icon)
-		case percentage >= 90:
+		case 90:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress90Icon)
-		case percentage >= 80:
+		case 80:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress80Icon)
-		case percentage >= 70:
+		case 70:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress70Icon)
-		case percentage >= 60:
+		case 60:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress60Icon)
-		case percentage >= 50:
+		case 50:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress50Icon)
-		case percentage >= 40:
+		case 40:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress40Icon)
-		case percentage >= 30:
+		case 30:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress30Icon)
-		case percentage >= 20:
+		case 20:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress20Icon)
-		case percentage >= 10:
+		case 10:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress10Icon)
 		default:
 			desktopApp.SetSystemTrayIcon(puushTrayProgress0Icon)
 		}
 	}
+}
+
+// roundedPercentage rounds the given percentage to the nearest 10% increment
+func roundedPercentage(percentage float64) int {
+	return int(math.Ceil((percentage-5)/10)) * 10
 }

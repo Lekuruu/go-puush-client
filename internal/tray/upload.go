@@ -28,7 +28,6 @@ func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
 func (m *TrayManager) PerformProgressUpload(reader io.ReadCloser, total int64, filename string) {
 	pr := puush.NewProgressReader(reader, total, m.OnTrayProgressUpdate)
 	defer pr.Close()
-	defer m.OnTrayProgressComplete()
 
 	m.PerformUpload(pr, filename)
 }
@@ -40,7 +39,6 @@ func (m *TrayManager) PerformFileUpload(path string) {
 		return
 	}
 	defer pr.Close()
-	defer m.OnTrayProgressComplete()
 
 	filename := filepath.Base(path)
 	m.PerformUpload(pr, filename)

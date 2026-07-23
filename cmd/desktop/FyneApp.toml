@@ -14,7 +14,7 @@ Dir = "cmd/desktop"
 [LinuxAndBSD]
 GenericName = "Screenshot and file uploader"
 Categories = ["Graphics", "Utility"]
-Comment = "Capture screenshots and upload files to puush."
+Comment = "puush that file"
 Keywords = ["puush", "screenshot", "upload", "sharing"]
 
 [Migrations]

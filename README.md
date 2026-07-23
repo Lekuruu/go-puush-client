@@ -32,8 +32,12 @@ Other providers include `flameshot`, `maim` & `grim`/`slurp`, however, your mile
 
 The main application is mostly feature complete, with a few minor exceptions:
 
-- Context menu's + IPC
-- An updater
+- Context Menu
+- IPC / `-upload <file>` command
+- Updater
+- Filetype Icons next to recent uploads
+- Select multiple files to upload at once
+- Interactions with explorer
 
 Otherwise, the application does what I want it to do, which is to upload files and take screenshots.
 

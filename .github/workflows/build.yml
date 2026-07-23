@@ -18,15 +18,23 @@ jobs:
                     - os: windows-latest
                       name: windows-x86_64
                       goarch: amd64
+                      target: windows
+                      filename: puush-windows-x86_64.exe
                     - os: ubuntu-latest
                       name: linux-x86_64
                       goarch: amd64
+                      target: linux
+                      filename: puush-linux-x86_64.tar.gz
                     - os: macos-latest
                       name: macos-arm64
                       goarch: arm64
+                      target: darwin
+                      filename: puush-macos-arm64.zip
                     - os: macos-latest
                       name: macos-x86_64
                       goarch: amd64
+                      target: darwin
+                      filename: puush-macos-x86_64.zip
             fail-fast: false
 
         steps:
@@ -45,38 +53,48 @@ jobs:
                   sudo apt-get update
                   sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev libgtk-3-dev
 
-            - name: Set output filename
-              id: vars
-              shell: bash
-              run: |
-                  if [ "${{ matrix.os }}" = "windows-latest" ]; then
-                    echo "filename=puush-${{ matrix.name }}.exe" >> $GITHUB_OUTPUT
-                  else
-                    echo "filename=puush-${{ matrix.name }}" >> $GITHUB_OUTPUT
-                  fi
+            - name: Install Fyne CLI
+              run: go install fyne.io/tools/cmd/fyne@latest
 
-            - name: Build
+            - name: Package
               env:
                   GOARCH: ${{ matrix.goarch }}
                   CGO_ENABLED: 1
                   MACOSX_DEPLOYMENT_TARGET: "10.13"
+              working-directory: cmd/desktop
+              run: fyne package -os ${{ matrix.target }} -release
+
+            - name: Stage Windows package
+              if: runner.os == 'Windows'
               shell: bash
               run: |
                   mkdir -p build
-                  go build -ldflags="-s -w" -trimpath -o build/${{ steps.vars.outputs.filename }} ./cmd/desktop
+                  mv cmd/desktop/puush.exe build/${{ matrix.filename }}
+
+            - name: Stage Linux package
+              if: runner.os == 'Linux'
+              run: |
+                  mkdir -p build
+                  mv cmd/desktop/puush.tar.gz build/${{ matrix.filename }}
+
+            - name: Stage macOS package
+              if: runner.os == 'macOS'
+              run: |
+                  mkdir -p build
+                  ditto -c -k --sequesterRsrc --keepParent cmd/desktop/puush.app build/${{ matrix.filename }}
 
             - name: Upload Artifact
               if: github.event_name != 'release'
               uses: actions/upload-artifact@v4
               with:
                   name: puush-${{ matrix.name }}
-                  path: build/${{ steps.vars.outputs.filename }}
+                  path: build/${{ matrix.filename }}
                   retention-days: 7
 
             - name: Upload Release Asset
               if: github.event_name == 'release'
               uses: softprops/action-gh-release@v2
               with:
-                  files: build/${{ steps.vars.outputs.filename }}
+                  files: build/${{ matrix.filename }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

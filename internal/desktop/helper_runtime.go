@@ -1,6 +1,7 @@
 package desktop
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -8,7 +9,12 @@ import (
 )
 
 // IsDevelopmentBuild checks if the given executable is a development build of the application.
-func IsDevelopmentBuild(executable string) bool {
+func IsDevelopmentBuild() bool {
+	executable, err := os.Executable()
+	if err != nil {
+		return false
+	}
+
 	base := filepath.Base(executable)
 	isDesktopBinary := base == "desktop" || strings.EqualFold(base, "desktop.exe")
 	return isDesktopBinary && strings.Contains(executable, "go-build")

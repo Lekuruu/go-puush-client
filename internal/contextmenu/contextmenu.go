@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/Lekuruu/go-puush-client/internal/desktop"
 )
 
 const (
@@ -28,11 +26,6 @@ func Apply(enabled bool) error {
 	executable, err = filepath.Abs(executable)
 	if err != nil {
 		return fmt.Errorf("resolve puush executable: %w", err)
-	}
-
-	if enabled && desktop.IsDevelopmentBuild(executable) {
-		// We don't want to apply context menu's for dev builds
-		return ErrDevelopmentBuild
 	}
 	return applyPlatform(filepath.Clean(executable), enabled)
 }

@@ -10,6 +10,9 @@ import (
 func (ui *UI) UpdateContextMenuConfiguration(enabled bool) {
 	ui.config.General.ContextMenu = enabled
 
+	if IsDevelopmentBuild() {
+		return
+	}
 	if err := contextmenu.Apply(enabled); err != nil {
 		log.Printf("Failed to update context-menu integration: %v", err)
 		if ui.tray != nil {
@@ -20,6 +23,9 @@ func (ui *UI) UpdateContextMenuConfiguration(enabled bool) {
 
 // ReconcileContextMenuConfiguration applies the configured/remembered context menu state.
 func (ui *UI) ReconcileContextMenuConfiguration() {
+	if IsDevelopmentBuild() {
+		return
+	}
 	if err := contextmenu.Apply(ui.config.General.ContextMenu); err != nil {
 		log.Printf("Failed to reconcile context menu integration: %v", err)
 	}

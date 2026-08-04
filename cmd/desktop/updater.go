@@ -11,6 +11,11 @@ import (
 )
 
 func updaterLoop(cfg *config.Config, ui *desktop.UI) {
+	// We don't want to run the updater in dev builds
+	if desktop.IsDevelopmentBuild() {
+		return
+	}
+
 	// Check if we can even update, and inform the user if not
 	if !updater.CanUpdate() {
 		log.Printf("puush cannot update itself, no write permission to the executable path")

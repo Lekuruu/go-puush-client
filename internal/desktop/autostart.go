@@ -14,6 +14,9 @@ func EnableAutostart() error {
 	if err != nil {
 		return err
 	}
+	if app == nil {
+		return fmt.Errorf("autostart is not supported on this platform")
+	}
 
 	if app.IsEnabled() {
 		return nil
@@ -34,14 +37,13 @@ func DisableAutostart() error {
 }
 
 func getAutostartApp() (*autostart.App, error) {
-	executable, err := os.Executable()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get executable path: %w", err)
+	if IsDevelopmentBuild() {
+		return nil, fmt.Errorf("not supported in development builds")
 	}
 
-	// Check if this is a development build
-	if IsDevelopmentBuild(executable) {
-		return nil, fmt.Errorf("autostart is not supported in development builds")
+	executable, err := os.Executable()
+	if err != nil {
+		return nil, fmt.Errorf("get executable path: %w", err)
 	}
 
 	return &autostart.App{

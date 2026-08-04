@@ -7,6 +7,7 @@ var (
 	PuushErrorRequestFailure      PuushError = NewPuushError("Connection error", -2, true)
 	PuushErrorChecksumFailure     PuushError = NewPuushError("Checksum error", -3, true)
 	PuushErrorInsufficientStorage PuushError = NewPuushError("Insufficient storage", -4, false)
+	PuushErrorUploadTooLarge      PuushError = NewPuushError("Upload too large", -997, false)
 
 	/* Custom internal errors */
 	PuushErrorNotFound PuushError = NewPuushError("Not found", -998, false)
@@ -65,6 +66,8 @@ func FormatError(err error) string {
 		return "Server responded with an unexpected checksum error."
 	case PuushErrorInsufficientStorage:
 		return "Insufficient account storage remaining. Please delete some files or consider upgrading to a pro account!"
+	case PuushErrorUploadTooLarge:
+		return "The selected file is too large for this server."
 	default:
 		return "An unexpected error occured. Please try again!"
 	}

@@ -58,44 +58,44 @@ func (c *Client) FormatURL(path string) string {
 
 // EvaluateResponse checks the response for errors and returns a scanner if the request was successful
 func (c *Client) EvaluateResponse(response *http.Response) (*bufio.Scanner, PuushError) {
-	// Check for server errors first
-	if response.StatusCode >= http.StatusInternalServerError {
-		return nil, PuushErrorRequestFailure
-	}
-
-	// Parse response body for error codes
-	// The first line should usually contain a status code
+	httpError := c.EvaluateHttpResponse(response)
 	scanner := bufio.NewScanner(response.Body)
-
 	if !scanner.Scan() {
+		if httpError != nil {
+			return nil, httpError
+		}
 		return nil, PuushErrorRequestFailure
 	}
 
 	responseLine := scanner.Text()
-	responseStatus := strings.SplitN(responseLine, ",", 1)[0]
+	responseStatus, _, _ := strings.Cut(responseLine, ",")
 	statusCode, err := strconv.Atoi(responseStatus)
 	if err != nil {
-		// Assuming we have a successful response here too
-		return scanner, nil
-	}
-
-	if statusCode >= 0 {
-		// We have a successful response
-		return scanner, nil
-	}
-
-	switch statusCode {
-	case -1:
-		return nil, PuushErrorInvalidCredentials
-	case -2:
-		return nil, PuushErrorRequestFailure
-	case -3:
-		return nil, PuushErrorChecksumFailure
-	case -4:
-		return nil, PuushErrorInsufficientStorage
-	default:
+		if httpError != nil {
+			return nil, httpError
+		}
 		return nil, PuushErrorUnknown
 	}
+
+	if statusCode < 0 {
+		switch statusCode {
+		case -1:
+			return nil, PuushErrorInvalidCredentials
+		case -2:
+			return nil, PuushErrorRequestFailure
+		case -3:
+			return nil, PuushErrorChecksumFailure
+		case -4:
+			return nil, PuushErrorInsufficientStorage
+		default:
+			return nil, PuushErrorUnknown
+		}
+	}
+
+	if httpError != nil {
+		return nil, httpError
+	}
+	return scanner, nil
 }
 
 // EvaluateHttpResponse returns a puush error based on the http status code of the response
@@ -111,6 +111,8 @@ func (c *Client) EvaluateHttpResponse(response *http.Response) PuushError {
 		return PuushErrorNotFound
 	case http.StatusUnauthorized, http.StatusForbidden:
 		return PuushErrorInvalidCredentials
+	case http.StatusRequestEntityTooLarge:
+		return PuushErrorUploadTooLarge
 	default:
 		return PuushErrorUnknown
 	}

@@ -2,8 +2,17 @@ package desktop
 
 import (
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 )
+
+// IsDevelopmentBuild checks if the given executable is a development build of the application.
+func IsDevelopmentBuild(executable string) bool {
+	base := filepath.Base(executable)
+	isDesktopBinary := base == "desktop" || strings.EqualFold(base, "desktop.exe")
+	return isDesktopBinary && strings.Contains(executable, "go-build")
+}
 
 // OpenBrowser opens the specified URL in the default browser of the user.
 // https://stackoverflow.com/questions/39320371/how-start-web-server-to-open-page-in-browser-in-golang

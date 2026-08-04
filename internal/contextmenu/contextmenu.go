@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/Lekuruu/go-puush-client/internal/desktop"
 )
 
 const (
@@ -29,15 +30,9 @@ func Apply(enabled bool) error {
 		return fmt.Errorf("resolve puush executable: %w", err)
 	}
 
-	if enabled && isTemporaryDevelopmentBuild(executable) {
+	if enabled && desktop.IsDevelopmentBuild(executable) {
 		// We don't want to apply context menu's for dev builds
 		return ErrDevelopmentBuild
 	}
 	return applyPlatform(filepath.Clean(executable), enabled)
-}
-
-func isTemporaryDevelopmentBuild(executable string) bool {
-	base := filepath.Base(executable)
-	isDesktopBinary := base == "desktop" || strings.EqualFold(base, "desktop.exe") // TODO: eventually I want to rename the binary to "puush"
-	return isDesktopBinary && strings.Contains(executable, "go-build")
 }

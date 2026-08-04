@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/emersion/go-autostart"
@@ -41,7 +40,7 @@ func getAutostartApp() (*autostart.App, error) {
 	}
 
 	// Check if this is a development build
-	if filepath.Base(executable) == "desktop" && strings.Contains(executable, "go-build") {
+	if IsDevelopmentBuild(executable) {
 		return nil, fmt.Errorf("autostart is not supported in development builds")
 	}
 

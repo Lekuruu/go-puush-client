@@ -58,11 +58,6 @@ func Perform(candidate ReleaseCandidate) error {
 		return fmt.Errorf("get executable path: %w", err)
 	}
 
-	executablePath := filepath.Dir(executable)
-	if !hasWritePermission(executablePath) {
-		return fmt.Errorf("no write permission to the executable path: %s", executablePath)
-	}
-
 	replacementExecutable := executable + ".new"
 	err = downloadFile(candidate.DownloadUrl(), replacementExecutable)
 	if err != nil {
@@ -132,15 +127,20 @@ func downloadFile(url string, destination string) error {
 }
 
 func hasWritePermission(path string) bool {
-	fileInfo, err := os.Stat(path)
+	file, err := os.CreateTemp(path, ".puush-update-test-*")
 	if err != nil {
 		return false
 	}
+	originalPath := file.Name()
+	renamedPath := originalPath + ".renamed"
+	defer os.Remove(originalPath)
+	defer os.Remove(renamedPath)
 
-	mode := fileInfo.Mode()
-	if mode&os.ModePerm == os.ModePerm {
+	if err := file.Close(); err != nil {
 		return false
-	} else {
-		return true
 	}
+	if err := os.Rename(originalPath, renamedPath); err != nil {
+		return false
+	}
+	return os.Remove(renamedPath) == nil
 }

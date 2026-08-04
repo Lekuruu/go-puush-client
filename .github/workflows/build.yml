@@ -63,7 +63,11 @@ jobs:
               shell: bash
               run: |
                   mkdir -p build
-                  go build -ldflags="-s -w" -trimpath -o build/${{ steps.vars.outputs.filename }} ./cmd/desktop
+                  ldflags="-s -w"
+                  if [ "$RUNNER_OS" = "Windows" ]; then
+                    ldflags="$ldflags -H=windowsgui"
+                  fi
+                  go build -ldflags="$ldflags" -trimpath -o build/${{ steps.vars.outputs.filename }} ./cmd/desktop
 
             - name: Upload Artifact
               if: github.event_name != 'release'

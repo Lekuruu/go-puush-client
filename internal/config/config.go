@@ -92,8 +92,9 @@ type HotkeyConfig struct {
 }
 
 type MiscConfig struct {
-	LastUpdate time.Time
-	ServerURL  string
+	UpdatesEnabled bool
+	LastUpdate     time.Time
+	ServerURL      string
 }
 
 func (misc *MiscConfig) ParseServerURL() *url.URL {
@@ -138,8 +139,9 @@ func DefaultConfig() *Config {
 			Toggle:                  "Ctrl+Alt+P",
 		},
 		Misc: MiscConfig{
-			ServerURL:  "https://puush.me",
-			LastUpdate: time.Now(),
+			UpdatesEnabled: true,
+			LastUpdate:     time.Now(),
+			ServerURL:      "https://puush.me",
 		},
 	}
 }

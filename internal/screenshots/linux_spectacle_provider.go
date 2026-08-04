@@ -28,7 +28,7 @@ func NewSpectacleProvider() (ScreenshotProvider, error) {
 
 	return &SpectacleScreenshotProvider{
 		binPath: binPath,
-		timeout: 15 * time.Second,
+		timeout: 5 * time.Minute,
 	}, nil
 }
 

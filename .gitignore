@@ -132,3 +132,6 @@ cmd/desktop/puush.tar.xz
 cmd/desktop/puush.tar.gz
 cmd/desktop/desktop
 cmd/desktop/tmp-pkg/
+
+# My local build scripts
+build*.sh

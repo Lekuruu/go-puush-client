@@ -45,7 +45,7 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 			continue
 		}
 
-		log.Printf("Update available: %s -> %s", currentVersion, candidate)
+		log.Printf("Update available: %s -> %s", currentVersion, candidate.Version())
 		ui.ShowNotification("Downloading update...", "puush will automatically restart when done!")
 
 		err = updater.Perform(candidate)

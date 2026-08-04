@@ -55,6 +55,17 @@ jobs:
                     echo "filename=puush-${{ matrix.name }}" >> $GITHUB_OUTPUT
                   fi
 
+            - name: Generate Windows icon resource
+              if: runner.os == 'Windows'
+              working-directory: cmd/desktop
+              shell: bash
+              run: |
+                  go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0 \
+                    -skip-versioninfo \
+                    -icon=../../assets/icons/icon.ico \
+                    -64 \
+                    -o=resource_windows_amd64.syso
+
             - name: Build
               env:
                   GOARCH: ${{ matrix.goarch }}

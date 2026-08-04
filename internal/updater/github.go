@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/google/go-github/v89/github"
@@ -41,6 +42,7 @@ func (c *GitHubReleaseCandidate) DownloadUrl() string {
 		"puush-%s-%s.%s",
 		runtime.GOOS, runtime.GOARCH, targetFiletype,
 	)
+	targetFilename = strings.TrimSuffix(targetFilename, ".")
 
 	for _, asset := range c.release.Assets {
 		if asset.GetName() == targetFilename {

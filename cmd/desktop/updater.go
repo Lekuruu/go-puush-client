@@ -57,6 +57,7 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 			continue
 		}
 
+		cfg.Misc.LastUpdate = time.Now()
 		log.Printf("Update downloaded, restarting...")
 		restart()
 	}

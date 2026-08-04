@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
+
+const updateCheckTimeout = 8 * time.Second
 
 func CanUpdate() bool {
 	executable, err := os.Executable()
@@ -19,7 +22,10 @@ func CanUpdate() bool {
 }
 
 func Check(current Version) (ReleaseCandidate, error) {
-	release, err := FetchGitHubRelease(context.Background()) // TODO: add context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), updateCheckTimeout)
+	defer cancel()
+
+	release, err := FetchGitHubRelease(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +117,7 @@ func downloadFile(url string, destination string) error {
 	}
 	defer out.Close()
 
+	// TODO: add some context timeout here too, i'm literally too lazy right now
 	resp, err := http.Get(url)
 	if err != nil {
 		return err

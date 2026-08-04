@@ -42,7 +42,7 @@ func NewTrayManager(cfg *config.Config, api *puush.Client) *TrayManager {
 		api:             api,
 		config:          cfg,
 		screenshots:     provider,
-		uploadQueue:     make(chan []string, 32),
+		uploadQueue:     make(chan []string, 255),
 		uploadQueueStop: make(chan struct{}),
 	}
 }

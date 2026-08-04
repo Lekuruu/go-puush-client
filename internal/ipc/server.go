@@ -12,8 +12,8 @@ import (
 )
 
 const (
+	inboxCapacity     = maxUploadPaths
 	requestLimit      = 256 * 1024 // 256 KiB
-	inboxCapacity     = 32
 	connectionTimeout = 5 * time.Second
 )
 

@@ -9,5 +9,7 @@ func (m *TrayManager) UploadFileFromDialog() {
 	if err != nil {
 		return
 	}
-	m.PerformFileUpload(filename)
+	if err := m.EnqueueFile(filename); err != nil {
+		m.OnUploadError(err)
+	}
 }

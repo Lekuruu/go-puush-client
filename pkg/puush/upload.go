@@ -66,13 +66,24 @@ func (c *Client) Upload(file io.Reader, filename string) (string, error) {
 		return "", err
 	}
 
-	responseData := strings.Split(scanner.Text(), ",")
-	uploadUrl := responseData[1]
-	updatedDiskUsage, err := strconv.ParseInt(responseData[2], 10, 64)
+	uploadUrl, updatedDiskUsage, err := parseUploadResponse(scanner.Text())
 	if err != nil {
-		return "", errors.New("response error: invalid disk usage provided")
+		return "", err
 	}
 
 	c.Account.DiskUsage = updatedDiskUsage
 	return uploadUrl, nil
+}
+
+func parseUploadResponse(responseLine string) (string, int64, error) {
+	responseData := strings.SplitN(responseLine, ",", 4)
+	if len(responseData) < 3 || responseData[0] != "0" || responseData[1] == "" {
+		return "", 0, errors.New("response error: malformed upload response")
+	}
+
+	updatedDiskUsage, err := strconv.ParseInt(responseData[2], 10, 64)
+	if err != nil {
+		return "", 0, errors.New("response error: invalid disk usage provided")
+	}
+	return responseData[1], updatedDiskUsage, nil
 }

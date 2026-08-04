@@ -19,9 +19,17 @@ import (
 // Elements like the login prompt are just added on top of it.
 
 func (ui *UI) ShowStartupWindow() {
+	if ui.startupWindow != nil {
+		ui.startupWindow.Show()
+		ui.startupWindow.RequestFocus()
+		return
+	}
+
 	w := ui.app.NewWindow("puush quick start")
+	w.SetOnClosed(func() { ui.startupWindow = nil })
 	w.SetFixedSize(true)
 	w.SetIcon(puushIcon)
+	ui.startupWindow = w
 
 	serverUrl := ui.config.Misc.ParseServerURL()
 	registerUrl := serverUrl.String() + "/register"

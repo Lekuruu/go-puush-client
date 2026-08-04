@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
@@ -28,11 +29,22 @@ type TrayManager struct {
 	settingsCallback func()
 
 	watcher *fsnotify.Watcher
+
+	uploadQueue         chan []string
+	uploadQueueStop     chan struct{}
+	uploadQueueStart    sync.Once
+	uploadQueueStopOnce sync.Once
 }
 
 func NewTrayManager(cfg *config.Config, api *puush.Client) *TrayManager {
 	provider, _ := screenshots.GetDefaultProvider()
-	return &TrayManager{api: api, config: cfg, screenshots: provider}
+	return &TrayManager{
+		api:             api,
+		config:          cfg,
+		screenshots:     provider,
+		uploadQueue:     make(chan []string, 255),
+		uploadQueueStop: make(chan struct{}),
+	}
 }
 
 // SetSettingsCallback will set the function that will be called

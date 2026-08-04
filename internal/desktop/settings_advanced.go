@@ -72,14 +72,9 @@ func (ui *UI) buildAdvancedTab(accountViewUpdate func()) fyne.CanvasObject {
 		qualityRadio.SetSelected("No Compression")
 	}
 
-	/*
-		// TODO: Implement context menus
-		contextMenuCheckbox := widget.NewCheck("Show explorer context menu item", func(b bool) {
-			ui.config.General.ContextMenu = b
-		})
-		contextMenuCheckbox.Checked = ui.config.General.ContextMenu
-		contextMenuGroup := createGroup("Context Menu", contextMenuCheckbox)
-	*/
+	contextMenuCheckbox := widget.NewCheck("Show \"Upload with puush\" in file context menus", ui.UpdateContextMenuConfiguration)
+	contextMenuCheckbox.Checked = ui.config.General.ContextMenu
+	contextMenuGroup := createGroup("Context Menu", contextMenuCheckbox)
 
 	// Fullscreen Capture
 	fullscreenOptions := []string{
@@ -129,8 +124,8 @@ func (ui *UI) buildAdvancedTab(accountViewUpdate func()) fyne.CanvasObject {
 		widget.NewSeparator(),
 		createGroup("Screen Capture Quality", qualityRadio),
 		widget.NewSeparator(),
-		// contextMenuGroup,
-		// widget.NewSeparator(),
+		contextMenuGroup,
+		widget.NewSeparator(),
 		createGroup("Fullscreen Capture", fullscreenRadio),
 		widget.NewSeparator(),
 		createGroup("Server URL", serverUrlEntry),

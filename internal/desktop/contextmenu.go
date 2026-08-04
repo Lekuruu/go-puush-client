@@ -1,0 +1,26 @@
+package desktop
+
+import (
+	"log"
+
+	"github.com/Lekuruu/go-puush-client/internal/contextmenu"
+)
+
+// UpdateContextMenuConfiguration applies and remembers the requested state.
+func (ui *UI) UpdateContextMenuConfiguration(enabled bool) {
+	ui.config.General.ContextMenu = enabled
+
+	if err := contextmenu.Apply(enabled); err != nil {
+		log.Printf("Failed to update context-menu integration: %v", err)
+		if ui.tray != nil {
+			ui.tray.ShowErrorNotification("Could not update the context menu. puush will try again the next time it starts.")
+		}
+	}
+}
+
+// ReconcileContextMenuConfiguration applies the configured/remembered context menu state.
+func (ui *UI) ReconcileContextMenuConfiguration() {
+	if err := contextmenu.Apply(ui.config.General.ContextMenu); err != nil {
+		log.Printf("Failed to reconcile context menu integration: %v", err)
+	}
+}

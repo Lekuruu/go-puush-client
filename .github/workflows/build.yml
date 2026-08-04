@@ -2,9 +2,9 @@ name: Build & Release
 
 on:
     push:
-        branches: ['*']
+        branches: ["*"]
     pull_request:
-        branches: ['*']
+        branches: ["*"]
     release:
         types: [published, created]
 
@@ -13,21 +13,21 @@ jobs:
         name: Build ${{ matrix.name }}
         runs-on: ${{ matrix.os }}
         strategy:
-          matrix:
-              include:
-                  - os: windows-latest
-                    name: windows-x86_64
-                    goarch: amd64
-                  - os: ubuntu-latest
-                    name: linux-x86_64
-                    goarch: amd64
-                  - os: macos-latest
-                    name: macos-arm64
-                    goarch: arm64
-                  - os: macos-latest
-                    name: macos-x86_64
-                    goarch: amd64
-          fail-fast: false
+            matrix:
+                include:
+                    - os: windows-latest
+                      name: windows-amd64
+                      goarch: amd64
+                    - os: ubuntu-latest
+                      name: linux-amd64
+                      goarch: amd64
+                    - os: macos-latest
+                      name: macos-arm64
+                      goarch: arm64
+                    - os: macos-latest
+                      name: macos-amd64
+                      goarch: amd64
+            fail-fast: false
 
         steps:
             - name: Checkout code

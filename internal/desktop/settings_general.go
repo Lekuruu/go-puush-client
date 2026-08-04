@@ -11,6 +11,9 @@ func (ui *UI) buildGeneralTab() fyne.CanvasObject {
 	startupCheckbox := widget.NewCheck("Start puush on startup", ui.UpdateAutostartConfiguration)
 	startupCheckbox.Checked = ui.config.General.Startup
 
+	autoUpdateCheckbox := widget.NewCheck("Automatically download new updates", func(b bool) { ui.config.General.AutoUpdate = b })
+	autoUpdateCheckbox.Checked = ui.config.General.AutoUpdate
+
 	soundCheckbox := widget.NewCheck("Play a notification sound", func(b bool) { ui.config.General.NotificationSound = b })
 	soundCheckbox.Checked = ui.config.General.NotificationSound
 
@@ -41,11 +44,13 @@ func (ui *UI) buildGeneralTab() fyne.CanvasObject {
 
 	onSuccessLeft := container.NewVBox(soundCheckbox, copyLinkCheckbox, openBrowserCheckbox)
 	onSuccessRight := container.NewVBox(saveClipboardCheckbox, saveLocalCheckbox, saveLocalPathContainer)
+
 	onSuccessGrid := container.NewGridWithColumns(2, onSuccessLeft, onSuccessRight)
+	generalGrid := container.NewGridWithColumns(2, startupCheckbox, autoUpdateCheckbox)
 
 	return container.NewVBox(
 		widget.NewSeparator(),
-		createGroup("General Settings", startupCheckbox),
+		createGroup("General Settings", generalGrid),
 		widget.NewSeparator(),
 		createGroup("On successful puush", onSuccessGrid),
 		widget.NewSeparator(),

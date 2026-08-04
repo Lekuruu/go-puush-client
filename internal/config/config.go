@@ -70,6 +70,7 @@ type GeneralConfig struct {
 	ContextMenu       bool
 	DisabledToggle    bool
 	CopyToClipboard   bool
+	AutoUpdate        bool
 }
 
 type CaptureConfig struct {
@@ -92,9 +93,8 @@ type HotkeyConfig struct {
 }
 
 type MiscConfig struct {
-	UpdatesEnabled bool
-	LastUpdate     time.Time
-	ServerURL      string
+	LastUpdate time.Time
+	ServerURL  string
 }
 
 func (misc *MiscConfig) ParseServerURL() *url.URL {
@@ -120,6 +120,7 @@ func DefaultConfig() *Config {
 			Startup:           true,
 			ContextMenu:       true,
 			DisabledToggle:    false,
+			AutoUpdate:        true,
 		},
 		Capture: CaptureConfig{
 			UploadQuality:         screenshots.QualityBest,
@@ -139,9 +140,8 @@ func DefaultConfig() *Config {
 			Toggle:                  "Ctrl+Alt+P",
 		},
 		Misc: MiscConfig{
-			UpdatesEnabled: true,
-			LastUpdate:     time.Now(),
-			ServerURL:      "https://puush.me",
+			LastUpdate: time.Now(),
+			ServerURL:  "https://puush.me",
 		},
 	}
 }

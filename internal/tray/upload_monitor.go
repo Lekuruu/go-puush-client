@@ -35,7 +35,9 @@ func (m *TrayManager) StartMonitor(directories []string) error {
 
 					// Wait a little bit to ensure the file is fully written before attempting to upload
 					time.AfterFunc(time.Second, func() {
-						m.PerformFileUpload(event.Name)
+						if err := m.EnqueueFile(event.Name); err != nil {
+							log.Printf("Failed to queue monitored file %s: %v", event.Name, err)
+						}
 					})
 				}
 			case err, ok := <-watcher.Errors:

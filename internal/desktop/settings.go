@@ -7,9 +7,17 @@ import (
 )
 
 func (ui *UI) ShowSettingsWindow() {
+	if ui.settingsWindow != nil {
+		ui.settingsWindow.Show()
+		ui.settingsWindow.RequestFocus()
+		return
+	}
+
 	w := ui.app.NewWindow("puush settings")
+	w.SetOnClosed(func() { ui.settingsWindow = nil })
 	w.Resize(fyne.NewSize(500, 350))
 	w.SetIcon(puushIcon)
+	ui.settingsWindow = w
 
 	generalView := ui.buildGeneralTab()
 	keyBindingsView := ui.buildKeyBindingsTab()

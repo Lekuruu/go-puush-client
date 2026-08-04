@@ -1,17 +1,46 @@
 package main
 
 import (
+	"context"
+	"log"
+	"os"
 	"time"
 
 	"fyne.io/fyne/v2/app"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/desktop"
+	appipc "github.com/Lekuruu/go-puush-client/internal/ipc"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
 func main() {
-	app := app.NewWithID("me.puush.client")
+	if err := run(os.Args[1:]); err != nil {
+		log.Printf("puush: %v", err)
+		os.Exit(1)
+	}
+}
+
+func run(arguments []string) error {
+	command, err := parseIpcCommand(arguments)
+	if err != nil {
+		return err
+	}
+
+	// Try to open an IPC server to communicate with an existing instance of the app
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ipcResult, err := appipc.Open(ctx, command)
+	cancel() // Cancel the context to free resources
+
+	if err != nil {
+		return err
+	}
+	if ipcResult.Role == appipc.RoleForwarded {
+		// If the command was forwarded to an existing instance, we can exit now
+		// Otherwise, we will continue to run the app and handle the command ourselves
+		return nil
+	}
+	fyneApp := app.NewWithID("me.puush.client")
 
 	store := config.NewStore()
 	cfg, err := store.Load()
@@ -33,7 +62,9 @@ func main() {
 	api.Account.SubscriptionEnd = &expiry
 	// TODO: Handle time parsing better, I'm just too lazy right now and also cba tbh
 
-	ui := desktop.NewUI(app, api, cfg)
+	ui := desktop.NewUI(fyneApp, api, cfg)
+	ui.SetIPCServer(ipcResult.Server)
 	defer ui.OnShutdown()
 	ui.Run()
+	return nil
 }

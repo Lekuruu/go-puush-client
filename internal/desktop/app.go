@@ -9,6 +9,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/hotkeys"
+	appipc "github.com/Lekuruu/go-puush-client/internal/ipc"
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
@@ -23,6 +24,10 @@ type UI struct {
 	config  *config.Config
 	tray    *tray.TrayManager
 	hotkeys *hotkeys.HotkeyManager
+	ipc     *appipc.Server
+
+	settingsWindow fyne.Window
+	startupWindow  fyne.Window
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
@@ -36,6 +41,11 @@ func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
 		tray:    tm,
 		hotkeys: hkm,
 	}
+}
+
+// SetIPCServer connects commands from secondary processes to this UI.
+func (ui *UI) SetIPCServer(server *appipc.Server) {
+	ui.ipc = server
 }
 
 func (ui *UI) Run() {
@@ -56,6 +66,8 @@ func (ui *UI) Run() {
 		ui.tray.Initialize("puush")
 		ui.tray.Apply(ui.app)
 		ui.tray.SetSettingsCallback(ui.ShowSettingsWindow)
+		ui.tray.StartUploadQueue()
+		ui.startIPC()
 
 		// Start directory monitoring
 		if len(ui.config.Capture.MonitorDirectories) > 0 {
@@ -85,7 +97,12 @@ func (ui *UI) Run() {
 
 func (ui *UI) OnShutdown() {
 	ui.tray.StopMonitor()
+	ui.tray.StopUploadQueue()
 	ui.UpdateAccountConfiguration()
+
+	if ui.ipc != nil {
+		ui.ipc.Close()
+	}
 }
 
 func (ui *UI) UpdateAccountConfiguration() {
@@ -115,4 +132,49 @@ func (ui *UI) UpdateAutostartConfiguration(enabled bool) {
 			log.Printf("Failed to disable autostart: %v", err)
 		}
 	}
+}
+
+func (ui *UI) activeWindow() fyne.Window {
+	if ui.settingsWindow != nil {
+		return ui.settingsWindow
+	}
+	return ui.startupWindow
+}
+
+func (ui *UI) showRelevantWindow() {
+	// Check if a window is already active & focus it
+	if window := ui.activeWindow(); window != nil {
+		window.Show()
+		window.RequestFocus()
+		return
+	}
+	// Show settings window otherwise
+	ui.ShowSettingsWindow()
+}
+
+func (ui *UI) startIPC() {
+	if ui.ipc == nil {
+		return
+	}
+	if ui.tray == nil {
+		return
+	}
+
+	go func() {
+		for {
+			select {
+			case command := <-ui.ipc.Incoming():
+				switch command.Action {
+				case appipc.ActionUpload:
+					if err := ui.tray.EnqueueFiles(command.UploadPaths); err != nil {
+						ui.tray.OnUploadError(err)
+					}
+				case appipc.ActionAttention:
+					fyne.Do(ui.showRelevantWindow)
+				}
+			case <-ui.ipc.Done():
+				return
+			}
+		}
+	}()
 }

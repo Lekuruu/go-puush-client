@@ -35,6 +35,7 @@ The main application is mostly feature complete, with a few minor exceptions:
 - Updater
 - Filetype Icons next to recent uploads
 - Interactions with explorer
+- "About" section in settings to show build info & other stuff
 
 Otherwise, the application does what I want it to do, which is to upload files and take screenshots.
 

@@ -10,7 +10,7 @@ import (
 )
 
 func Check(current Version) (ReleaseCandidate, error) {
-	release, err := FetchGitHubRelease(context.Background())
+	release, err := FetchGitHubRelease(context.Background()) // TODO: add context with timeout
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func Check(current Version) (ReleaseCandidate, error) {
 func Perform(candidate ReleaseCandidate) error {
 	executable, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
+		return fmt.Errorf("get executable path: %w", err)
 	}
 
 	executablePath := filepath.Dir(executable)
@@ -48,23 +48,17 @@ func Perform(candidate ReleaseCandidate) error {
 		return fmt.Errorf("no write permission to the executable path: %s", executablePath)
 	}
 
-	tempFile, err := os.CreateTemp("", "puush-*")
+	replacementExecutable := executable + ".new"
+	err = downloadFile(candidate.DownloadUrl(), replacementExecutable)
 	if err != nil {
-		return fmt.Errorf("failed to create temporary file for update: %w", err)
+		return fmt.Errorf("download update: %w", err)
 	}
-	defer os.Remove(tempFile.Name())
-
-	err = downloadFile(candidate.DownloadUrl(), tempFile.Name())
-	if err != nil {
-		return fmt.Errorf("failed to download update: %w", err)
-	}
-	replacementExecutable := tempFile.Name()
 
 	// Rename current executable to a backup name
 	backupExecutable := executable + ".old"
 	err = os.Rename(executable, backupExecutable)
 	if err != nil {
-		return fmt.Errorf("failed to rename current executable: %w", err)
+		return fmt.Errorf("rename current executable: %w", err)
 	}
 
 	// Rename the new executable to the original name
@@ -73,7 +67,7 @@ func Perform(candidate ReleaseCandidate) error {
 		// We're in a really bad state right now, since no executable would be available to run
 		// Attempt to restore the original executable
 		os.Rename(backupExecutable, executable)
-		return fmt.Errorf("failed to replace executable with new version: %w", err)
+		return fmt.Errorf("replace executable with new version: %w", err)
 	}
 	return nil
 }
@@ -83,7 +77,12 @@ func Cleanup() bool {
 	if err != nil {
 		return false
 	}
+	newExecutable := executable + ".new"
 	backupExecutable := executable + ".old"
+
+	// Remove any leftover new/replacement executable
+	// We don't really care if it fails
+	os.Remove(newExecutable)
 
 	if _, err := os.Stat(backupExecutable); err == nil {
 		err = os.Remove(backupExecutable)
@@ -97,10 +96,6 @@ func Cleanup() bool {
 }
 
 func downloadFile(url string, destination string) error {
-	if !hasWritePermission(destination) {
-		return os.ErrPermission
-	}
-
 	out, err := os.Create(destination)
 	if err != nil {
 		return err

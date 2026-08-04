@@ -9,6 +9,15 @@ import (
 	"path/filepath"
 )
 
+func CanUpdate() bool {
+	executable, err := os.Executable()
+	if err != nil {
+		return false
+	}
+	executablePath := filepath.Dir(executable)
+	return hasWritePermission(executablePath)
+}
+
 func Check(current Version) (ReleaseCandidate, error) {
 	release, err := FetchGitHubRelease(context.Background()) // TODO: add context with timeout
 	if err != nil {

@@ -11,6 +11,12 @@ import (
 )
 
 func updaterLoop(cfg *config.Config, ui *desktop.UI) {
+	// Check if we can even update, and inform the user if not
+	if !updater.CanUpdate() {
+		log.Printf("puush cannot update itself, no write permission to the executable path")
+		ui.ShowNotification("puush cannot update itself!", "puush has no write permission to the installation folder. Please move it somewhere else!")
+		return
+	}
 	currentVersion, _ := updater.NewVersionFromString(AppVersion)
 
 	// Check if an old version is next to the current executable

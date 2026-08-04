@@ -54,6 +54,7 @@ func (ui *UI) Run() {
 
 	// Update autostart configuration based on current settings
 	ui.UpdateAutostartConfiguration(ui.config.General.Startup)
+	ui.ReconcileContextMenuConfiguration()
 
 	// Show quickstart window if no credentials have been set
 	// Otherwise, re-authenticate to see if the API key is still valid

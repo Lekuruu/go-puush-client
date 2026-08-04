@@ -70,6 +70,7 @@ type GeneralConfig struct {
 	ContextMenu       bool
 	DisabledToggle    bool
 	CopyToClipboard   bool
+	AutoUpdate        bool
 }
 
 type CaptureConfig struct {
@@ -119,6 +120,7 @@ func DefaultConfig() *Config {
 			Startup:           true,
 			ContextMenu:       true,
 			DisabledToggle:    false,
+			AutoUpdate:        true,
 		},
 		Capture: CaptureConfig{
 			UploadQuality:         screenshots.QualityBest,
@@ -138,8 +140,8 @@ func DefaultConfig() *Config {
 			Toggle:                  "Ctrl+Alt+P",
 		},
 		Misc: MiscConfig{
-			ServerURL:  "https://puush.me",
 			LastUpdate: time.Now(),
+			ServerURL:  "https://puush.me",
 		},
 	}
 }

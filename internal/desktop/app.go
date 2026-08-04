@@ -43,11 +43,6 @@ func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
 	}
 }
 
-// SetIPCServer connects commands from secondary processes to this UI.
-func (ui *UI) SetIPCServer(server *appipc.Server) {
-	ui.ipc = server
-}
-
 func (ui *UI) Run() {
 	// TODO: Maybe add some sort of theme customization?
 	ui.app.Settings().SetTheme(NewWindowsTheme())
@@ -103,6 +98,16 @@ func (ui *UI) OnShutdown() {
 
 	if ui.ipc != nil {
 		ui.ipc.Close()
+	}
+}
+
+func (ui *UI) SetIPCServer(server *appipc.Server) {
+	ui.ipc = server
+}
+
+func (ui *UI) ShowNotification(title, message string) {
+	if ui.tray != nil {
+		ui.tray.ShowNotification(title, message)
 	}
 }
 

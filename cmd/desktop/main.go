@@ -74,11 +74,7 @@ func run(arguments []string) error {
 }
 
 // https://stackoverflow.com/questions/71418671/restart-or-shutdown-golang-apps-programmatically
-func restart() error {
-	self, err := os.Executable()
-	if err != nil {
-		return err
-	}
+func restart(self string) error {
 	args := os.Args
 	env := os.Environ()
 

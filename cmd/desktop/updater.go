@@ -66,7 +66,7 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	log.Printf("Update available: %s -> %s", currentVersion, candidate.Version())
 	ui.ShowNotification("Downloading update...", "puush will automatically restart when done!")
 
-	err = updater.Perform(candidate)
+	updatedExecutable, err := updater.Perform(candidate)
 	if err != nil {
 		ui.ShowNotification("Update failed!", "You may have to install this update manually :(")
 		log.Printf("Failed to perform update: %v", err)
@@ -78,6 +78,10 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	ui.CloseIPCServer()
 
 	log.Printf("Update downloaded, restarting...")
-	restart()
+	if err := restart(updatedExecutable); err != nil {
+		ui.ShowNotification("Update restart failed!", "Please restart puush manually to finish the update.")
+		log.Printf("Failed to restart after update: %v", err)
+		return false
+	}
 	return true
 }

@@ -52,23 +52,34 @@ func Check(current Version) (ReleaseCandidate, error) {
 	return nil, nil
 }
 
-func Perform(candidate ReleaseCandidate) error {
+func Perform(candidate ReleaseCandidate) (string, error) {
 	executable, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("get executable path: %w", err)
+		return "", fmt.Errorf("get executable path: %w", err)
+	}
+	executableInfo, err := os.Stat(executable)
+	if err != nil {
+		return "", fmt.Errorf("stat current executable: %w", err)
 	}
 
 	replacementExecutable := executable + ".new"
+	defer os.Remove(replacementExecutable)
+
 	err = downloadFile(candidate.DownloadUrl(), replacementExecutable)
 	if err != nil {
-		return fmt.Errorf("download update: %w", err)
+		return "", fmt.Errorf("download update: %w", err)
+	}
+
+	// Preserve the mode of the current executable so the replacement remains executable on unix
+	if err := os.Chmod(replacementExecutable, executableInfo.Mode().Perm()); err != nil {
+		return "", fmt.Errorf("set replacement executable permissions: %w", err)
 	}
 
 	// Rename current executable to a backup name
 	backupExecutable := executable + ".old"
 	err = os.Rename(executable, backupExecutable)
 	if err != nil {
-		return fmt.Errorf("rename current executable: %w", err)
+		return "", fmt.Errorf("rename current executable: %w", err)
 	}
 
 	// Rename the new executable to the original name
@@ -77,9 +88,9 @@ func Perform(candidate ReleaseCandidate) error {
 		// We're in a really bad state right now, since no executable would be available to run
 		// Attempt to restore the original executable
 		os.Rename(backupExecutable, executable)
-		return fmt.Errorf("replace executable with new version: %w", err)
+		return "", fmt.Errorf("replace executable with new version: %w", err)
 	}
-	return nil
+	return executable, nil
 }
 
 func Cleanup() bool {
@@ -118,6 +129,10 @@ func downloadFile(url string, destination string) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return fmt.Errorf("unexpected HTTP status: %s", resp.Status)
+	}
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {

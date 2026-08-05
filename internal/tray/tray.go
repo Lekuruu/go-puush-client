@@ -148,11 +148,21 @@ func (m *TrayManager) Initialize(applicationName string) error {
 	return nil
 }
 
+func (m *TrayManager) buildString() string {
+	if m.targetApp == nil {
+		return "puush"
+	}
+	if m.targetApp.Metadata().Build == 0 {
+		return "puush dev"
+	}
+	return fmt.Sprintf("puush b%d", m.targetApp.Metadata().Build)
+}
+
 func (m *TrayManager) rebuildMenuItems() {
 	if m.menu == nil {
 		return
 	}
-	puushVersion := fyne.NewMenuItem(config.VersionString(), func() {})
+	puushVersion := fyne.NewMenuItem(m.buildString(), func() {})
 	puushVersion.Disabled = true
 
 	accountSettings := fyne.NewMenuItem("My Account", func() {

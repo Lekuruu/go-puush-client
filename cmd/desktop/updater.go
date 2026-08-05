@@ -51,6 +51,7 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	if !cfg.General.AutoUpdate {
 		return false
 	}
+	cfg.Misc.LastUpdate = time.Now()
 
 	candidate, err := updater.Check(currentVersion)
 	if err != nil {
@@ -72,9 +73,6 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 		log.Printf("Failed to perform update: %v", err)
 		return false
 	}
-
-	cfg.Misc.LastUpdate = time.Now()
-	config.NewStore().Save(cfg)
 
 	// Stop the IPC server to let the new process start its own server
 	ui.CloseIPCServer()

@@ -106,11 +106,9 @@ func Cleanup() bool {
 	os.Remove(newExecutable)
 
 	if _, err := os.Stat(backupExecutable); err == nil {
-		err = os.Remove(backupExecutable)
-		if err != nil {
-			return false
-		}
-		// An old executable was found & successfully removed
+		// The old process may still be running so we need to wait for it
+		// to exit before we can remove the backup executable
+		go removeFileWithBackoff(backupExecutable, 5, time.Second)
 		return true
 	}
 	return false
@@ -158,4 +156,20 @@ func hasWritePermission(path string) bool {
 		return false
 	}
 	return os.Remove(renamedPath) == nil
+}
+
+func removeFileWithBackoff(path string, maxAttempts int, backoff time.Duration) (err error) {
+	delay := backoff
+
+	for i := 0; i < maxAttempts; i++ {
+		err = os.Remove(path)
+		if err == nil || os.IsNotExist(err) {
+			return nil
+		}
+
+		time.Sleep(delay)
+		delay *= 2 // Exponential backoff
+	}
+
+	return fmt.Errorf("failed to remove %s after %d attempts: %w", path, maxAttempts, err)
 }

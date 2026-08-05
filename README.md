@@ -27,6 +27,27 @@ With that said, go ahead and download the latest release from the [releases](htt
 
 ### Dependencies
 
+On macOS and Windows, the application has no actual dependencies. For linux, however, you will need to install a few dependencies for full functionality.
+
+#### File Managers
+
+Linux has no standard file manager, which makes it hard to implement context menu integration for all of them.
+Currently, the following file managers are supported:
+
+- **Nautilus** (GNOME)
+- **Dolphin** (KDE)
+- **Nemo** (Cinnamon)
+
+Feel free to request support for other file managers.
+
+#### Notifications
+
+Notifications on linux use `notify-send` and `paplay`, which are usually included in most distributions. If you don't have them installed, you can install them with your package manager.
+
+The app also uses `xdg-open` to open links in your default browser, which I would be surprised if it wasn't installed on your system. But y'know, just to be sure.
+
+If you are on Wayland, you should check if `wl-clipboard` is installed to make your clipboard work with puush.
+
 #### Screenshot Providers
 
 For macOS and Windows, the application uses native implementations for taking screenshots, so you won't have to worry about installing any dependencies.  
@@ -49,7 +70,7 @@ go build -o puush-client ./cmd/desktop
 Since this project uses [fyne](https://fyne.io/), you may also need some C compiler dependencies depending on your platform. See [Fyne's prerequisite documentation](https://docs.fyne.io/started/quick/) for more information.  
 Note that these can be pretty painful to set up on windows especially (speaking from experience).
 
-## Usage example
+## Development
 
 The `pkg/puush` package contains the implementation of the puush api.
 Here's a simple example of how to upload a file:

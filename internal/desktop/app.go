@@ -134,6 +134,10 @@ func (ui *UI) UpdateAccountConfiguration() {
 func (ui *UI) UpdateAutostartConfiguration(enabled bool) {
 	ui.config.General.Startup = enabled
 
+	if IsDevelopmentBuild() {
+		return
+	}
+
 	if enabled {
 		err := EnableAutostart()
 		if err != nil {

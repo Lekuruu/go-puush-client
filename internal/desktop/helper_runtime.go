@@ -1,23 +1,16 @@
 package desktop
 
 import (
-	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
-	"strings"
+
+	"fyne.io/fyne/v2"
 )
 
 // IsDevelopmentBuild checks if the given executable is a development build of the application.
 func IsDevelopmentBuild() bool {
-	executable, err := os.Executable()
-	if err != nil {
-		return false
-	}
-
-	base := filepath.Base(executable)
-	isDesktopBinary := base == "desktop" || strings.EqualFold(base, "desktop.exe")
-	return isDesktopBinary && strings.Contains(executable, "go-build")
+	metadata := fyne.CurrentApp().Metadata()
+	return metadata.Custom["commit"] == "dev" || metadata.Build == 0
 }
 
 // OpenBrowser opens the specified URL in the default browser of the user.

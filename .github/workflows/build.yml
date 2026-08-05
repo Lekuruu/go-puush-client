@@ -85,11 +85,18 @@ jobs:
               shell: bash
               run: |
                   mkdir -p build
-                  ldflags="-s -w -X main.AppBuild=$APP_BUILD -X main.AppCommit=$APP_COMMIT"
+                  ldflags="-s -X main.AppBuild=$APP_BUILD -X main.AppCommit=$APP_COMMIT"
                   if [ "$RUNNER_OS" = "Windows" ]; then
                     ldflags="$ldflags -H=windowsgui"
                   fi
-                  go build -ldflags="$ldflags" -trimpath -o build/${{ steps.vars.outputs.filename }} ./cmd/desktop
+
+                  go build \
+                    -trimpath \
+                    -buildvcs=false \
+                    -tags no_emoji \
+                    -ldflags="$ldflags" \
+                    -o build/${{ steps.vars.outputs.filename }} \
+                    ./cmd/desktop
 
             - name: Upload Artifact
               if: github.event_name != 'release'

@@ -75,6 +75,8 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 
 	cfg.Misc.LastUpdate = time.Now()
 	config.NewStore().Save(cfg)
+
+	// Stop the IPC server to let the new process start its own server
 	ui.CloseIPCServer()
 
 	log.Printf("Update downloaded, restarting...")
@@ -83,5 +85,6 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 		log.Printf("Failed to restart after update: %v", err)
 		return false
 	}
+	ui.Quit()
 	return true
 }

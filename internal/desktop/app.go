@@ -91,6 +91,10 @@ func (ui *UI) Run() {
 	ui.app.Run()
 }
 
+func (ui *UI) Quit() {
+	ui.app.Quit()
+}
+
 func (ui *UI) OnShutdown() {
 	ui.tray.StopMonitor()
 	ui.tray.StopUploadQueue()

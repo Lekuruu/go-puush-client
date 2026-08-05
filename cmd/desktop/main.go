@@ -85,11 +85,16 @@ func restart(self string) error {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		cmd.Env = env
-		err := cmd.Run()
-		if err == nil {
-			os.Exit(0)
+		if err := cmd.Start(); err != nil {
+			return err
 		}
-		return err
+
+		// cmd.Run would wait for the replacement to exit and keep
+		// the old application running indefinitely
+		// cmd.Start starts the replacement and returns immediately,
+		// allowing the old application to exit
+		cmd.Process.Release()
+		return nil
 	}
 
 	return syscall.Exec(self, args, env)

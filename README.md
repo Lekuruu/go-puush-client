@@ -30,12 +30,8 @@ Other providers include `flameshot`, `maim` & `grim`/`slurp`, however, your mile
 
 ## Progress
 
-The main application is mostly feature complete, with a few minor exceptions:
-
-- Cancelling uploads
-- Interactions with explorer (probably out of scope)
-
-Otherwise, the application does what I want it to do, which is to upload files and take screenshots.
+The main application is mostly feature complete. It does what I want it to do, which is to upload files and take screenshots.  
+However, there are still some small niceties that I want to add eventually. These can be found in the [issues](https://github.com/Lekuruu/go-puush-client/issues) section of this repository.
 
 ## Usage example
 

@@ -10,7 +10,7 @@ import (
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
-func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
+func (m *TrayManager) PerformUpload(reader io.Reader, filename string, preserveClipboard bool) {
 	if !m.api.Account.Credentials.HasApiKey() {
 		return
 	}
@@ -21,23 +21,36 @@ func (m *TrayManager) PerformUpload(reader io.Reader, filename string) {
 		m.OnUploadError(err)
 		return
 	}
-	m.OnUploadComplete(urlResponse)
+	m.OnUploadComplete(urlResponse, preserveClipboard)
 	// TODO: Implement upload retries
 }
 
-func (m *TrayManager) PerformProgressUpload(reader io.ReadCloser, total int64, filename string) {
-	pr := puush.NewProgressReader(reader, total, m.OnTrayProgressUpdate)
+func (m *TrayManager) PerformFileUpload(path string) {
+	pr, err := puush.NewProgressReaderFromFile(path, m.OnTrayProgressUpdate)
+	if err != nil {
+		m.OnUploadError(err)
+		return
+	}
 	defer pr.Close()
 
-	m.PerformUpload(pr, filename)
+	filename := filepath.Base(path)
+	m.PerformUpload(pr, filename, false)
 }
 
-func (m *TrayManager) PerformSeekableUpload(reader io.ReadSeekCloser, filename string) {
+func (m *TrayManager) PerformScreenshotUpload(reader io.ReadSeekCloser, filename string) {
+	// Preserve the clipboard if the raw image was already saved to it
+	preserveClipboard := m.config.Capture.SaveImagesToClipboard
+
+	// For screenshots we only have a reader available by default
+	// We want to try our best to still show a progress bar for the upload
+
 	total, err := seekableReaderSize(reader)
 	if err == nil {
 		// If we can determine the size of the reader, we can
 		// show the progress bar during the upload
-		m.PerformProgressUpload(reader, total, filename)
+		pr := puush.NewProgressReader(reader, total, m.OnTrayProgressUpdate)
+		defer pr.Close()
+		m.PerformUpload(pr, filename, preserveClipboard)
 		return
 	}
 
@@ -51,22 +64,10 @@ func (m *TrayManager) PerformSeekableUpload(reader io.ReadSeekCloser, filename s
 		return
 	}
 	defer reader.Close()
-	m.PerformUpload(reader, filename)
+	m.PerformUpload(reader, filename, preserveClipboard)
 }
 
-func (m *TrayManager) PerformFileUpload(path string) {
-	pr, err := puush.NewProgressReaderFromFile(path, m.OnTrayProgressUpdate)
-	if err != nil {
-		m.OnUploadError(err)
-		return
-	}
-	defer pr.Close()
-
-	filename := filepath.Base(path)
-	m.PerformUpload(pr, filename)
-}
-
-func (m *TrayManager) OnUploadComplete(urlResponse string) {
+func (m *TrayManager) OnUploadComplete(urlResponse string, preserveClipboard bool) {
 	log.Println("Upload complete:", urlResponse)
 
 	// Set updated disk usage to config
@@ -76,7 +77,7 @@ func (m *TrayManager) OnUploadComplete(urlResponse string) {
 	m.OnTrayProgressComplete()
 	m.ShowUploadNotification(urlResponse)
 
-	if m.config.General.CopyToClipboard {
+	if m.config.General.CopyToClipboard && !preserveClipboard {
 		fyne.CurrentApp().Clipboard().SetContent(urlResponse)
 	}
 	if m.config.General.OpenBrowser {

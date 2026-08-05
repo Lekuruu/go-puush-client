@@ -28,7 +28,7 @@ func (m *TrayManager) UploadAreaScreenshot() {
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformSeekableUpload(reader, filename)
+	m.PerformScreenshotUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadDesktopScreenshot() {
@@ -49,7 +49,7 @@ func (m *TrayManager) UploadDesktopScreenshot() {
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformSeekableUpload(reader, filename)
+	m.PerformScreenshotUpload(reader, filename)
 }
 
 func (m *TrayManager) UploadWindowScreenshot() {
@@ -70,7 +70,7 @@ func (m *TrayManager) UploadWindowScreenshot() {
 
 	filename := getImageFilename(reader)
 	m.OnScreenshotCaptured(reader, filename)
-	m.PerformSeekableUpload(reader, filename)
+	m.PerformScreenshotUpload(reader, filename)
 }
 
 func (m *TrayManager) OnScreenshotCaptured(reader io.ReadSeeker, filename string) {

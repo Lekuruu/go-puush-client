@@ -16,5 +16,5 @@ func (m *TrayManager) UploadFromClipboard() {
 	reader := strings.NewReader(content)
 	filename := fmt.Sprintf("clipboard (%s).txt", time.Now().Format("2006-01-02 at 15.04.05"))
 
-	m.PerformUpload(reader, filename)
+	m.PerformUpload(reader, filename, false)
 }

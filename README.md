@@ -6,6 +6,20 @@ My main motivation was to have a usable puush client for linux, since it was the
 <img src="https://raw.githubusercontent.com/Lekuruu/go-puush-client/refs/heads/main/.github/screenshot-1.png" alt="tray" width="400px" />
 <img src="https://raw.githubusercontent.com/Lekuruu/go-puush-client/refs/heads/main/.github/screenshot-2.png" alt="notification" width="400px" />
 
+## Installation
+
+There's no dedicated installer for this application, and you are technically free to place the binary *anywhere* you want, as long as it has **write permissions** to the directory it is placed in. If that is not the case, the app might not be able to update itself automatically.
+
+If you are unsure whether or not it has write permissions: on startup, the app should yell at you if it can't write to the directory it is placed in. If that happens, just move the binary to a different location and try again.
+
+With that said, go ahead and download the latest release from the [releases](https://github.com/Lekuruu/go-puush-client/releases) page.
+
+### Recommended installation locations
+
+- **Windows**: `%LOCALAPPDATA%\puush`
+- **Linux**: `~/.local/bin`
+- **macOS**: `~/Applications`
+
 ## Build instructions
 
 If you know at least a little bit of how to use go, this should be pretty straightforward.

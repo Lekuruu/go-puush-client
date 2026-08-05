@@ -5,6 +5,9 @@ import _ "embed"
 //go:embed icons/puush.png
 var PuushIconData []byte
 
+//go:embed icons/puush-error.png
+var PuushErrorIconData []byte // NOTE: Not part of the original client
+
 //go:embed sounds/success.wav
 var SuccessSoundData []byte
 

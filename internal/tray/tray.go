@@ -91,9 +91,8 @@ func (m *TrayManager) ShowUploadNotification(url string) {
 // ShowErrorNotification will display an error notification with the provided message
 func (m *TrayManager) ShowErrorNotification(message string) {
 	go notifications.NewNotification("puush error", "", message).
-		WithIconData(assets.PuushIconData).
+		WithIconData(assets.PuushErrorIconData).
 		Push()
-	// TODO: Find right icon for error
 }
 
 // TogglePuushing will toggle the puushing functionality on or off

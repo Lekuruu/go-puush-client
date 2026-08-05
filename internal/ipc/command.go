@@ -15,6 +15,7 @@ type Action uint8
 const (
 	ActionAttention Action = iota + 1
 	ActionUpload
+	// TODO: ActionCheckUpdates, ActionToggleUploads
 )
 
 var (

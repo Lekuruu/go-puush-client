@@ -27,7 +27,7 @@ With that said, go ahead and download the latest release from the [releases](htt
 
 ### Dependencies
 
-On macOS and Windows, the application has no actual dependencies. For linux, however, you will need to install a few dependencies for full functionality.
+On macOS and Windows, the application has no actual dependencies. For linux, however, you may need to install a few dependencies for full functionality.
 
 #### File Managers
 

@@ -95,14 +95,17 @@ func (ui *UI) OnShutdown() {
 	ui.tray.StopMonitor()
 	ui.tray.StopUploadQueue()
 	ui.UpdateAccountConfiguration()
-
-	if ui.ipc != nil {
-		ui.ipc.Close()
-	}
+	ui.CloseIPCServer()
 }
 
 func (ui *UI) SetIPCServer(server *appipc.Server) {
 	ui.ipc = server
+}
+
+func (ui *UI) CloseIPCServer() {
+	if ui.ipc != nil {
+		ui.ipc.Close()
+	}
 }
 
 func (ui *UI) ShowNotification(title, message string) {

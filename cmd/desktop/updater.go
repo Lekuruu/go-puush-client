@@ -74,6 +74,9 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	}
 
 	cfg.Misc.LastUpdate = time.Now()
+	config.NewStore().Save(cfg)
+	ui.CloseIPCServer()
+
 	log.Printf("Update downloaded, restarting...")
 	restart()
 	return true

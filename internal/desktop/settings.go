@@ -23,12 +23,14 @@ func (ui *UI) ShowSettingsWindow() {
 	keyBindingsView := ui.buildKeyBindingsTab()
 	accountView, accountViewUpdate := ui.buildAccountTab()
 	advancedView := ui.buildAdvancedTab(accountViewUpdate)
+	aboutView := ui.buildAboutTab()
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("General", generalView),
 		container.NewTabItem("Key Bindings", keyBindingsView),
 		container.NewTabItem("Account", accountView),
 		container.NewTabItem("Advanced", advancedView),
+		container.NewTabItem("About", aboutView),
 	)
 	w.SetContent(container.NewPadded(tabs))
 	w.Show()

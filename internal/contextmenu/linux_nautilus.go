@@ -11,7 +11,10 @@ func nautilusPath(context linuxContext) string {
 }
 
 func enableNautilus(context linuxContext, executable string) error {
-	content, err := renderContextMenuTemplate("linux-nautilus.sh.tmpl", newContextMenuTemplateData(executable))
+	content, err := renderContextMenuTemplate(
+		"linux-nautilus.sh.tmpl",
+		newContextMenuTemplateData(executable, context.iconPath),
+	)
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,10 @@ func dolphinPath(context linuxContext) string {
 }
 
 func enableDolphin(context linuxContext, executable string) error {
-	content, err := renderContextMenuTemplate("linux-dolphin.desktop.tmpl", newContextMenuTemplateData(executable))
+	content, err := renderContextMenuTemplate(
+		"linux-dolphin.desktop.tmpl",
+		newContextMenuTemplateData(executable, context.iconPath),
+	)
 	if err != nil {
 		return err
 	}

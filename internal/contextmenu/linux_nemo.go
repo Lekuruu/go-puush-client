@@ -11,7 +11,10 @@ func nemoPath(context linuxContext) string {
 }
 
 func enableNemo(context linuxContext, executable string) error {
-	content, err := renderContextMenuTemplate("linux-nemo.action.tmpl", newContextMenuTemplateData(executable))
+	content, err := renderContextMenuTemplate(
+		"linux-nemo.action.tmpl",
+		newContextMenuTemplateData(executable, context.iconPath),
+	)
 	if err != nil {
 		return err
 	}

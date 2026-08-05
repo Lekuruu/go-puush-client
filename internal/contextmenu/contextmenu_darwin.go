@@ -47,7 +47,7 @@ func (workflow macOSContextMenu) enable(executable string) error {
 	// We are able to create / overwrite the workflow
 	// Use bundled templates to generate the workflow files
 
-	data := newContextMenuTemplateData(executable)
+	data := newContextMenuTemplateData(executable, "")
 	command, err := renderContextMenuTemplate("macos-command.sh.tmpl", data)
 	if err != nil {
 		return err

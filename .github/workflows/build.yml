@@ -32,6 +32,8 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
             - name: Set up Go
               uses: actions/setup-go@v6
@@ -55,6 +57,13 @@ jobs:
                     echo "filename=puush-${{ matrix.name }}" >> $GITHUB_OUTPUT
                   fi
 
+            - name: Set build metadata
+              id: metadata
+              shell: bash
+              run: |
+                  echo "build=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+                  echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
             - name: Generate Windows icon resource
               if: runner.os == 'Windows'
               working-directory: cmd/desktop
@@ -71,10 +80,12 @@ jobs:
                   GOARCH: ${{ matrix.goarch }}
                   CGO_ENABLED: 1
                   MACOSX_DEPLOYMENT_TARGET: "10.13"
+                  APP_BUILD: ${{ steps.metadata.outputs.build }}
+                  APP_COMMIT: ${{ steps.metadata.outputs.commit }}
               shell: bash
               run: |
                   mkdir -p build
-                  ldflags="-s -w"
+                  ldflags="-s -w -X main.AppBuild=$APP_BUILD -X main.AppCommit=$APP_COMMIT"
                   if [ "$RUNNER_OS" = "Windows" ]; then
                     ldflags="$ldflags -H=windowsgui"
                   fi

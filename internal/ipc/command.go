@@ -16,7 +16,7 @@ const (
 	ActionAttention Action = iota + 1
 	ActionUpload
 	ActionChooseFile
-	// TODO: ActionCheckUpdates, ActionToggleUploads
+	ActionToggleShortcuts
 )
 
 var (
@@ -66,6 +66,11 @@ func NewChooseFileCommand() Command {
 	return Command{Action: ActionChooseFile}
 }
 
+// NewToggleShortcutsCommand creates a command that toggles puush shortcuts.
+func NewToggleShortcutsCommand() Command {
+	return Command{Action: ActionToggleShortcuts}
+}
+
 // Validate checks whether the command's action and payload valid.
 func (command Command) Validate() error {
 	switch command.Action {
@@ -77,6 +82,11 @@ func (command Command) Validate() error {
 	case ActionChooseFile:
 		if len(command.UploadPaths) != 0 {
 			return errors.New("choose command cannot contain upload paths")
+		}
+		return nil
+	case ActionToggleShortcuts:
+		if len(command.UploadPaths) != 0 {
+			return errors.New("toggle command cannot contain upload paths")
 		}
 		return nil
 	case ActionUpload:
@@ -106,6 +116,8 @@ func (command Command) ValidateReceived() (Command, error) {
 		return NewAttentionCommand(), nil
 	case ActionChooseFile:
 		return NewChooseFileCommand(), nil
+	case ActionToggleShortcuts:
+		return NewToggleShortcutsCommand(), nil
 	case ActionUpload:
 		paths, err := validatePaths(command.UploadPaths)
 		if err != nil {

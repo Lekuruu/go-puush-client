@@ -188,6 +188,8 @@ func (ui *UI) startIPC() {
 					}
 				case appipc.ActionChooseFile:
 					ui.tray.UploadFileFromDialog()
+				case appipc.ActionToggleShortcuts:
+					ui.tray.TogglePuushing()
 				case appipc.ActionAttention:
 					fyne.Do(ui.showRelevantWindow)
 				}

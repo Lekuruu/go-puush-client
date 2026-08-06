@@ -15,6 +15,7 @@ type Action uint8
 const (
 	ActionAttention Action = iota + 1
 	ActionUpload
+	ActionChooseFile
 	// TODO: ActionCheckUpdates, ActionToggleUploads
 )
 
@@ -60,12 +61,22 @@ func NewUploadCommand(paths []string) (Command, error) {
 	return Command{Action: ActionUpload, UploadPaths: absolutePaths}, nil
 }
 
+// NewChooseFileCommand creates a command that allows the user to pick a file to upload.
+func NewChooseFileCommand() Command {
+	return Command{Action: ActionChooseFile}
+}
+
 // Validate checks whether the command's action and payload valid.
 func (command Command) Validate() error {
 	switch command.Action {
 	case ActionAttention:
 		if len(command.UploadPaths) != 0 {
-			return errors.New("get-attention command cannot contain upload paths")
+			return errors.New("attention command cannot contain upload paths")
+		}
+		return nil
+	case ActionChooseFile:
+		if len(command.UploadPaths) != 0 {
+			return errors.New("choose command cannot contain upload paths")
 		}
 		return nil
 	case ActionUpload:
@@ -93,6 +104,8 @@ func (command Command) ValidateReceived() (Command, error) {
 	switch command.Action {
 	case ActionAttention:
 		return NewAttentionCommand(), nil
+	case ActionChooseFile:
+		return NewChooseFileCommand(), nil
 	case ActionUpload:
 		paths, err := validatePaths(command.UploadPaths)
 		if err != nil {

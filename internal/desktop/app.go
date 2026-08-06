@@ -186,6 +186,8 @@ func (ui *UI) startIPC() {
 					if err := ui.tray.EnqueueFiles(command.UploadPaths); err != nil {
 						ui.tray.OnUploadError(err)
 					}
+				case appipc.ActionChooseFile:
+					ui.tray.UploadFileFromDialog()
 				case appipc.ActionAttention:
 					fyne.Do(ui.showRelevantWindow)
 				}

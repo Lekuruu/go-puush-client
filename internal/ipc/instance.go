@@ -56,8 +56,8 @@ func openAt(ctx context.Context, endpoint string, command Command) (OpenResult, 
 	server.listener = endpointState.listener
 	go server.serve()
 
-	// An initial upload needs to enter the inbox before the UI starts consuming commands
-	if command.Action == ActionUpload {
+	// Enqueue the command before launching the ipc processor
+	if command.Action != ActionAttention {
 		if err := server.enqueue(command); err != nil {
 			server.Close()
 			return OpenResult{}, err

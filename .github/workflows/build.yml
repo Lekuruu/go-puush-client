@@ -156,11 +156,16 @@ jobs:
                       <string>10.13</string>
                       <key>NSHighResolutionCapable</key>
                       <true/>
+                      <key>NSScreenCaptureUsageDescription</key>
+                      <string>puush needs Screen Recording access to capture screenshots.</string>
                   </dict>
                   </plist>
                   PLIST
 
                   plutil -lint "$app_dir/Contents/Info.plist"
+                  test -x "$app_dir/Contents/MacOS/puush"
+                  test "$(plutil -extract CFBundleIdentifier raw -o - "$app_dir/Contents/Info.plist")" = "me.puush.client"
+                  test -n "$(plutil -extract NSScreenCaptureUsageDescription raw -o - "$app_dir/Contents/Info.plist")"
 
                   ditto -c -k --sequesterRsrc --keepParent \
                     "$app_dir" \

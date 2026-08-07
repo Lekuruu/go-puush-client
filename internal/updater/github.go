@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/google/go-github/v89/github"
@@ -34,16 +33,10 @@ func (c *GitHubReleaseCandidate) IsPrerelease() bool {
 }
 
 func (c *GitHubReleaseCandidate) DownloadUrl() string {
-	targetFiletype := "" // empty for linux & macos
-	if runtime.GOOS == "windows" {
-		targetFiletype = "exe"
-	}
-	targetFilename := fmt.Sprintf(
-		"puush-%s-%s.%s",
-		runtime.GOOS, runtime.GOARCH, targetFiletype,
+	targetFilename := releaseAssetFilename(
+		runtime.GOOS,
+		runtime.GOARCH,
 	)
-	targetFilename = strings.TrimSuffix(targetFilename, ".")
-
 	for _, asset := range c.release.Assets {
 		if asset.GetName() == targetFilename {
 			return asset.GetBrowserDownloadURL()
@@ -67,4 +60,16 @@ func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
 	}
 
 	return &GitHubReleaseCandidate{release: release}, nil
+}
+
+func releaseAssetFilename(goos, goarch string) string {
+	extension := ""
+	if goos == "windows" {
+		extension = ".exe"
+	}
+	if goos == "darwin" {
+		// Github actions publishes as "macos" instead of "darwin"
+		goos = "macos"
+	}
+	return fmt.Sprintf("puush-%s-%s%s", goos, goarch, extension)
 }

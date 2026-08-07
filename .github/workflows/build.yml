@@ -75,6 +75,7 @@ jobs:
               run: |
                   echo "build=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
                   echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+                  echo "version=$(awk -F '"' '/AppVersion[[:space:]]+=/ {print $2; exit}' cmd/desktop/metadata.go)" >> "$GITHUB_OUTPUT"
 
             - name: Generate Windows icon resource
               if: runner.os == 'Windows'
@@ -117,6 +118,58 @@ jobs:
                     -o build/${{ steps.vars.outputs.filename }} \
                     ./cmd/desktop
 
+            - name: Package macOS app bundle
+              if: runner.os == 'macOS'
+              working-directory: .
+              shell: bash
+              run: |
+                  app_dir="build/puush-${{ matrix.name }}.app"
+                  mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources"
+
+                  install -m 755 \
+                    "build/${{ steps.vars.outputs.filename }}" \
+                    "$app_dir/Contents/MacOS/puush"
+                  install -m 644 \
+                    assets/icons/icon.icns \
+                    "$app_dir/Contents/Resources/puush.icns"
+
+                  cat > "$app_dir/Contents/Info.plist" <<'PLIST'
+                  <?xml version="1.0" encoding="UTF-8"?>
+                  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                  <plist version="1.0">
+                  <dict>
+                      <key>CFBundleDisplayName</key>
+                      <string>puush</string>
+                      <key>CFBundleExecutable</key>
+                      <string>puush</string>
+                      <key>CFBundleIconFile</key>
+                      <string>puush.icns</string>
+                      <key>CFBundleIdentifier</key>
+                      <string>me.puush.client</string>
+                      <key>CFBundleInfoDictionaryVersion</key>
+                      <string>6.0</string>
+                      <key>CFBundleName</key>
+                      <string>puush</string>
+                  <key>CFBundlePackageType</key>
+                  <string>APPL</string>
+                  <key>CFBundleShortVersionString</key>
+                  <string>${{ steps.metadata.outputs.version }}</string>
+                      <key>CFBundleVersion</key>
+                      <string>${{ steps.metadata.outputs.build }}</string>
+                      <key>LSMinimumSystemVersion</key>
+                      <string>10.13</string>
+                      <key>NSHighResolutionCapable</key>
+                      <true/>
+                  </dict>
+                  </plist>
+                  PLIST
+
+                  plutil -lint "$app_dir/Contents/Info.plist"
+
+                  ditto -c -k --sequesterRsrc --keepParent \
+                    "$app_dir" \
+                    "build/puush-${{ matrix.name }}.app.zip"
+
             - name: Upload Artifact
               if: github.event_name != 'release'
               uses: actions/upload-artifact@v7
@@ -125,10 +178,26 @@ jobs:
                   path: build/${{ steps.vars.outputs.filename }}
                   retention-days: 7
 
+            - name: Upload macOS app artifact
+              if: github.event_name != 'release' && runner.os == 'macOS'
+              uses: actions/upload-artifact@v7
+              with:
+                  name: puush-${{ matrix.name }}-app
+                  path: build/puush-${{ matrix.name }}.app.zip
+                  retention-days: 7
+
             - name: Upload Release Asset
               if: github.event_name == 'release'
               uses: softprops/action-gh-release@v3
               with:
                   files: build/${{ steps.vars.outputs.filename }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload macOS app release asset
+              if: github.event_name == 'release' && runner.os == 'macOS'
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: build/puush-${{ matrix.name }}.app.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

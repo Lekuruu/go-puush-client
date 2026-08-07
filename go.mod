@@ -7,7 +7,6 @@ require (
 	fyne.io/systray v1.12.2
 	github.com/Lekuruu/go-hotkey v0.0.0-20260806155541-3775f4aa3fbc
 	github.com/Microsoft/go-winio v0.6.2
-	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/emersion/go-autostart v0.0.0-20250403115856-34830d6457d2
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/google/go-github/v89 v89.0.0

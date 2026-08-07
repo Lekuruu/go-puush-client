@@ -17,16 +17,28 @@ jobs:
                 include:
                     - os: windows-latest
                       name: windows-amd64
+                      goos: windows
                       goarch: amd64
                     - os: ubuntu-latest
                       name: linux-amd64
+                      goos: linux
                       goarch: amd64
+                    - os: ubuntu-24.04-arm
+                      name: linux-arm64
+                      goos: linux
+                      goarch: arm64
                     - os: macos-latest
                       name: macos-arm64
+                      goos: darwin
                       goarch: arm64
                     - os: macos-latest
                       name: macos-amd64
+                      goos: darwin
                       goarch: amd64
+                    - os: windows-11-arm
+                      name: windows-arm64
+                      goos: windows
+                      goarch: arm64
             fail-fast: false
 
         steps:
@@ -51,7 +63,7 @@ jobs:
               id: vars
               shell: bash
               run: |
-                  if [ "${{ matrix.os }}" = "windows-latest" ]; then
+                  if [ "$RUNNER_OS" = "Windows" ]; then
                     echo "filename=puush-${{ matrix.name }}.exe" >> $GITHUB_OUTPUT
                   else
                     echo "filename=puush-${{ matrix.name }}" >> $GITHUB_OUTPUT
@@ -69,14 +81,21 @@ jobs:
               working-directory: cmd/desktop
               shell: bash
               run: |
-                  go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0 \
-                    -skip-versioninfo \
-                    -icon=../../assets/icons/icon.ico \
-                    -64 \
-                    -o=resource_windows_amd64.syso
+                  versioninfo_args=(
+                    -skip-versioninfo
+                    -icon=../../assets/icons/icon.ico
+                    -o=resource_windows_${{ matrix.goarch }}.syso
+                  )
+                  if [ "${{ matrix.goarch }}" = "arm64" ]; then
+                    versioninfo_args+=(-64 -arm)
+                  else
+                    versioninfo_args+=(-64)
+                  fi
+                  go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0 "${versioninfo_args[@]}"
 
             - name: Build
               env:
+                  GOOS: ${{ matrix.goos }}
                   GOARCH: ${{ matrix.goarch }}
                   CGO_ENABLED: 1
                   MACOSX_DEPLOYMENT_TARGET: "10.13"

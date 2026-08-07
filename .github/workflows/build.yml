@@ -35,10 +35,6 @@ jobs:
                       name: macos-amd64
                       goos: darwin
                       goarch: amd64
-                    - os: windows-11-arm
-                      name: windows-arm64
-                      goos: windows
-                      goarch: arm64
             fail-fast: false
 
         steps:

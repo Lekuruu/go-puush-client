@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/emersion/go-autostart"
@@ -40,6 +41,17 @@ func getAutostartApp() (*autostart.App, error) {
 	executable, err := os.Executable()
 	if err != nil {
 		return nil, fmt.Errorf("get executable path: %w", err)
+	}
+
+	if runtime.GOOS == "darwin" {
+		// Check if we are inside an app bundle
+		// os.Executable will point to the binary inside the bundle,
+		// but we need to point to the bundle itself
+		// We expect the following path: /puush.app/Contents/MacOS/puush
+		bundlePath := filepath.Dir(filepath.Dir(filepath.Dir(executable)))
+		if filepath.Ext(bundlePath) == ".app" {
+			executable = bundlePath
+		}
 	}
 
 	return &autostart.App{

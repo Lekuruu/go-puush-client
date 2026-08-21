@@ -48,60 +48,66 @@ func (m *TrayManager) ResetTrayIcon() {
 
 func (m *TrayManager) ResetTrayIconSoon() {
 	time.AfterFunc(2*time.Second, func() {
-		m.ResetTrayIcon()
+		fyne.Do(m.ResetTrayIcon)
 	})
 }
 
 // OnTrayProgressComplete will indicate a successful
 // upload & reset the tray icon afterwards
 func (m *TrayManager) OnTrayProgressComplete() {
-	if desktopApp, ok := m.targetApp.(desktop.App); ok {
-		desktopApp.SetSystemTrayIcon(puushTrayCompleteIcon)
-		setTrayTooltip("puush: upload complete!")
-		m.ResetTrayIconSoon()
-	}
+	fyne.Do(func() {
+		if desktopApp, ok := m.targetApp.(desktop.App); ok {
+			desktopApp.SetSystemTrayIcon(puushTrayCompleteIcon)
+			setTrayTooltip("puush: upload complete!")
+			m.ResetTrayIconSoon()
+		}
+	})
 }
 
 // OnTrayProgressFail will indicate a failed
 // upload & reset the tray icon afterwards
 func (m *TrayManager) OnTrayProgressFail() {
-	if desktopApp, ok := m.targetApp.(desktop.App); ok {
-		desktopApp.SetSystemTrayIcon(puushTrayFailIcon)
-		setTrayTooltip("puush: upload failed!")
-		m.ResetTrayIconSoon()
-	}
+	fyne.Do(func() {
+		if desktopApp, ok := m.targetApp.(desktop.App); ok {
+			desktopApp.SetSystemTrayIcon(puushTrayFailIcon)
+			setTrayTooltip("puush: upload failed!")
+			m.ResetTrayIconSoon()
+		}
+	})
 }
 
 // OnTrayProgressUpdate gets called once the upload percentage
 // has been updated through `puush.ProgressReader`
 func (m *TrayManager) OnTrayProgressUpdate(percentage float64) {
-	if desktopApp, ok := m.targetApp.(desktop.App); ok {
-		switch roundedPercentage(percentage) {
-		case 100:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress100Icon)
-		case 90:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress90Icon)
-		case 80:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress80Icon)
-		case 70:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress70Icon)
-		case 60:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress60Icon)
-		case 50:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress50Icon)
-		case 40:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress40Icon)
-		case 30:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress30Icon)
-		case 20:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress20Icon)
-		case 10:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress10Icon)
-		default:
-			desktopApp.SetSystemTrayIcon(puushTrayProgress0Icon)
+	fyne.Do(func() {
+		if desktopApp, ok := m.targetApp.(desktop.App); ok {
+			switch roundedPercentage(percentage) {
+			case 100:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress100Icon)
+			case 90:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress90Icon)
+			case 80:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress80Icon)
+			case 70:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress70Icon)
+			case 60:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress60Icon)
+			case 50:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress50Icon)
+			case 40:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress40Icon)
+			case 30:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress30Icon)
+			case 20:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress20Icon)
+			case 10:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress10Icon)
+			default:
+				desktopApp.SetSystemTrayIcon(puushTrayProgress0Icon)
+			}
+			setTrayTooltip(fmt.Sprintf("puush: Uploading (%.2f%%)", percentage))
 		}
-		setTrayTooltip(fmt.Sprintf("puush: Uploading (%.2f%%)", percentage))
-	}
+	})
 }
 
 // roundedPercentage rounds the given percentage to the nearest 10% increment

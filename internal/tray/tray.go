@@ -184,11 +184,17 @@ func (m *TrayManager) rebuildMenuItems() {
 	items = append(items, m.BuildHistoryMenu()...)
 	items = append(items, fyne.NewMenuItemSeparator())
 
-	captureWindow := fyne.NewMenuItem("Capture Current Window", m.UploadWindowScreenshot)
+	captureWindow := fyne.NewMenuItem("Capture Current Window", func() {
+		go m.UploadWindowScreenshot()
+	})
 	captureWindow.Icon = windowIcon
-	captureDesktop := fyne.NewMenuItem("Capture Desktop", m.UploadDesktopScreenshot)
+	captureDesktop := fyne.NewMenuItem("Capture Desktop", func() {
+		go m.UploadDesktopScreenshot()
+	})
 	captureDesktop.Icon = fullscreenIcon
-	captureArea := fyne.NewMenuItem("Capture Area", m.UploadAreaScreenshot)
+	captureArea := fyne.NewMenuItem("Capture Area", func() {
+		go m.UploadAreaScreenshot()
+	})
 	captureArea.Icon = selectionIcon
 	uploadFile := fyne.NewMenuItem("Upload File", m.UploadFileFromDialog)
 	uploadFile.Icon = uploadIcon

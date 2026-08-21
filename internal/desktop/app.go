@@ -128,6 +128,7 @@ func (ui *UI) UpdateAccountConfiguration() {
 		if ui.api.Account.SubscriptionEnd != nil {
 			ui.config.Account.Expiry = ui.api.Account.SubscriptionEnd.Format(time.DateTime)
 		}
+		fyne.Do(ui.tray.RefreshHistory)
 	}
 }
 

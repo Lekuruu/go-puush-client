@@ -27,7 +27,7 @@ func NewDarwinProvider() (ScreenshotProvider, error) {
 
 	return &DarwinScreenshotProvider{
 		binPath: binPath,
-		timeout: 60 * time.Second,
+		timeout: 5 * time.Minute,
 	}, nil
 }
 

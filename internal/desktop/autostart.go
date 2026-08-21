@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/Lekuruu/go-puush-client/assets"
 	"github.com/emersion/go-autostart"
@@ -49,7 +50,7 @@ func getAutostartApp() (*autostart.App, error) {
 		// but we need to point to the bundle itself
 		// We expect the following path: /puush.app/Contents/MacOS/puush
 		bundlePath := filepath.Dir(filepath.Dir(filepath.Dir(executable)))
-		if filepath.Ext(bundlePath) == ".app" {
+		if strings.HasSuffix(bundlePath, ".app") {
 			executable = bundlePath
 		}
 	}

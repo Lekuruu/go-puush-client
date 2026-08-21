@@ -171,9 +171,8 @@ jobs:
                   test "$(plutil -extract CFBundleIdentifier raw -o - "$app_dir/Contents/Info.plist")" = "me.puush.client"
                   test -n "$(plutil -extract NSScreenCaptureUsageDescription raw -o - "$app_dir/Contents/Info.plist")"
 
-                  # UserNotifications requires a signed application bundle
-                  codesign --force --deep --sign - --timestamp=none "$app_dir"
-                  codesign --verify --deep --strict "$app_dir"
+                  codesign --force --sign - --requirements '=designated => identifier "me.puush.client"' --timestamp=none "$app_dir"
+                  codesign --verify --strict "$app_dir"
 
                   ditto -c -k --sequesterRsrc --keepParent \
                     "$app_dir" \

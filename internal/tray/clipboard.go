@@ -2,6 +2,7 @@ package tray
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"os/exec"
@@ -55,6 +56,6 @@ func SetClipboard(reader io.Reader) error {
 		format = clipboard.FmtImage
 	}
 
-	go clipboard.Write(format, data)
-	return nil
+	_, err = clipboard.Write(context.Background(), format, data)
+	return err
 }

@@ -25,6 +25,10 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 		},
 	)
 	branchSelect.SetSelected(ui.config.General.UpdateBranch.String())
+	checkButton := widget.NewButton("Check for Updates", func() {
+		ui.RequestUpdateCheck()
+	})
+	updateChannel := container.NewGridWithColumns(2, branchSelect, checkButton)
 
 	lastChecked := "Never"
 	if !ui.config.Misc.LastUpdate.IsZero() {
@@ -39,7 +43,7 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 		widget.NewSeparator(),
 		createGroup("Update Management", updateManagement),
 		widget.NewSeparator(),
-		createGroup("Update Channel", branchSelect),
+		createGroup("Update Channel", updateChannel),
 		widget.NewSeparator(),
 	)
 }

@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -77,6 +80,27 @@ func run(arguments []string) error {
 func restart(self string) error {
 	args := os.Args
 	env := os.Environ()
+
+	// macOS: Relaunch the complete app bundle through Launch Services
+	if runtime.GOOS == "darwin" {
+		bundlePath := filepath.Dir(filepath.Dir(filepath.Dir(self)))
+		if !strings.HasSuffix(bundlePath, ".app") {
+			// We are not inside an app bundle, so we can only exec the binary
+			return syscall.Exec(self, args, env)
+		}
+
+		openArgs := []string{"-n", bundlePath}
+		if len(args) > 1 {
+			openArgs = append(openArgs, "--args")
+			openArgs = append(openArgs, args[1:]...)
+		}
+		cmd := exec.Command("/usr/bin/open", openArgs...)
+		cmd.Env = env
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("relaunch macOS app bundle: %w: %s", err, output)
+		}
+		return nil
+	}
 
 	// Windows does not support exec syscall
 	if runtime.GOOS == "windows" {

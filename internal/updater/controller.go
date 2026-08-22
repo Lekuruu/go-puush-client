@@ -158,8 +158,9 @@ func (controller *Controller) performCheck(request CheckRequest) bool {
 	defer controller.isChecking.Store(false)
 
 	branch := controller.branch()
-	if request.Branch != nil {
-		// Use default branch unless overridden by request
+	if request.Branch != nil && branch != *request.Branch {
+		// Switching branches should install always that branch
+		request.Force = true
 		branch = *request.Branch
 	}
 	currentVersion, err := controller.versionResolver(branch)

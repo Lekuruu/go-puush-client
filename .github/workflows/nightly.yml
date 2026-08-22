@@ -1,0 +1,64 @@
+name: Publish Nightly
+
+on:
+    workflow_run:
+        workflows: ["Build & Release"]
+        types: [completed]
+        branches: [main]
+
+permissions:
+    actions: read
+    contents: write
+
+jobs:
+    publish:
+        if: >-
+            github.event.workflow_run.conclusion == 'success' &&
+            github.event.workflow_run.event == 'push'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out the built commit
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.event.workflow_run.head_sha }}
+                  fetch-depth: 0
+
+            - name: Determine nightly version
+              id: metadata
+              shell: bash
+              run: echo "timestamp=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
+
+            - name: Download build artifacts
+              uses: actions/download-artifact@v8
+              with:
+                  run-id: ${{ github.event.workflow_run.id }}
+                  github-token: ${{ github.token }}
+                  repository: ${{ github.repository }}
+                  pattern: puush-*
+                  merge-multiple: true
+                  path: ${{ runner.temp }}/nightly-artifacts
+
+            - name: Publish nightly pre-release
+              env:
+                  ARTIFACT_DIR: ${{ runner.temp }}/nightly-artifacts
+                  GH_TOKEN: ${{ github.token }}
+                  NIGHTLY_TAG: nightly-${{ steps.metadata.outputs.timestamp }}
+                  SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+                  SOURCE_URL: ${{ github.event.workflow_run.html_url }}
+              shell: bash
+              run: |
+                  if gh release view "$NIGHTLY_TAG" >/dev/null 2>&1; then
+                    gh release upload "$NIGHTLY_TAG" "$ARTIFACT_DIR"/* --clobber
+                    gh release edit "$NIGHTLY_TAG" \
+                      --title "Nightly build $NIGHTLY_TAG" \
+                      --notes "Automated build from [$SOURCE_SHA]($SOURCE_URL)." \
+                      --prerelease
+                  else
+                    gh release create "$NIGHTLY_TAG" "$ARTIFACT_DIR"/* \
+                      --target "$SOURCE_SHA" \
+                      --title "Nightly build $NIGHTLY_TAG" \
+                      --notes "Automated build from [$SOURCE_SHA]($SOURCE_URL)." \
+                      --prerelease \
+                      --latest=false
+                  fi

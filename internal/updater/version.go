@@ -12,11 +12,6 @@ type Version interface {
 }
 
 func NewVersionFromString(versionString string) (Version, error) {
-	integerVersion, err := NewIntegerVersionFromString(versionString)
-	if err == nil {
-		return integerVersion, nil
-	}
-
 	semanticVersion, err := NewSemanticVersionFromString(versionString)
 	if err == nil {
 		return semanticVersion, nil
@@ -25,6 +20,11 @@ func NewVersionFromString(versionString string) (Version, error) {
 	timestampVersion, err := NewTimestampVersionFromString(versionString)
 	if err == nil {
 		return timestampVersion, nil
+	}
+
+	integerVersion, err := NewIntegerVersionFromString(versionString)
+	if err == nil {
+		return integerVersion, nil
 	}
 
 	return nil, fmt.Errorf("invalid version string: %s", versionString)

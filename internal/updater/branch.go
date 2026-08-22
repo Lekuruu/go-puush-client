@@ -20,3 +20,14 @@ func (branch Branch) String() string {
 		return string(branch)
 	}
 }
+
+func NewBranchFromString(s string) Branch {
+	switch s {
+	case "Stable":
+		return BranchStable
+	case "Nightly":
+		return BranchNightly
+	default:
+		return Branch(s)
+	}
+}

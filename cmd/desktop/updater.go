@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -22,7 +23,11 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 		ui.ShowNotification("puush cannot update itself!", "puush has no write permission to the installation folder. Please move it somewhere else!")
 		return
 	}
-	currentVersion, _ := updater.NewVersionFromString(AppVersion)
+	currentVersion, err := currentUpdateVersion(cfg.General.UpdateBranch)
+	if err != nil {
+		log.Printf("Failed to determine current update version: %v", err)
+		return
+	}
 
 	// Check if an old version is next to the current executable
 	wasUpdated := updater.Cleanup()
@@ -85,4 +90,15 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	}
 	ui.Quit()
 	return true
+}
+
+func currentUpdateVersion(branch updater.Branch) (updater.Version, error) {
+	switch branch {
+	case updater.BranchStable:
+		return updater.NewSemanticVersionFromString(AppVersion)
+	case updater.BranchNightly:
+		return updater.NewTimestampVersionFromString(AppTimestamp)
+	default:
+		return nil, fmt.Errorf("unknown update branch %q", branch)
+	}
 }

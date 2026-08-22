@@ -32,7 +32,7 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 	wasUpdated := updater.Cleanup()
 	if wasUpdated {
 		log.Printf("puush was updated to version %s", currentVersion)
-		ui.ShowNotification("puush was updated!", "You are now running "+currentVersion.String()+".")
+		ui.ShowNotification("puush was updated!", "You are now running "+currentVersion.String())
 		// TODO: Add button for opening changelog page on github
 	}
 

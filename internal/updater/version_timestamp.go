@@ -11,7 +11,7 @@ type VersionTimestamp struct {
 }
 
 func (v VersionTimestamp) String() string {
-	return v.timestamp.Format(time.RFC3339)
+	return v.timestamp.Format(time.DateTime)
 }
 
 func (v VersionTimestamp) CanCompare(other Version) bool {

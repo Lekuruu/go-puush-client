@@ -71,6 +71,7 @@ jobs:
               run: |
                   echo "build=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
                   echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+                  echo "timestamp=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
                   echo "version=$(awk -F '"' '/AppVersion[[:space:]]+=/ {print $2; exit}' cmd/desktop/metadata.go)" >> "$GITHUB_OUTPUT"
 
             - name: Generate Windows icon resource
@@ -98,10 +99,11 @@ jobs:
                   MACOSX_DEPLOYMENT_TARGET: "10.14"
                   APP_BUILD: ${{ steps.metadata.outputs.build }}
                   APP_COMMIT: ${{ steps.metadata.outputs.commit }}
+                  APP_TIMESTAMP: ${{ steps.metadata.outputs.timestamp }}
               shell: bash
               run: |
                   mkdir -p build
-                  ldflags="-s -X main.AppBuild=$APP_BUILD -X main.AppCommit=$APP_COMMIT"
+                  ldflags="-s -X main.AppBuild=$APP_BUILD -X main.AppCommit=$APP_COMMIT -X main.AppTimestamp=$APP_TIMESTAMP"
                   if [ "$RUNNER_OS" = "Windows" ]; then
                     ldflags="$ldflags -H=windowsgui"
                   fi

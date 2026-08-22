@@ -17,8 +17,9 @@ const (
 
 // Set by the build system through -ldflags -X
 var (
-	AppBuild  = "0"   // Number of current commits
-	AppCommit = "dev" // Current commit sha
+	AppBuild     = "0"   // Number of current commits
+	AppCommit    = "dev" // Current commit sha
+	AppTimestamp = "0"   // Unix timestamp of the current commit
 )
 
 func init() {

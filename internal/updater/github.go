@@ -14,10 +14,16 @@ const GitHubRepository = "go-puush-client"
 
 type GitHubReleaseCandidate struct {
 	release *github.RepositoryRelease
+	version Version
+	branch  Branch
 }
 
-func (c *GitHubReleaseCandidate) Version() string {
-	return c.release.GetTagName()
+func (c *GitHubReleaseCandidate) Version() Version {
+	return c.version
+}
+
+func (c *GitHubReleaseCandidate) Branch() Branch {
+	return c.branch
 }
 
 func (c *GitHubReleaseCandidate) Description() string {
@@ -45,31 +51,38 @@ func (c *GitHubReleaseCandidate) DownloadUrl() string {
 	return ""
 }
 
-func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
-	client, err := github.NewClient()
+func FetchGitHubCandidate(ctx context.Context, branch Branch) (ReleaseCandidate, error) {
+	var release ReleaseCandidate
+	var err error
+	switch branch {
+	case BranchStable:
+		release, err = FetchGitHubRelease(ctx)
+	case BranchNightly:
+		release, err = FetchGitHubNightly(ctx)
+	default:
+		return nil, fmt.Errorf("unknown update branch %q", branch)
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	release, response, err := client.Repositories.GetLatestRelease(ctx, GitHubUser, GitHubRepository)
-	if response.StatusCode == 404 {
+	if release == nil {
+		// No release found
 		return nil, nil
 	}
-	if err != nil {
-		return nil, err
+	if release.DownloadUrl() == "" {
+		// No download url found
+		return nil, nil
 	}
-
-	return &GitHubReleaseCandidate{release: release}, nil
+	return release, nil
 }
 
 func releaseAssetFilename(goos, goarch string) string {
-	extension := ""
-	if goos == "windows" {
-		extension = ".exe"
+	switch goos {
+	case "darwin":
+		return fmt.Sprintf("puush-macos-%s.app.zip", goarch)
+	case "windows":
+		return fmt.Sprintf("puush-windows-%s.exe", goarch)
+	default:
+		return fmt.Sprintf("puush-%s-%s", goos, goarch)
 	}
-	if goos == "darwin" {
-		// Github actions publishes as "macos" instead of "darwin"
-		goos = "macos"
-	}
-	return fmt.Sprintf("puush-%s-%s%s", goos, goarch, extension)
 }

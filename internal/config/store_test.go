@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/Lekuruu/go-puush-client/internal/updater"
 )
 
 func TestJsonStore(t *testing.T) {
@@ -16,6 +18,7 @@ func TestJsonStore(t *testing.T) {
 	cfg := DefaultConfig()
 	cfg.Account.Username = "test_user"
 	cfg.General.Startup = false
+	cfg.General.UpdateBranch = updater.BranchNightly
 	cfg.Capture.UploadQuality = 2
 
 	// Save the config
@@ -40,6 +43,9 @@ func TestJsonStore(t *testing.T) {
 	}
 	if updatedCfg.General.Startup != false {
 		t.Errorf("expected Startup to be false, got true")
+	}
+	if updatedCfg.General.UpdateBranch != updater.BranchNightly {
+		t.Errorf("expected UpdateBranch %q, got %q", updater.BranchNightly, updatedCfg.General.UpdateBranch)
 	}
 	if updatedCfg.Capture.UploadQuality != 2 {
 		t.Errorf("expected UploadQuality to be 2, got %d", updatedCfg.Capture.UploadQuality)

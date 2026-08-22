@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
+	"github.com/Lekuruu/go-puush-client/internal/updater"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
@@ -71,6 +72,7 @@ type GeneralConfig struct {
 	DisabledToggle    bool
 	CopyToClipboard   bool
 	AutoUpdate        bool
+	UpdateBranch      updater.Branch
 }
 
 type CaptureConfig struct {
@@ -121,6 +123,7 @@ func DefaultConfig() *Config {
 			ContextMenu:       true,
 			DisabledToggle:    false,
 			AutoUpdate:        true,
+			UpdateBranch:      updater.BranchStable,
 		},
 		Capture: CaptureConfig{
 			UploadQuality:         screenshots.QualityBest,

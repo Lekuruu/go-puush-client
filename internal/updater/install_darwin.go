@@ -94,7 +94,6 @@ func performUpdate(downloadURL, executable string) (string, error) {
 	}
 
 	// Return the path to the new executable
-	// TODO: Ensure that we are restarting with open -n bundlePath
 	return filepath.Join(bundlePath, "Contents", "MacOS", filepath.Base(executable)), nil
 }
 

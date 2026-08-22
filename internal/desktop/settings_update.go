@@ -26,17 +26,22 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 		}
 	}
 
+	branchSelectInitialized := false
 	branchSelect := widget.NewSelect(
 		[]string{
 			updater.BranchStable.String(),
 			updater.BranchNightly.String(),
 		},
 		func(selected string) {
+			if !branchSelectInitialized {
+				return
+			}
 			branch := updater.NewBranchFromString(selected)
 			checkForUpdates(&branch)
 		},
 	)
 	branchSelect.SetSelected(ui.config.General.UpdateBranch.String())
+	branchSelectInitialized = true
 
 	checkButton = widget.NewButton("Check for Updates", func() {
 		branch := ui.config.General.UpdateBranch

@@ -19,6 +19,7 @@ type CheckRequest struct {
 type CheckResult struct {
 	Request CheckRequest
 	Error   error
+	Manual  bool
 
 	CurrentVersion Version
 	Branch         Branch
@@ -168,6 +169,7 @@ func (controller *Controller) performCheck(request CheckRequest) bool {
 
 	result := CheckResult{
 		Request:        request,
+		Manual:         request.Manual,
 		Branch:         branch,
 		CurrentVersion: currentVersion,
 		Candidate:      candidate,

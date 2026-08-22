@@ -65,7 +65,16 @@ func handleUpdateResult(result updater.CheckResult, cfg *config.Config, ui *desk
 		return false
 	}
 	if result.Candidate == nil {
-		log.Printf("No update available, current version: %s", result.CurrentVersion)
+		log.Printf(
+			"No update available, current version: %s",
+			result.CurrentVersion,
+		)
+		if result.Manual {
+			ui.ShowNotification(
+				"No updates available",
+				fmt.Sprintf("You're already running the latest %s version.", result.Branch),
+			)
+		}
 		return false
 	}
 

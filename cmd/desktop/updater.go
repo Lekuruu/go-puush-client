@@ -51,6 +51,9 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 		WithCallback(func(result updater.CheckResult) bool {
 			return handleUpdateResult(result, cfg, ui)
 		})
+	ui.SetUpdateCheckCallback(func() bool {
+		return controller.RequestCheck(updater.CheckRequest{Manual: true})
+	})
 	controller.Run(context.Background())
 }
 

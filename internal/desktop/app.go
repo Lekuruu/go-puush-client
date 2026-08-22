@@ -28,6 +28,8 @@ type UI struct {
 
 	settingsWindow fyne.Window
 	startupWindow  fyne.Window
+
+	requestUpdateCheck func() bool
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
@@ -104,6 +106,15 @@ func (ui *UI) OnShutdown() {
 
 func (ui *UI) SetIPCServer(server *appipc.Server) {
 	ui.ipc = server
+}
+
+func (ui *UI) SetUpdateCheckCallback(callback func() bool) {
+	ui.requestUpdateCheck = callback
+}
+
+func (ui *UI) RequestUpdateCheck() bool {
+	callback := ui.requestUpdateCheck
+	return callback != nil && callback()
 }
 
 func (ui *UI) CloseIPCServer() {

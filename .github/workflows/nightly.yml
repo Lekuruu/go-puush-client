@@ -42,23 +42,25 @@ jobs:
             - name: Publish nightly pre-release
               env:
                   ARTIFACT_DIR: ${{ runner.temp }}/nightly-artifacts
+                  BUILD_TIMESTAMP: ${{ steps.metadata.outputs.timestamp }}
                   GH_TOKEN: ${{ github.token }}
                   NIGHTLY_TAG: nightly-${{ steps.metadata.outputs.timestamp }}
+                  SOURCE_BRANCH: ${{ github.event.workflow_run.head_branch }}
                   SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
-                  SOURCE_URL: ${{ github.event.workflow_run.html_url }}
+                  SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.workflow_run.head_sha }}
               shell: bash
               run: |
                   if gh release view "$NIGHTLY_TAG" >/dev/null 2>&1; then
                     gh release upload "$NIGHTLY_TAG" "$ARTIFACT_DIR"/* --clobber
                     gh release edit "$NIGHTLY_TAG" \
-                      --title "Nightly build $NIGHTLY_TAG" \
-                      --notes "Automated build from [$SOURCE_SHA]($SOURCE_URL)." \
+                      --title "Autobuild: $BUILD_TIMESTAMP" \
+                      --notes "Automated build from commit [$SOURCE_SHA]($SOURCE_URL) on $SOURCE_BRANCH" \
                       --prerelease
                   else
                     gh release create "$NIGHTLY_TAG" "$ARTIFACT_DIR"/* \
                       --target "$SOURCE_SHA" \
-                      --title "Nightly build $NIGHTLY_TAG" \
-                      --notes "Automated build from [$SOURCE_SHA]($SOURCE_URL)." \
+                      --title "Autobuild: $BUILD_TIMESTAMP" \
+                      --notes "Automated build from commit [$SOURCE_SHA]($SOURCE_URL) on $SOURCE_BRANCH" \
                       --prerelease \
                       --latest=false
                   fi

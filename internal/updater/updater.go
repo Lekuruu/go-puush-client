@@ -19,7 +19,7 @@ func CanUpdate() bool {
 	return canUpdate(executable)
 }
 
-func Check(current Version) (ReleaseCandidate, error) {
+func Check(current Version, force bool) (ReleaseCandidate, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), updateCheckTimeout)
 	defer cancel()
 
@@ -41,7 +41,7 @@ func Check(current Version) (ReleaseCandidate, error) {
 		return nil, err
 	}
 
-	if current.IsOlderThan(releaseVersion) {
+	if current.IsOlderThan(releaseVersion) || force {
 		// We have found a newer version on github
 		return release, nil
 	}

@@ -14,6 +14,8 @@ type CheckRequest struct {
 	Manual bool
 	// Force updates to the update candidate no matter what
 	Force bool
+	// Branch to check for updates on, can be left empty to use the default branch
+	Branch *Branch
 }
 
 type CheckResult struct {
@@ -156,6 +158,10 @@ func (controller *Controller) performCheck(request CheckRequest) bool {
 	defer controller.isChecking.Store(false)
 
 	branch := controller.branch()
+	if request.Branch != nil {
+		// Use default branch unless overridden by request
+		branch = *request.Branch
+	}
 	currentVersion, err := controller.versionResolver(branch)
 
 	var candidate ReleaseCandidate

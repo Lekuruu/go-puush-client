@@ -22,7 +22,9 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 		ui.ShowNotification("puush cannot update itself!", "puush has no write permission to the installation folder. Please move it somewhere else!")
 		return
 	}
-	currentVersion, err := currentUpdateVersion(cfg.General.UpdateBranch)
+
+	currentBranch := cfg.General.UpdateBranch
+	currentVersion, err := currentUpdateVersion(currentBranch)
 	if err != nil {
 		log.Printf("Failed to determine current update version: %v", err)
 		return
@@ -43,7 +45,7 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 	}
 	controller.
 		WithBranch(func() updater.Branch {
-			return cfg.General.UpdateBranch
+			return currentBranch
 		}).
 		WithAutomaticChecksEnabled(func() bool {
 			return cfg.General.AutoUpdate
@@ -51,14 +53,16 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 		WithCallback(func(result updater.CheckResult) bool {
 			return handleUpdateResult(result, cfg, ui)
 		})
-	ui.SetUpdateCheckCallback(func() bool {
-		return controller.RequestCheck(updater.CheckRequest{Manual: true})
+	ui.SetUpdateCheckCallback(func(branch *updater.Branch) bool {
+		request := updater.CheckRequest{Manual: true, Branch: branch}
+		return controller.RequestCheck(request)
 	})
 	controller.Run(context.Background())
 }
 
 func handleUpdateResult(result updater.CheckResult, cfg *config.Config, ui *desktop.UI) bool {
 	cfg.Misc.LastUpdate = result.CheckedAt
+	cfg.General.UpdateBranch = result.Branch
 	defer ui.FinishUpdateCheck(result.CheckedAt)
 
 	if result.Error != nil {

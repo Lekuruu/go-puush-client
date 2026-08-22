@@ -12,6 +12,7 @@ import (
 	appipc "github.com/Lekuruu/go-puush-client/internal/ipc"
 	"github.com/Lekuruu/go-puush-client/internal/screenshots"
 	"github.com/Lekuruu/go-puush-client/internal/tray"
+	"github.com/Lekuruu/go-puush-client/internal/updater"
 	"github.com/Lekuruu/go-puush-client/pkg/puush"
 )
 
@@ -29,7 +30,7 @@ type UI struct {
 	settingsWindow fyne.Window
 	startupWindow  fyne.Window
 
-	requestUpdateCheck  func() bool
+	requestUpdateCheck  func(branch *updater.Branch) bool
 	updateCheckFinished func(time.Time)
 }
 
@@ -109,16 +110,16 @@ func (ui *UI) SetIPCServer(server *appipc.Server) {
 	ui.ipc = server
 }
 
-func (ui *UI) SetUpdateCheckCallback(callback func() bool) {
+func (ui *UI) SetUpdateCheckCallback(callback func(branch *updater.Branch) bool) {
 	ui.requestUpdateCheck = callback
 }
 
-func (ui *UI) RequestUpdateCheck() bool {
+func (ui *UI) RequestUpdateCheck(branch *updater.Branch) bool {
 	callback := ui.requestUpdateCheck
 	if callback == nil {
 		return false
 	}
-	return callback()
+	return callback(branch)
 }
 
 func (ui *UI) SetUpdateFinishedCallback(callback func(time.Time)) {

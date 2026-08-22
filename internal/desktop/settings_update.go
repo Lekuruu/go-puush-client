@@ -15,13 +15,14 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 	})
 	autoUpdateCheckbox.Checked = ui.config.General.AutoUpdate
 
+	selectedBranch := ui.config.General.UpdateBranch
 	branchSelect := widget.NewSelect(
 		[]string{
 			updater.BranchStable.String(),
 			updater.BranchNightly.String(),
 		},
 		func(selected string) {
-			ui.config.General.UpdateBranch = updater.NewBranchFromString(selected)
+			selectedBranch = updater.NewBranchFromString(selected)
 		},
 	)
 	branchSelect.SetSelected(ui.config.General.UpdateBranch.String())
@@ -30,7 +31,7 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 	checkButton = widget.NewButton("Check for Updates", func() {
 		checkButton.SetText("Checking...")
 		checkButton.Disable()
-		if !ui.RequestUpdateCheck() {
+		if !ui.RequestUpdateCheck(&selectedBranch) {
 			checkButton.SetText("Check for Updates")
 			checkButton.Enable()
 			ui.ShowNotification("Update check in progress", "Another update check is already running.")

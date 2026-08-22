@@ -1,10 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"math"
-	"time"
 
 	"github.com/Lekuruu/go-puush-client/internal/config"
 	"github.com/Lekuruu/go-puush-client/internal/desktop"
@@ -37,42 +36,40 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 		// TODO: Add button for opening changelog page on github
 	}
 
-	// Periodically check for updates, if auto-updates are enabled inside the config
-	for {
-		interrupt := updaterTick(currentVersion, cfg, ui)
-		if interrupt {
-			return
-		}
-
-		// Start at 30 minutes and keep doubling time until we hit 6 hours max
-		// This is the same thing that the official puush client did
-		interval := math.Max(1000*60*30, math.Min(1000*60*360, float64(time.Hour)*2))
-		intervalDuration := time.Duration(interval) * time.Millisecond
-		time.Sleep(intervalDuration)
+	controller, err := updater.NewController(currentUpdateVersion, updater.DefaultCheckInterval)
+	if err != nil {
+		log.Printf("Failed to initialize updater: %v", err)
+		return
 	}
+	controller.
+		WithBranch(func() updater.Branch {
+			return cfg.General.UpdateBranch
+		}).
+		WithAutomaticChecksEnabled(func() bool {
+			return cfg.General.AutoUpdate
+		}).
+		WithCallback(func(result updater.CheckResult) bool {
+			return handleUpdateResult(result, cfg, ui)
+		})
+	controller.Run(context.Background())
 }
 
-func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop.UI) bool {
-	if !cfg.General.AutoUpdate {
-		return false
-	}
-	cfg.Misc.LastUpdate = time.Now()
-
-	candidate, err := updater.Check(currentVersion, cfg.General.UpdateBranch, false)
-	if err != nil {
-		log.Printf("Failed to check for updates: %v", err)
+func handleUpdateResult(result updater.CheckResult, cfg *config.Config, ui *desktop.UI) bool {
+	cfg.Misc.LastUpdate = result.CheckedAt
+	if result.Error != nil {
+		log.Printf("Failed to check for updates: %v", result.Error)
 		ui.ShowNotification("Update check failed!", "You may have to check for updates manually :(")
 		return false
 	}
-	if candidate == nil {
-		log.Printf("No update available, current version: %s", currentVersion)
+	if result.Candidate == nil {
+		log.Printf("No update available, current version: %s", result.CurrentVersion)
 		return false
 	}
 
-	log.Printf("Update available: %s -> %s", currentVersion, candidate.Version())
+	log.Printf("Update available: %s -> %s", result.CurrentVersion, result.Candidate.Version())
 	ui.ShowNotification("Downloading update...", "puush will automatically restart when done!")
 
-	updatedExecutable, err := updater.Perform(candidate)
+	updatedExecutable, err := updater.Perform(result.Candidate)
 	if err != nil {
 		ui.ShowNotification("Update failed!", "You may have to install this update manually :(")
 		log.Printf("Failed to perform update: %v", err)

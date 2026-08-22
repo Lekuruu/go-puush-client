@@ -15,27 +15,32 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 	})
 	autoUpdateCheckbox.Checked = ui.config.General.AutoUpdate
 
-	selectedBranch := ui.config.General.UpdateBranch
+	var checkButton *widget.Button
+	checkForUpdates := func(branch *updater.Branch) {
+		checkButton.SetText("Checking...")
+		checkButton.Disable()
+		if !ui.RequestUpdateCheck(branch) {
+			checkButton.SetText("Check for Updates")
+			checkButton.Enable()
+			ui.ShowNotification("Update check in progress", "Another update check is already running.")
+		}
+	}
+
 	branchSelect := widget.NewSelect(
 		[]string{
 			updater.BranchStable.String(),
 			updater.BranchNightly.String(),
 		},
 		func(selected string) {
-			selectedBranch = updater.NewBranchFromString(selected)
+			branch := updater.NewBranchFromString(selected)
+			checkForUpdates(&branch)
 		},
 	)
 	branchSelect.SetSelected(ui.config.General.UpdateBranch.String())
 
-	var checkButton *widget.Button
 	checkButton = widget.NewButton("Check for Updates", func() {
-		checkButton.SetText("Checking...")
-		checkButton.Disable()
-		if !ui.RequestUpdateCheck(&selectedBranch) {
-			checkButton.SetText("Check for Updates")
-			checkButton.Enable()
-			ui.ShowNotification("Update check in progress", "Another update check is already running.")
-		}
+		branch := ui.config.General.UpdateBranch
+		checkForUpdates(&branch)
 	})
 	updateChannel := container.NewGridWithColumns(2, branchSelect, checkButton)
 

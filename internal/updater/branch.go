@@ -9,3 +9,14 @@ const (
 	// Latest github actions builds
 	BranchNightly Branch = "nightly"
 )
+
+func (branch Branch) String() string {
+	switch branch {
+	case BranchStable:
+		return "Stable"
+	case BranchNightly:
+		return "Nightly"
+	default:
+		return string(branch)
+	}
+}

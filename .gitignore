@@ -41,6 +41,10 @@ go.work.sum
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
+# Code-signing certificates and private keys
+*.p12
+*.p12*
+
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries

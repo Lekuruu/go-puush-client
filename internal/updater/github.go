@@ -63,13 +63,12 @@ func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
 }
 
 func releaseAssetFilename(goos, goarch string) string {
-	extension := ""
-	if goos == "windows" {
-		extension = ".exe"
+	switch goos {
+	case "darwin":
+		return fmt.Sprintf("puush-macos-%s.app.zip", goarch)
+	case "windows":
+		return fmt.Sprintf("puush-windows-%s.exe", goarch)
+	default:
+		return fmt.Sprintf("puush-%s-%s", goos, goarch)
 	}
-	if goos == "darwin" {
-		// Github actions publishes as "macos" instead of "darwin"
-		goos = "macos"
-	}
-	return fmt.Sprintf("puush-%s-%s%s", goos, goarch, extension)
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -17,8 +16,7 @@ func CanUpdate() bool {
 	if err != nil {
 		return false
 	}
-	executablePath := filepath.Dir(executable)
-	return hasWritePermission(executablePath)
+	return canUpdate(executable)
 }
 
 func Check(current Version) (ReleaseCandidate, error) {
@@ -57,40 +55,7 @@ func Perform(candidate ReleaseCandidate) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("get executable path: %w", err)
 	}
-	executableInfo, err := os.Stat(executable)
-	if err != nil {
-		return "", fmt.Errorf("stat current executable: %w", err)
-	}
-
-	replacementExecutable := executable + ".new"
-	defer os.Remove(replacementExecutable)
-
-	err = downloadFile(candidate.DownloadUrl(), replacementExecutable)
-	if err != nil {
-		return "", fmt.Errorf("download update: %w", err)
-	}
-
-	// Preserve the mode of the current executable so the replacement remains executable on unix
-	if err := os.Chmod(replacementExecutable, executableInfo.Mode().Perm()); err != nil {
-		return "", fmt.Errorf("set replacement executable permissions: %w", err)
-	}
-
-	// Rename current executable to a backup name
-	backupExecutable := executable + ".old"
-	err = os.Rename(executable, backupExecutable)
-	if err != nil {
-		return "", fmt.Errorf("rename current executable: %w", err)
-	}
-
-	// Rename the new executable to the original name
-	err = os.Rename(replacementExecutable, executable)
-	if err != nil {
-		// We're in a really bad state right now, since no executable would be available to run
-		// Attempt to restore the original executable
-		os.Rename(backupExecutable, executable)
-		return "", fmt.Errorf("replace executable with new version: %w", err)
-	}
-	return executable, nil
+	return performUpdate(candidate.DownloadUrl(), executable)
 }
 
 func Cleanup() bool {
@@ -98,20 +63,7 @@ func Cleanup() bool {
 	if err != nil {
 		return false
 	}
-	newExecutable := executable + ".new"
-	backupExecutable := executable + ".old"
-
-	// Remove any leftover new/replacement executable
-	// We don't really care if it fails
-	os.Remove(newExecutable)
-
-	if _, err := os.Stat(backupExecutable); err == nil {
-		// The old process may still be running so we need to wait for it
-		// to exit before we can remove the backup executable
-		go removeFileWithBackoff(backupExecutable, 5, time.Second)
-		return true
-	}
-	return false
+	return cleanupUpdate(executable)
 }
 
 func downloadFile(url string, destination string) error {
@@ -158,11 +110,11 @@ func hasWritePermission(path string) bool {
 	return os.Remove(renamedPath) == nil
 }
 
-func removeFileWithBackoff(path string, maxAttempts int, backoff time.Duration) (err error) {
+func removePathWithBackoff(path string, remove func(string) error, maxAttempts int, backoff time.Duration) (err error) {
 	delay := backoff
 
 	for i := 0; i < maxAttempts; i++ {
-		err = os.Remove(path)
+		err = remove(path)
 		if err == nil || os.IsNotExist(err) {
 			return nil
 		}

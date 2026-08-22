@@ -20,6 +20,10 @@ func (c *GitHubReleaseCandidate) Version() string {
 	return c.release.GetTagName()
 }
 
+func (c *GitHubReleaseCandidate) Branch() Branch {
+	return BranchStable
+}
+
 func (c *GitHubReleaseCandidate) Description() string {
 	return c.release.GetBody()
 }
@@ -51,6 +55,7 @@ func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
 		return nil, err
 	}
 
+	// NOTE: This does not include pre-releases, so we'll always consider this as stable updates
 	release, response, err := client.Repositories.GetLatestRelease(ctx, GitHubUser, GitHubRepository)
 	if response.StatusCode == 404 {
 		return nil, nil

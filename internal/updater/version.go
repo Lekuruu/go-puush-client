@@ -1,5 +1,7 @@
 package updater
 
+import "fmt"
+
 type Version interface {
 	String() string
 	CanCompare(other Version) bool
@@ -10,8 +12,20 @@ type Version interface {
 }
 
 func NewVersionFromString(versionString string) (Version, error) {
-	// For now, we only support semantic versioning
-	// We can later try out every versioning scheme we want to support,
-	// and return the first one that works
-	return NewSemanticVersionFromString(versionString)
+	integerVersion, err := NewIntegerVersionFromString(versionString)
+	if err == nil {
+		return integerVersion, nil
+	}
+
+	semanticVersion, err := NewSemanticVersionFromString(versionString)
+	if err == nil {
+		return semanticVersion, nil
+	}
+
+	timestampVersion, err := NewTimestampVersionFromString(versionString)
+	if err == nil {
+		return timestampVersion, nil
+	}
+
+	return nil, fmt.Errorf("invalid version string: %s", versionString)
 }

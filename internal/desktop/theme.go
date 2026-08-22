@@ -37,7 +37,7 @@ func (w *classicTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant
 		return color.NRGBA{R: 160, G: 160, B: 160, A: 255}
 	case theme.ColorNameHover:
 		return color.NRGBA{R: 216, G: 230, B: 242, A: 255}
-	case theme.ColorNameInputBackground:
+	case theme.ColorNameInputBackground, theme.ColorNameMenuBackground:
 		return color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	case theme.ColorNamePrimary, theme.ColorNameHyperlink:
 		return color.NRGBA{R: 0, G: 102, B: 204, A: 255}

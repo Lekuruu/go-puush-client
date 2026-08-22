@@ -15,6 +15,7 @@ const GitHubRepository = "go-puush-client"
 type GitHubReleaseCandidate struct {
 	release *github.RepositoryRelease
 	version Version
+	branch  Branch
 }
 
 func (c *GitHubReleaseCandidate) Version() Version {
@@ -22,7 +23,7 @@ func (c *GitHubReleaseCandidate) Version() Version {
 }
 
 func (c *GitHubReleaseCandidate) Branch() Branch {
-	return BranchStable
+	return c.branch
 }
 
 func (c *GitHubReleaseCandidate) Description() string {
@@ -50,28 +51,29 @@ func (c *GitHubReleaseCandidate) DownloadUrl() string {
 	return ""
 }
 
-func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
-	client, err := github.NewClient()
+func FetchGitHubCandidate(ctx context.Context, branch Branch) (ReleaseCandidate, error) {
+	var release ReleaseCandidate
+	var err error
+	switch branch {
+	case BranchStable:
+		release, err = FetchGitHubRelease(ctx)
+	case BranchNightly:
+		release, err = FetchGitHubNightly(ctx)
+	default:
+		return nil, fmt.Errorf("unknown update branch %q", branch)
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	// NOTE: This does not include pre-releases, so we'll always consider this as stable updates
-	release, response, err := client.Repositories.GetLatestRelease(ctx, GitHubUser, GitHubRepository)
-	if response.StatusCode == 404 {
+	if release == nil {
+		// No release found
 		return nil, nil
 	}
-	if err != nil {
-		return nil, err
+	if release.DownloadUrl() == "" {
+		// No download url found
+		return nil, nil
 	}
-
-	tag := release.GetTagName()
-	version, err := NewVersionFromString(tag)
-	if err != nil {
-		return nil, err
-	}
-
-	return &GitHubReleaseCandidate{release: release, version: version}, nil
+	return release, nil
 }
 
 func releaseAssetFilename(goos, goarch string) string {

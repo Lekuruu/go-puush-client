@@ -2,52 +2,13 @@ package updater
 
 import (
 	"context"
-	"runtime"
-	"time"
+	"fmt"
+	"strings"
 
 	"github.com/google/go-github/v89/github"
 )
 
-const GitHubWorkflowName = "build.yml"
-
-type GitHubNightlyCandidate struct {
-	workflowRun       *github.WorkflowRun
-	workflowArtifacts []*github.Artifact
-}
-
-func (c *GitHubNightlyCandidate) Version() Version {
-	commit := c.workflowRun.GetRunNumber()
-	return NewIntegerVersion(commit)
-}
-
-func (c *GitHubNightlyCandidate) Branch() Branch {
-	return BranchNightly
-}
-
-func (c *GitHubNightlyCandidate) Description() string {
-	return c.workflowRun.GetHeadCommit().GetMessage()
-}
-
-func (c *GitHubNightlyCandidate) CreatedAt() time.Time {
-	return c.workflowRun.GetCreatedAt().Time
-}
-
-func (c *GitHubNightlyCandidate) IsPrerelease() bool {
-	return true
-}
-
-func (c *GitHubNightlyCandidate) DownloadUrl() string {
-	targetFilename := releaseAssetFilename(
-		runtime.GOOS,
-		runtime.GOARCH,
-	)
-	for _, artifact := range c.workflowArtifacts {
-		if artifact.GetName() == targetFilename {
-			return artifact.GetArchiveDownloadURL()
-		}
-	}
-	return ""
-}
+const GitHubNightlyTagPrefix = "nightly-"
 
 func FetchGitHubNightly(ctx context.Context) (ReleaseCandidate, error) {
 	client, err := github.NewClient()
@@ -55,24 +16,32 @@ func FetchGitHubNightly(ctx context.Context) (ReleaseCandidate, error) {
 		return nil, err
 	}
 
-	workflowRuns, _, err := client.Actions.ListWorkflowRunsByFileName(ctx, GitHubUser, GitHubRepository, GitHubWorkflowName, &github.ListWorkflowRunsOptions{
-		Status: "completed",
-	})
-	if err != nil {
-		return nil, err
-	}
-	if len(workflowRuns.WorkflowRuns) == 0 {
-		return nil, nil
-	}
-
-	latestRun := workflowRuns.WorkflowRuns[0]
-	artifacts, _, err := client.Actions.ListWorkflowRunArtifacts(ctx, GitHubUser, GitHubRepository, latestRun.GetID(), &github.ListOptions{})
+	releases, _, err := client.Repositories.ListReleases(
+		ctx,
+		GitHubUser,
+		GitHubRepository,
+		&github.ListOptions{PerPage: 100},
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GitHubNightlyCandidate{
-		workflowRun:       latestRun,
-		workflowArtifacts: artifacts.Artifacts,
-	}, nil
+	for _, release := range releases {
+		tag := release.GetTagName()
+		if release.GetDraft() || !release.GetPrerelease() || !strings.HasPrefix(tag, GitHubNightlyTagPrefix) {
+			continue
+		}
+
+		version, err := NewTimestampVersionFromString(strings.TrimPrefix(tag, GitHubNightlyTagPrefix))
+		if err != nil {
+			return nil, fmt.Errorf("parse nightly release tag %q: %w", tag, err)
+		}
+
+		return &GitHubReleaseCandidate{
+			release: release,
+			version: version,
+			branch:  BranchNightly,
+		}, nil
+	}
+	return nil, nil
 }

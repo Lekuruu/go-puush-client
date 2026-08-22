@@ -53,7 +53,7 @@ func updaterTick(currentVersion updater.Version, cfg *config.Config, ui *desktop
 	}
 	cfg.Misc.LastUpdate = time.Now()
 
-	candidate, err := updater.Check(currentVersion, false)
+	candidate, err := updater.Check(currentVersion, cfg.General.UpdateBranch, false)
 	if err != nil {
 		log.Printf("Failed to check for updates: %v", err)
 		ui.ShowNotification("Update check failed!", "You may have to check for updates manually :(")

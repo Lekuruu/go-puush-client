@@ -19,20 +19,16 @@ func CanUpdate() bool {
 	return canUpdate(executable)
 }
 
-func Check(current Version, force bool) (ReleaseCandidate, error) {
+func Check(current Version, branch Branch, force bool) (ReleaseCandidate, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), updateCheckTimeout)
 	defer cancel()
 
-	release, err := FetchGitHubRelease(ctx)
+	release, err := FetchGitHubCandidate(ctx, branch)
 	if err != nil {
 		return nil, err
 	}
 	if release == nil {
-		// No release found
-		return nil, nil
-	}
-	if release.DownloadUrl() == "" {
-		// No download url found
+		// No release / download found
 		return nil, nil
 	}
 

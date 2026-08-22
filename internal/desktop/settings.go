@@ -14,7 +14,10 @@ func (ui *UI) ShowSettingsWindow() {
 	}
 
 	w := ui.app.NewWindow("puush settings")
-	w.SetOnClosed(func() { ui.settingsWindow = nil })
+	w.SetOnClosed(func() {
+		ui.settingsWindow = nil
+		ui.SetUpdateFinishedCallback(nil)
+	})
 	w.Resize(fyne.NewSize(500, 350))
 	w.SetIcon(puushIcon)
 	ui.settingsWindow = w

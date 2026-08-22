@@ -59,6 +59,8 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 
 func handleUpdateResult(result updater.CheckResult, cfg *config.Config, ui *desktop.UI) bool {
 	cfg.Misc.LastUpdate = result.CheckedAt
+	defer ui.FinishUpdateCheck(result.CheckedAt)
+
 	if result.Error != nil {
 		log.Printf("Failed to check for updates: %v", result.Error)
 		ui.ShowNotification("Update check failed!", "You may have to check for updates manually :(")

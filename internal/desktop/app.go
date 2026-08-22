@@ -29,7 +29,8 @@ type UI struct {
 	settingsWindow fyne.Window
 	startupWindow  fyne.Window
 
-	requestUpdateCheck func() bool
+	requestUpdateCheck  func() bool
+	updateCheckFinished func(time.Time)
 }
 
 func NewUI(app fyne.App, api *puush.Client, cfg *config.Config) *UI {
@@ -114,7 +115,22 @@ func (ui *UI) SetUpdateCheckCallback(callback func() bool) {
 
 func (ui *UI) RequestUpdateCheck() bool {
 	callback := ui.requestUpdateCheck
-	return callback != nil && callback()
+	if callback == nil {
+		return false
+	}
+	return callback()
+}
+
+func (ui *UI) SetUpdateFinishedCallback(callback func(time.Time)) {
+	ui.updateCheckFinished = callback
+}
+
+func (ui *UI) FinishUpdateCheck(checkedAt time.Time) {
+	callback := ui.updateCheckFinished
+	if callback == nil {
+		return
+	}
+	fyne.Do(func() { callback(checkedAt) })
 }
 
 func (ui *UI) CloseIPCServer() {

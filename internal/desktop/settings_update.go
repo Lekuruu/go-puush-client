@@ -25,17 +25,27 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 		},
 	)
 	branchSelect.SetSelected(ui.config.General.UpdateBranch.String())
-	checkButton := widget.NewButton("Check for Updates", func() {
-		ui.RequestUpdateCheck()
+
+	var checkButton *widget.Button
+	checkButton = widget.NewButton("Check for Updates", func() {
+		checkButton.SetText("Checking...")
+		checkButton.Disable()
+		if !ui.RequestUpdateCheck() {
+			checkButton.SetText("Check for Updates")
+			checkButton.Enable()
+			ui.ShowNotification("Update check in progress", "Another update check is already running.")
+		}
 	})
 	updateChannel := container.NewGridWithColumns(2, branchSelect, checkButton)
 
-	lastChecked := "Never"
-	if !ui.config.Misc.LastUpdate.IsZero() {
-		lastChecked = ui.config.Misc.LastUpdate.Local().Format(time.DateTime)
-	}
+	lastCheckedLabel := widget.NewLabel(formatLastUpdateCheck(ui.config.Misc.LastUpdate))
+	ui.SetUpdateFinishedCallback(func(checkedAt time.Time) {
+		checkButton.SetText("Check for Updates")
+		checkButton.Enable()
+		lastCheckedLabel.SetText(formatLastUpdateCheck(checkedAt))
+	})
 	updateInformation := widget.NewForm(
-		widget.NewFormItem("Last Checked:", widget.NewLabel(lastChecked)),
+		widget.NewFormItem("Last Checked:", lastCheckedLabel),
 	)
 	updateManagement := container.NewGridWithColumns(2, autoUpdateCheckbox, updateInformation)
 
@@ -46,4 +56,11 @@ func (ui *UI) buildUpdateTab() fyne.CanvasObject {
 		createGroup("Update Channel", updateChannel),
 		widget.NewSeparator(),
 	)
+}
+
+func formatLastUpdateCheck(checkedAt time.Time) string {
+	if checkedAt.IsZero() {
+		return "Never"
+	}
+	return checkedAt.Local().Format(time.DateTime)
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type ReleaseCandidate interface {
-	Version() string
+	Version() Version
 	Branch() Branch
 	Description() string
 	DownloadUrl() string

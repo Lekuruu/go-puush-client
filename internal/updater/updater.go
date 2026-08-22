@@ -36,13 +36,13 @@ func Check(current Version, force bool) (ReleaseCandidate, error) {
 		return nil, nil
 	}
 
-	releaseVersion, err := NewVersionFromString(release.Version())
-	if err != nil {
-		return nil, err
+	if !current.CanCompare(release.Version()) {
+		// We'll assume that we have switched update branches
+		return release, nil
 	}
 
-	if current.IsOlderThan(releaseVersion) || force {
-		// We have found a newer version on github
+	if current.IsOlderThan(release.Version()) || force {
+		// We have found a newer version on github or the update was forced
 		return release, nil
 	}
 

@@ -2,17 +2,43 @@ package updater
 
 import "fmt"
 
-type Version struct {
+type Version interface {
+	String() string
+	CanCompare(other Version) bool
+	Compare(other Version) int
+	IsNewerThan(other Version) bool
+	IsOlderThan(other Version) bool
+	IsEqualTo(other Version) bool
+}
+
+func NewVersionFromString(versionString string) (Version, error) {
+	// For now, we only support semantic versioning
+	// We can later try out every versioning scheme we want to support,
+	// and return the first one that works
+	return NewSemanticVersionFromString(versionString)
+}
+
+type VersionSemantic struct {
 	Major int
 	Minor int
 	Patch int
 }
 
-func (v Version) String() string {
+func (v VersionSemantic) String() string {
 	return fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch)
 }
 
-func (v Version) Compare(other Version) int {
+func (v VersionSemantic) CanCompare(other Version) bool {
+	_, ok := other.(VersionSemantic)
+	return ok
+}
+
+func (v VersionSemantic) Compare(anyOther Version) int {
+	other, ok := anyOther.(VersionSemantic)
+	if !ok {
+		panic(fmt.Sprintf("Cannot compare VersionSemantic with %T", anyOther))
+	}
+
 	if v.Major != other.Major {
 		return v.Major - other.Major
 	}
@@ -22,30 +48,30 @@ func (v Version) Compare(other Version) int {
 	return v.Patch - other.Patch
 }
 
-func (v Version) IsNewerThan(other Version) bool {
+func (v VersionSemantic) IsNewerThan(other Version) bool {
 	return v.Compare(other) > 0
 }
 
-func (v Version) IsOlderThan(other Version) bool {
+func (v VersionSemantic) IsOlderThan(other Version) bool {
 	return v.Compare(other) < 0
 }
 
-func (v Version) IsEqualTo(other Version) bool {
+func (v VersionSemantic) IsEqualTo(other Version) bool {
 	return v.Compare(other) == 0
 }
 
-func NewVersion(major, minor, patch int) Version {
-	return Version{Major: major, Minor: minor, Patch: patch}
+func NewSemanticVersion(major, minor, patch int) VersionSemantic {
+	return VersionSemantic{Major: major, Minor: minor, Patch: patch}
 }
 
-func NewVersionFromString(versionString string) (Version, error) {
+func NewSemanticVersionFromString(versionString string) (VersionSemantic, error) {
 	var major, minor, patch int
 	n, err := fmt.Sscanf(versionString, "%d.%d.%d", &major, &minor, &patch)
 	if err != nil {
-		return Version{}, err
+		return VersionSemantic{}, err
 	}
 	if n != 3 {
-		return Version{}, fmt.Errorf("invalid version string: %s", versionString)
+		return VersionSemantic{}, fmt.Errorf("invalid version string: %s", versionString)
 	}
-	return NewVersion(major, minor, patch), nil
+	return NewSemanticVersion(major, minor, patch), nil
 }

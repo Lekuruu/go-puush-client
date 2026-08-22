@@ -14,10 +14,11 @@ const GitHubRepository = "go-puush-client"
 
 type GitHubReleaseCandidate struct {
 	release *github.RepositoryRelease
+	version Version
 }
 
-func (c *GitHubReleaseCandidate) Version() string {
-	return c.release.GetTagName()
+func (c *GitHubReleaseCandidate) Version() Version {
+	return c.version
 }
 
 func (c *GitHubReleaseCandidate) Branch() Branch {
@@ -64,7 +65,13 @@ func FetchGitHubRelease(ctx context.Context) (ReleaseCandidate, error) {
 		return nil, err
 	}
 
-	return &GitHubReleaseCandidate{release: release}, nil
+	tag := release.GetTagName()
+	version, err := NewVersionFromString(tag)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubReleaseCandidate{release: release, version: version}, nil
 }
 
 func releaseAssetFilename(goos, goarch string) string {

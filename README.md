@@ -25,6 +25,14 @@ With that said, go ahead and download the latest release from the [releases](htt
 - **Linux**: `~/.local/bin`
 - **macOS**: `~/Applications`
 
+### macOS quirks
+
+When downloading the .app bundle on macOS, you may need to remove the quarantine attribute that apple throws at every freshly downloaded application. Otherwise, the system will report that the app is "corrupted". Thanks apple!
+
+```sh
+xattr -d com.apple.quarantine puush.app
+```
+
 ### Dependencies
 
 On macOS and Windows, the application has no actual dependencies. For linux, however, you may need to install a few dependencies for full functionality.

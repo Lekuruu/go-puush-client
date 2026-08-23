@@ -106,6 +106,7 @@ func cleanupUpdate(executable string) (hasUpdated bool) {
 	backupBundle := bundlePath + ".old"
 	if _, err := os.Stat(backupBundle); err == nil {
 		go removePathWithBackoff(backupBundle, os.RemoveAll, 5, time.Second)
+		go resetScreenCapturePermission()
 		return true
 	}
 	return false
@@ -175,6 +176,16 @@ func validateBundle(bundlePath, executable string) error {
 	requirement := fmt.Sprintf("identifier %q", bundleIdentifier)
 	if output, err := exec.Command("/usr/bin/codesign", "--verify", "--strict", "-R="+requirement, bundlePath).CombinedOutput(); err != nil {
 		return fmt.Errorf("verify replacement app bundle: %w: %s", err, strings.TrimSpace(string(output)))
+	}
+	return nil
+}
+
+func resetScreenCapturePermission() error {
+	// On every update of the puush app, the user has to re-grant screen capture permission in System Preferences
+	// This is because we use ad-hoc signing for the app bundle, which means the signature changes on every update
+	// TODO: Find a way to have a consistent signature without paying apple a bagillion dollars a year
+	if output, err := exec.Command("/usr/bin/tccutil", "reset", "ScreenCapture", bundleIdentifier).CombinedOutput(); err != nil {
+		return fmt.Errorf("reset screen capture permission: %w: %s", err, strings.TrimSpace(string(output)))
 	}
 	return nil
 }

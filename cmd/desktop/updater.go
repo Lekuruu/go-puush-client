@@ -63,6 +63,7 @@ func updaterLoop(cfg *config.Config, ui *desktop.UI) {
 func handleUpdateResult(result updater.CheckResult, cfg *config.Config, ui *desktop.UI) bool {
 	cfg.Misc.LastUpdate = result.CheckedAt
 	cfg.General.UpdateBranch = result.Branch
+	config.NewStore().Save(cfg) // ensure we update this before restarting
 	defer ui.FinishUpdateCheck(result.CheckedAt)
 
 	if result.Error != nil {

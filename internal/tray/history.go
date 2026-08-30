@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -73,16 +72,7 @@ func (m *TrayManager) BuildHistoryMenuItem(historyItem *puush.HistoryItem) *fyne
 	fileName := strings.ReplaceAll(historyItem.FileName, "_", "__")
 	historyMenuItem := fyne.NewMenuItem(fileName, nil)
 	historyMenuItem.ChildMenu = historyMenu
-
-	if runtime.GOOS != "linux" {
-		// TODO: For some fucking reason, the child menu does not appear
-		// 		 when applying an icon and I have no clue why, and this is
-		// 		 only happening on linux
-		// 	     https://github.com/fyne-io/systray/pull/118 this seems to be related ???
-		//       it doesn't fix it though...
-		historyMenuItem.Icon = historyFileIcon(historyItem.FileName)
-	}
-
+	historyMenuItem.Icon = historyFileIcon(historyItem.FileName)
 	return historyMenuItem
 }
 

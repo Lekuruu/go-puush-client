@@ -25,6 +25,7 @@ type TrayManager struct {
 	uploadHistory []*puush.HistoryItem
 
 	menu             *fyne.Menu
+	menuLock         sync.Mutex
 	targetApp        fyne.App
 	settingsCallback func()
 
@@ -162,6 +163,9 @@ func (m *TrayManager) rebuildMenuItems() {
 	if m.menu == nil {
 		return
 	}
+	m.menuLock.Lock()
+	defer m.menuLock.Unlock()
+
 	puushVersion := fyne.NewMenuItem(m.buildString(), func() {})
 	puushVersion.Disabled = true
 

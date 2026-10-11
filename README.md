@@ -63,8 +63,9 @@ On Linux, however, you may have to install one depending on your distribution:
 
 - `spectacle` (Highly recommended for KDE)
 - `gnome-screenshot` (Highly recommended for GNOME)
+- `lumine-capture` (Very fast provider for Wayland)
 
-These two are the most feature complete and work flawlessly from testing.  
+These are the most feature complete and work flawlessly from testing.  
 Other providers include `flameshot`, `maim` & `grim`/`slurp`, however, your mileage may vary with these.
 
 ## Build instructions

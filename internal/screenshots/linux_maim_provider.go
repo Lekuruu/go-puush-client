@@ -9,6 +9,8 @@ import (
 	"os/exec"
 )
 
+// https://github.com/naelstrof/maim
+
 type MaimScreenshotProvider struct {
 	binPath        string
 	fullscreenMode FullscreenMode

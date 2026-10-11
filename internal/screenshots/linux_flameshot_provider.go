@@ -9,6 +9,9 @@ import (
 	"os/exec"
 )
 
+// https://flameshot.org
+// https://github.com/flameshot-org/flameshot
+
 type FlameshotScreenshotProvider struct {
 	binPath        string
 	fullscreenMode FullscreenMode

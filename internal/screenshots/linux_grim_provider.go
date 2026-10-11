@@ -10,6 +10,9 @@ import (
 	"strings"
 )
 
+// https://github.com/emersion/grim / https://sr.ht/~emersion/grim/
+// https://github.com/emersion/slurp
+
 type GrimScreenshotProvider struct {
 	grimPath       string
 	slurpPath      string
